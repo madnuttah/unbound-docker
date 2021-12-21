@@ -37,6 +37,7 @@ RUN set -xe; \
   --without-pythonmodule \
   --without-pyunbound \
   --enable-dnscrypt \
+  --enable-event-api \
   --enable-tfo-server \
   --enable-tfo-client \
   --enable-event-api \
