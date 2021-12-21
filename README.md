@@ -30,7 +30,7 @@ Late 2019, Unbound has been rigorously audited, which means that the code base i
 ## About this image
 
 This container image is based on a customized Alpine Linux base with focus on security, performance and a small image size.
-The unbound process runs in the context of a non-root user and utilizes unprivileged ports (5335 tcp/udp).
+The unbound process runs in the context of a non-root user, is jailed with chroot and utilizes unprivileged ports (5335 tcp/udp).
 
 Unbound is configured as an authoritative DNSSEC aware DNS resolver, which directly queries DNS root servers utilizing 
 zone tranfers to build a "hyperlocal" setup as an upstream DNS server in combination with e.g. PiHole for adblocking, 
@@ -57,7 +57,7 @@ Below is the complete list of available options that can be used to customize yo
 
 ### Standard usage
 
-My recommended way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a working [docker-compose.yml](examples/docker-compose.yml) sample that can be modified to your needs for development or production use.
+My recommended way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a working [docker-compose.yml](examples/docker-compose.yml) sample that can be modified to your needs for development or production use. This compose file makes use of the MCVLAN network interface which should be adapted to your needs.
 
 Run this container with the following command:
 
