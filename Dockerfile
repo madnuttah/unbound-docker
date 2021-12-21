@@ -16,8 +16,8 @@ RUN set -xe; \
   libsodium-dev \
   libevent-dev \
   linux-headers \
-  openssl3-dev \
-  nghttp2-dev \
+  libssl3-dev \
+  nghttp2-libs \
   expat-dev \
   build-base \
   curl \
@@ -28,11 +28,11 @@ RUN set -xe; \
   && rm unbound.tar.gz \
   && cd unbound-${UNBOUND_VERSION} \
   && addgroup -S _unbound -g 1000 \
-  && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /dev/null -G _unbound _unbound \
+  && adduser -S -D -H -h /etc -u 1000 -s /dev/null -G _unbound _unbound \
   && ./configure \
-    --prefix=/usr \
+    --prefix=/usr/bin/unbound \
+	--sysconfdir=/etc/unbound \
     --with-pthreads \
-    --disable-static \
     --disable-rpath \
     --without-pythonmodule \
     --without-pyunbound \
@@ -45,7 +45,7 @@ RUN set -xe; \
 	--with-libevent \
 	--with-ssl \
   && make \
-  && make DESTDIR="/app" install \
+  && make install \
   && apk del --no-cache .build-deps \
   && rm -rf \
 	/usr/share/man/* \
@@ -54,7 +54,7 @@ RUN set -xe; \
 	
 FROM alpine:latest
 
-ARG BUILD_DATE="2021-012-20T00:00:00Z"
+ARG BUILD_DATE="2021-012-21T00:00:00Z"
 ARG IMAGE_URL="https://github.com/madnuttah/unbound-docker" 
 ARG IMAGE_BASE_NAME="https://hub.docker.com/r/madnuttah/unbound-docker:latest" 
 ARG IMAGE_VEN="Madnuttah"
@@ -62,13 +62,14 @@ ARG UNBOUND_VERSION=1.14.0
 ARG IMAGE_REV=1
 ENV UNBOUND_VERSION=${UNBOUND_VERSION}
 ENV IMAGE_BASE_NAME=${IMAGE_BASE_NAME}
-ENV IMAGE_REVISION=${IMAGE_REV}
+ENV IMAGE_REV=${IMAGE_REV}
 ENV UNBOUND_HOME=/etc/unbound
 
 LABEL org.opencontainers.image.created=$BUILD_DATE \
 	org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
     org.opencontainers.image.title="madnuttah/unbound" \
     org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
+	org.opencontainers.image.summary="Unbound is a validating, recursive, and caching DNS resolver." \
     org.opencontainers.image.url=$IMAGE_URL \
     org.opencontainers.image.source=$IMAGE_URL \
 	org.opencontainers.image.authors=$IMAGE_VEN \
@@ -81,56 +82,65 @@ RUN set -xe; \
     addgroup -S _unbound -g 1000 \
     && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /dev/null -G _unbound _unbound \
     && apk add --no-cache \
-    ca-certificates \
-	openssl3 \
     libsodium \
     libevent \
-	nghttp2 \
+	libssl3 \
+	nghttp2-libs \
     expat 
+	
+# RUN set -xe; \
+	# addgroup -S _unbound -g 1000 \
+	# && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /dev/null -G _unbound _unbound \
+	# && apk add --no-cache \
+	# libsodium \
+	# libevent \
+	# libcap \
+	# libssl3 \
+	# nghttp2-libs \
+	# expat \
+	# && setcap 'cap_net_bind_service=+ep' _unbound
  	
 WORKDIR ${UNBOUND_HOME}
+
+ENV PATH ${UNBOUND_HOME}/bin.d:"$PATH"
 
 COPY root/etc/unbound/ \
   ${UNBOUND_HOME}/
 
 COPY root/unbound.sh \
-  /usr/local/sbin/
+  ${UNBOUND_HOME}/sbin.d
 
 RUN touch ${UNBOUND_HOME}/log.d/unbound.log \
   && chown -R _unbound:_unbound \
   ${UNBOUND_HOME}/ \
-  && chmod -R 0775 \
+  && chmod -R 0664 \
   ${UNBOUND_HOME}/ \
-  && chmod 0775 \
-  /usr/local/sbin/unbound.sh \
+  && chmod 0774 \
+  ${UNBOUND_HOME}/sbin.d/unbound.sh \
   && rm -rf \
 	/usr/share/man/* \
 	/tmp/* \
 	/var/tmp/*
+	
+COPY --from=unbound /etc/ssl/certs/ \
+  ${UNBOUND_HOME}/certs.d/
   
-COPY --from=unbound /app/usr/sbin/ \
-  /usr/sbin/
+COPY --from=unbound /usr/bin/unbound/ \
+  ${UNBOUND_HOME}/bin.d/
   
-COPY --from=unbound /app/usr/lib/ \
-  /usr/lib/ 
-  
-COPY --from=unbound bin/ \
-  /usr/local/bin/
+# COPY --from=unbound /app/usr/lib/ \
+#  ${UNBOUND_HOME}/lib.d/ 
       
-# VOLUME [ \
-  # "${UNBOUND_HOME}/iana.d", \
-  # "${UNBOUND_HOME}/conf.d", \
-  # "${UNBOUND_HOME}/zones.d", \
-  # "${UNBOUND_HOME}/log.d" \
-  # ] 
+VOLUME [ \
+  "${UNBOUND_HOME}/iana.d", \
+  "${UNBOUND_HOME}/conf.d", \
+  "${UNBOUND_HOME}/zones.d", \
+  "${UNBOUND_HOME}/log.d" \
+  ] 
 
-EXPOSE 5335/tcp
-EXPOSE 5335/udp
+EXPOSE 5335/tcp 5335/udp
 	
-#HEALTHCHECK --interval=1m --timeout=3s --start-period=10s \
-#  CMD /usr/sbin/unbound-control -c ${UNBOUND_HOME}/unbound.conf status -s 127.0.0.1:5335 || exit 1
+# HEALTHCHECK --interval=1m --timeout=3s --start-period=10s \
+#  CMD ${UNBOUND_HOME}/bin/unbound-control -c ${UNBOUND_HOME}/unbound.conf status -s 127.0.0.1:5335 || exit 1
 
-CMD [ "/usr/local/sbin/unbound.sh" ]
-
-
-	
+CMD [ "${UNBOUND_HOME}/unbound.sh" ]
