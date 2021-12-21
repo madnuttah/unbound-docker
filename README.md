@@ -1,4 +1,4 @@
-# Alpine Based Unbound Hyperlocal And DNSSEC Validating DNS Server Docker Image
+# Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Docker Image
 
 ## Supported tags and respective `Dockerfile` links
 
