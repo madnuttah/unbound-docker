@@ -30,27 +30,27 @@ RUN set -xe; \
   && addgroup -S _unbound -g 1000 \
   && adduser -S -D -H -h /etc -u 1000 -s /dev/null -G _unbound _unbound \
   && ./configure \
-    --prefix=/usr/bin/unbound \
-	--sysconfdir=/etc/unbound \
-    --with-pthreads \
-    --disable-rpath \
-    --without-pythonmodule \
-    --without-pyunbound \
-    --enable-dnscrypt \
-	--enable-tfo-server \
-    --enable-tfo-client \
-	--enable-event-api \
-	--with-deprecate-rsa-1024 \
-	--with-username=_unbound \
-	--with-libevent \
-	--with-ssl \
+  --prefix=/usr/bin/unbound \
+  --sysconfdir=/etc/unbound \
+  --with-pthreads \
+  --disable-rpath \
+  --without-pythonmodule \
+  --without-pyunbound \
+  --enable-dnscrypt \
+  --enable-tfo-server \
+  --enable-tfo-client \
+  --enable-event-api \
+  --with-deprecate-rsa-1024 \
+  --with-username=_unbound \
+  --with-libevent \
+  --with-ssl \
   && make \
   && make install \
   && apk del --no-cache .build-deps \
   && rm -rf \
-	/usr/share/man/* \
-	/tmp/* \
-	/var/tmp/*
+    /usr/share/man/* \
+    /tmp/* \
+    /var/tmp/*
 	
 FROM alpine:latest
 
@@ -77,28 +77,18 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.version=$UNBOUND_VERSION \
 	org.opencontainers.image.revision=$IMAGE_REV
-
-RUN set -xe; \
-    addgroup -S _unbound -g 1000 \
-    && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /dev/null -G _unbound _unbound \
-    && apk add --no-cache \
-    libsodium \
-    libevent \
-	libssl3 \
-	nghttp2-libs \
-    expat 
 	
-# RUN set -xe; \
-	# addgroup -S _unbound -g 1000 \
-	# && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /dev/null -G _unbound _unbound \
-	# && apk add --no-cache \
-	# libsodium \
-	# libevent \
-	# libcap \
-	# libssl3 \
-	# nghttp2-libs \
-	# expat \
-	# && setcap 'cap_net_bind_service=+ep' _unbound
+RUN set -xe; \
+  addgroup -S _unbound -g 1000 \
+  && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /dev/null -G _unbound _unbound \
+  && apk add --no-cache \
+  libsodium \
+  libevent \
+  libcap \
+  libssl3 \
+  nghttp2-libs \
+  expat \
+  && setcap 'cap_net_bind_service=+ep' _unbound
  	
 WORKDIR ${UNBOUND_HOME}
 
@@ -126,21 +116,4 @@ COPY --from=unbound /etc/ssl/certs/ \
   ${UNBOUND_HOME}/certs.d/
   
 COPY --from=unbound /usr/bin/unbound/ \
-  ${UNBOUND_HOME}/bin.d/
-  
-# COPY --from=unbound /app/usr/lib/ \
-#  ${UNBOUND_HOME}/lib.d/ 
-      
-VOLUME [ \
-  "${UNBOUND_HOME}/iana.d", \
-  "${UNBOUND_HOME}/conf.d", \
-  "${UNBOUND_HOME}/zones.d", \
-  "${UNBOUND_HOME}/log.d" \
-  ] 
-
-EXPOSE 5335/tcp 5335/udp
-	
-# HEALTHCHECK --interval=1m --timeout=3s --start-period=10s \
-#  CMD ${UNBOUND_HOME}/bin/unbound-control -c ${UNBOUND_HOME}/unbound.conf status -s 127.0.0.1:5335 || exit 1
-
-CMD [ "${UNBOUND_HOME}/unbound.sh" ]
+  ${UNBOUND_HOME}/
