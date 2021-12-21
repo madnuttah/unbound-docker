@@ -2,7 +2,7 @@
 
 ## Supported tags and respective `Dockerfile` links
 
-- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)]("https://github.com/madnuttah/unbound-docker")
+- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)]("https://github.com/madnuttah/unbound")
 
 [Changelog](CHANGELOG.md)
 
@@ -92,7 +92,7 @@ through a [GitHub issue](https://github.com/madnuttah/unbound/issues).
 
 ### License
 
-Unless otherwise specified, all code is released under the Creative Commons license v4 (CC BY 4.0).
+Unless otherwise specified, all code is released under the MIT license.
 See the [`LICENSE`](https://github.com/madnuttah) for details.
 
 ### Licenses for other components
