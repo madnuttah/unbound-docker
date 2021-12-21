@@ -101,7 +101,17 @@ RUN set -xe; \
 	libssl3 \
 	nghttp2-libs \
 	expat \
-	&& setcap 'cap_net_bind_service=+ep' _unbound
+	&& setcap 'cap_net_bind_service=+ep' _unbound \
+	&& mkdir -p \
+    "${UNBOUND_HOME}/bin.d" \
+    "${UNBOUND_HOME}/certs.d" \
+    "${UNBOUND_HOME}/conf.d" \
+    "${UNBOUND_HOME}/dev.d" \
+    "${UNBOUND_HOME}/iana.d" \
+	"${UNBOUND_HOME}/lib.d" \
+	"${UNBOUND_HOME}/log.d" \
+	"${UNBOUND_HOME}/sbin.d" \
+	"${UNBOUND_HOME}/zones.d" 
  	
 WORKDIR ${UNBOUND_HOME}
 
