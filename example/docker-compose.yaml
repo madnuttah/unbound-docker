@@ -1,4 +1,4 @@
-version: '2'
+hversion: '2'
 
 services:
   pihole:
