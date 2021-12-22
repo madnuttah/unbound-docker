@@ -4,7 +4,7 @@
 
 - [`1.14.0`, `latest` (*1.14.0/Dockerfile*)](Dockerfile)
 
-[Changelog](CHANGELOG.md)
+[Changelog](https://github.com/madnuttah/unbound-docker/blob/master/CHANGELOG.md)
 
 ## Maintainer
 
