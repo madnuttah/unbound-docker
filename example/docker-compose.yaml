@@ -1,4 +1,4 @@
-hversion: '2'
+version: '2'
 
 services:
   pihole:
@@ -72,5 +72,5 @@ networks:
     ipam:
       config:
         - subnet: SUBNET #e.g. 192.168.1.0/24      
-          gateway: GATEWAY-IP-ADDRESS     
+          gateway: GATEWAY-IP-ADDRESS #e.g. 192.168.1.1    
           ip_range: NETWORKRANGE #e.g. 192.168.1.253/30    
