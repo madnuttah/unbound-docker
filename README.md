@@ -18,6 +18,7 @@
 - [How to use this image](#How-to-use-this-image)
   - [Environment Variables](#Environment-Variables)
 - [Documentation and feedback](#Documentation-and-feedback)
+- [Licenses](#Licenses)
    
 ## What is Unbound
 
