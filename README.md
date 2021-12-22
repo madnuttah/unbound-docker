@@ -1,12 +1,18 @@
-<p align="center">
-    <img width=200 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
-</p>
-
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Docker Image
+
+<p align="Left">
+    <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
+</p>
 
 ![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")
 ![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")
-![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")<br/>
+![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")
+<br/>
+<br/>
+<p align="Left">
+    <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
+</p>
+
 ![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker "Issues")
 ![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")
 ![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")
