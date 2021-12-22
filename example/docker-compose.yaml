@@ -53,7 +53,7 @@ services:
       dns-network:
         ipv4_address: UNBOUND-IP-ADDRESS #e.g. 192.168.1.253
     environment: 
-      TZ: "YOURTIMEZONE"
+      TZ: "YOURTIMEZONE" #e.g. "America/New_York"
       ServerIP: UNBOUND-IP-ADDRESS  
       VIRTUAL_HOST: unbound.yourdomain.lan 
     volumes:
