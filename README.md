@@ -2,7 +2,7 @@
 
 ## Supported tags and respective `Dockerfile` links
 
-- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)]("https://github.com/madnuttah/unbound-docker")
+- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)](Dockerfile)
 
 [Changelog](CHANGELOG.md)
 
@@ -12,13 +12,13 @@
 
 ## Table of Contents
 
-- [What is Unbound](#What%20is%20Unbound?)
+- [What is Unbound](#What%20is%20Unbound)
 - [About this image](#About%20this%20image)
 - [Installation](#Installation)
-- [How to use this image](##How%20to%20use%20this%20image)
-  - [Environment Variables](###Environment%20Variables)
+- [How to use this image](#How%20to%20use%20this%20image)
+  - [Environment Variables](#Environment%20Variables)
    
-## What is Unbound?
+## What is Unbound
 
 Unbound is a validating, recursive, caching DNS resolver. 
 
