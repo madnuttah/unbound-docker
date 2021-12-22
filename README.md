@@ -2,7 +2,7 @@
 
 ## Supported tags and respective `Dockerfile` links
 
-- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)]("https://github.com/madnuttah/unbound")
+- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)]("https://github.com/madnuttah/unbound-docker")
 
 [Changelog](CHANGELOG.md)
 
@@ -74,14 +74,14 @@ madnuttah/unbound:latest
 
 ## Documentation
 
-You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound/blob/master/README.md).
+You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound-docker/blob/master/README.md).
 
 In-depth documentation for Unbound is available on the [project's website](https://unbound.net/).
 
 ## Issues
 
 If you have any problems with or questions about this image, please contact me
-through a [GitHub issue](https://github.com/madnuttah/unbound/issues).
+through a [GitHub issue](https://github.com/madnuttah/unbound-docker/issues).
 
 ## Acknowledgments
 
