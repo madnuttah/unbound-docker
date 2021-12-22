@@ -1,5 +1,11 @@
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Docker Image
 
+![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")
+![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker "Issues")
+![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")
+![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")
+![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")
+
 ## Supported tags and respective `Dockerfile` links
 
 - [`1.14.0`, `latest` (*1.14.0/Dockerfile*)](Dockerfile)
