@@ -7,8 +7,7 @@
 ![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")
 ![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")
 ![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")
-<br/>
-<br/>
+  
 <p align="Left">
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
 </p>
@@ -17,20 +16,22 @@
 ![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")
 ![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")
 ![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")
+  
+## Maintainer
+
+- [`madnuttah`](https://github.com/madnuttah/)
 
 ## Supported tags and respective `Dockerfile` links
 
 - [`1.14.0`, `latest` (*1.14.0/Dockerfile*)](Dockerfile)
 
-[Changelog](https://github.com/madnuttah/unbound-docker/blob/master/CHANGELOG.md)
+#### Changes
 
-## Maintainer
-
-- [madnuttah](https://github.com/madnuttah/)
+- [`Changelog`](https://github.com/madnuttah/unbound-docker/blob/master/CHANGELOG.md)
 
 ## Table of Contents
 
-- [What is Unbound](#What-is-Unbound)
+- ![What is Unbound](#What-is-Unbound)
 - [About this image](#About-this-image)
 - [Installation](#Installation)
 - [How to use this image](#How-to-use-this-image)
