@@ -93,7 +93,7 @@ through a [GitHub issue](https://github.com/madnuttah/unbound-docker/issues).
 ### License
 
 Unless otherwise specified, all code is released under the MIT license.
-See the [`LICENSE`](https://github.com/madnuttah) for details.
+See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE) for details.
 
 ### Licenses for other components
 
