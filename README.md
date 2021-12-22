@@ -31,7 +31,7 @@
 
 ## Table of Contents
 
-- ![What is Unbound](#What-is-Unbound)
+- [What is Unbound](#What-is-Unbound)
 - [About this image](#About-this-image)
 - [Installation](#Installation)
 - [How to use this image](#How-to-use-this-image)
