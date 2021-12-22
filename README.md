@@ -76,7 +76,7 @@ madnuttah/unbound:latest
 
 You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound-docker/blob/master/README.md).
 
-In-depth documentation for Unbound is available on the [project's website](https://unbound.net/).
+In-depth documentation for Unbound is available on the [Unbound project's website](https://unbound.net/).
 
 ## Issues
 
