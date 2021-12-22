@@ -12,11 +12,11 @@
 
 ## Table of Contents
 
-- [What is Unbound](#What%20is%20Unbound)
-- [About this image](#About%20this%20image)
+- [What is Unbound](#What-is-Unbound)
+- [About this image](#About-this-image)
 - [Installation](#Installation)
-- [How to use this image](#How%20to%20use%20this%20image)
-  - [Environment Variables](#Environment%20Variables)
+- [How to use this image](#How-to-use-this-image)
+  - [Environment Variables](#Environment-Variables)
    
 ## What is Unbound
 
