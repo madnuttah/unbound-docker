@@ -1,5 +1,5 @@
 FROM alpine:latest AS unbound
-LABEL maintainer="Madnuttah"
+LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION=1.14.0
 ARG UNBOUND_SHA256=6ef91cbf02d5299eab39328c0857393de7b4885a2fe7233ddfe3c124ff5a89c8
@@ -21,7 +21,7 @@ RUN set -xe; \
   nghttp2-libs \
   expat-dev \
   build-base \
-  binutils \
+  #binutils \
   curl \
   file \ 
   && curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz \
@@ -44,7 +44,9 @@ RUN set -xe; \
     --with-pthreads \
     --disable-rpath \
     #--disable-static \
-    --enable-static=no \
+    #--enable-static=no \
+    --enable-static-exe=no \
+    --enable-fully-static=no \
     --without-pythonmodule \
     --without-pyunbound \
     --enable-event-api \
@@ -53,8 +55,12 @@ RUN set -xe; \
     --enable-tfo-client \
     --enable-event-api \
     --with-deprecate-rsa-1024 \
-    --with-libevent \
-    --with-ssl \
+    --with-libevent=/usr/include/event2 \
+    --with-libexpat=/usr/include \
+    --with-ssl=/usr/include/openssl \
+    #--with-libevent=/usr/lib \
+    #--with-libexpat=/usr/lib \
+    #--with-libevent=/usr/include \
   && make \
   && make install \
   && apk del --no-cache .build-deps \
@@ -83,7 +89,7 @@ LABEL maintainer="Madnuttah"
 ARG BUILD_DATE="2021-012-21T00:00:00Z"
 ARG IMAGE_URL="https://github.com/madnuttah/unbound-docker" 
 ARG IMAGE_BASE_NAME="https://hub.docker.com/r/madnuttah/unbound-docker:latest" 
-ARG IMAGE_VEN="Madnuttah"
+ARG IMAGE_VEN="madnuttah"
 ARG UNBOUND_VERSION=1.14.0
 ARG IMAGE_REV=1
 ENV UNBOUND_VERSION=${UNBOUND_VERSION}
@@ -171,6 +177,3 @@ EXPOSE 5335/tcp 5335/udp
 # #  CMD ${UNBOUND_HOME}/bin/unbound-control -c ${UNBOUND_HOME}/unbound.conf status -s 127.0.0.1:5335 || exit 1
 
 # CMD [ "${UNBOUND_HOME}/unbound.sh" ]
-
-
-	
