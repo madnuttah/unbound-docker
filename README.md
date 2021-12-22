@@ -19,6 +19,9 @@
   - [Environment Variables](#Environment-Variables)
   - [Standard usage](#Standard-usage)
 - [Documentation and feedback](#Documentation-and-feedback)
+  - [Documentation](#Documentation)
+  - [Issues](#Issues)
+- [Acknowledgements](#Acknowledgements)
 - [Licenses](#Licenses)
    
 ## What is Unbound
