@@ -7,7 +7,7 @@ ARG UNBOUND_SHA256=6ef91cbf02d5299eab39328c0857393de7b4885a2fe7233ddfe3c124ff5a8
 ENV NAME=unbound \
     UNBOUND_VERSION=${UNBOUND_VERSION} \
     UNBOUND_SHA256=${UNBOUND_SHA256} \ 
-    UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
+	UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
 
 WORKDIR /tmp/src
 
@@ -21,6 +21,7 @@ RUN set -xe; \
   nghttp2-libs \
   expat-dev \
   build-base \
+  binutils \
   curl \
   file \ 
   && curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz \
@@ -75,6 +76,7 @@ RUN set -xe; \
     && strip --strip-all /etc/unbound/unbound.d/sbin/unbound-control \
     && strip --strip-all /etc/unbound/unbound.d/sbin/unbound-host
 
+
 FROM alpine:latest
 LABEL maintainer="Madnuttah"
 
@@ -88,6 +90,11 @@ ENV UNBOUND_VERSION=${UNBOUND_VERSION}
 ENV IMAGE_BASE_NAME=${IMAGE_BASE_NAME}
 ENV IMAGE_REV=${IMAGE_REV}
 ENV UNBOUND_HOME=/etc/unbound
+
+ENV NAME=unbound \
+    VERSION=${UNBOUND_VERSION} \
+    SUMMARY="${NAME} is a validating, recursive, and caching DNS resolver." \
+    DESCRIPTION="${NAME} is a validating, recursive, and caching DNS resolver."
 
 LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
@@ -108,15 +115,15 @@ RUN set -xe; \
   && apk add --no-cache \
     #ca-certificates \
     #libsodium \
-    #libevent \
+    libevent \
     openssl3 \
     nghttp2 \
     expat \
     && mkdir -p \
-        "${UNBOUND_HOME}/certs.d" \
-        "${UNBOUND_HOME}/dev.d" \
-        "${UNBOUND_HOME}/var.d" \
-        "${UNBOUND_HOME}/run.d"
+      "${UNBOUND_HOME}/certs.d" \
+      "${UNBOUND_HOME}/dev.d" \
+      "${UNBOUND_HOME}/var.d" \
+      "${UNBOUND_HOME}/run.d"
  	
 WORKDIR ${UNBOUND_HOME}
 
@@ -164,3 +171,6 @@ EXPOSE 5335/tcp 5335/udp
 # #  CMD ${UNBOUND_HOME}/bin/unbound-control -c ${UNBOUND_HOME}/unbound.conf status -s 127.0.0.1:5335 || exit 1
 
 # CMD [ "${UNBOUND_HOME}/unbound.sh" ]
+
+
+	
