@@ -64,7 +64,7 @@ Below is the complete list of available options that can be used to customize yo
 
 My recommended way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a working Pi-Hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample that makes use of a MCVLAN network which **must** be adapted to your network environment and to suit your needs for development or production use.
 
-Run this container with the following command:
+Anyway, you can also run this container with the following command:
 
 ```console
 docker run --name madnuttah-unbound -d \
