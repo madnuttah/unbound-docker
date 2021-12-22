@@ -32,43 +32,43 @@ RUN set -xe; \
   && adduser -S -D -H -h /etc/unbound -u 1000 -s 2>/dev/null -G _unbound _unbound \
   && ./configure \
     --prefix=/etc/unbound/unbound.d \
-	--with-conf-file=/etc/unbound/unbound.conf \
-	--sysconfdir=/etc/unbound \
-	--localstatedir=/etc/unbound/var.d \
+    --with-conf-file=/etc/unbound/unbound.conf \
+    --sysconfdir=/etc/unbound \
+    --localstatedir=/etc/unbound/var.d \
     --with-chroot-dir=/etc/unbound \
     --with-pidfile=/etc/unbound/run.d/unbound.pid \
     --with-run-dir=/etc/unbound/run.d \
-	--with-rootkey-file=/etc/unbound/iana.d/root.key
-	--with-username=_unbound \
+    --with-rootkey-file=/etc/unbound/iana.d/root.key
+    --with-username=_unbound \
     --with-pthreads \
     --disable-rpath \
-	#--disable-static \
-	--enable-static=no \
+    #--disable-static \
+    --enable-static=no \
     --without-pythonmodule \
     --without-pyunbound \
-	--enable-event-api \
+    --enable-event-api \
     --enable-dnscrypt \
-	--enable-tfo-server \
+    --enable-tfo-server \
     --enable-tfo-client \
-	--enable-event-api \
-	--with-deprecate-rsa-1024 \
-	--with-libevent \
-	--with-ssl \
+    --enable-event-api \
+    --with-deprecate-rsa-1024 \
+    --with-libevent \
+    --with-ssl \
   && make \
   && make install \
   && apk del --no-cache .build-deps \
   && rm -rf \
     /etc/unbound/share \
-	/etc/unbound/etc \
-	/etc/unbound/lib/pkgconfig \
-	/etc/unbound/include \
-	/etc/unbound/lib/*.la \
-	/usr/share/man \
-	/usr/share/docs \
-	/tmp/* \
-	/var/tmp/* \
-	/var/log/* \
-	find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all \
+    /etc/unbound/etc \
+    /etc/unbound/lib/pkgconfig \
+    /etc/unbound/include \
+    /etc/unbound/lib/*.la \
+    /usr/share/man \
+    /usr/share/docs \
+    /tmp/* \
+    /var/tmp/* \
+    /var/log/* \
+    find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all \
     strip --strip-all /etc/unbound/unbound.d/sbin/unbound \
     strip --strip-all /etc/unbound/unbound.d/sbin/unbound-anchor \
     strip --strip-all /etc/unbound/unbound.d/sbin/unbound-checkconf  \
@@ -90,33 +90,33 @@ ENV IMAGE_REV=${IMAGE_REV}
 ENV UNBOUND_HOME=/etc/unbound
 
 LABEL org.opencontainers.image.created=$BUILD_DATE \
-	org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
+    org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
     org.opencontainers.image.title="madnuttah/unbound" \
     org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
-	org.opencontainers.image.summary="Unbound is a validating, recursive, and caching DNS resolver." \
+    org.opencontainers.image.summary="Unbound is a validating, recursive, and caching DNS resolver." \
     org.opencontainers.image.url=$IMAGE_URL \
     org.opencontainers.image.source=$IMAGE_URL \
-	org.opencontainers.image.authors=$IMAGE_VEN \
+    org.opencontainers.image.authors=$IMAGE_VEN \
     org.opencontainers.image.vendor=$IMAGE_VEN \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.version=$UNBOUND_VERSION \
-	org.opencontainers.image.revision=$IMAGE_REV
+    org.opencontainers.image.revision=$IMAGE_REV
 	
 RUN set -xe; \
-	addgroup -S _unbound -g 1000 2>/dev/null \
-	&& adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /sbin/nologin -G _unbound _unbound 2>/dev/null \
-	&& apk add --no-cache \
-	#ca-certificates \
-	#libsodium \
-	#libevent \
-	openssl3 \
-	nghttp2 \
-	expat \
-	&& mkdir -p \
-	  "${UNBOUND_HOME}/certs.d" \
-	  "${UNBOUND_HOME}/dev.d" \
-	  "${UNBOUND_HOME}/var.d" \
-	  "${UNBOUND_HOME}/run.d"
+  addgroup -S _unbound -g 1000 2>/dev/null \
+  && adduser -S -D -H -h "${UNBOUND_HOME}" -u 1000 -s /sbin/nologin -G _unbound _unbound 2>/dev/null \
+  && apk add --no-cache \
+    #ca-certificates \
+    #libsodium \
+    #libevent \
+    openssl3 \
+    nghttp2 \
+    expat \
+    && mkdir -p \
+        "${UNBOUND_HOME}/certs.d" \
+        "${UNBOUND_HOME}/dev.d" \
+        "${UNBOUND_HOME}/var.d" \
+        "${UNBOUND_HOME}/run.d"
  	
 WORKDIR ${UNBOUND_HOME}
 
@@ -140,11 +140,11 @@ RUN touch ${UNBOUND_HOME}/log.d/unbound.log \
   && chmod -R 0755 \
     ${UNBOUND_HOME}/unbound.d/sbin/ \ 
   && rm -rf \
-	/usr/share/man \
-	/usr/share/docs \
-	/tmp/* \
-	/var/tmp/* \
-	/var/log/*
+    /usr/share/man \
+    /usr/share/docs \
+    /tmp/* \
+    /var/tmp/* \
+    /var/log/*
 	
 ENV PATH="$PATH": \
   ${UNBOUND_HOME}/: \
