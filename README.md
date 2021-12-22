@@ -88,7 +88,7 @@ In-depth documentation for Unbound is available on the [Unbound project's websit
 
 Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions or encounter problems with this image.
 
-## Acknowledgments
+## Acknowledgements
 
 - [Alpine Linux](https://www.alpinelinux.org/)
 - [Docker](https://www.docker.com/)
