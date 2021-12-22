@@ -6,7 +6,7 @@ services:
     image: pihole/pihole:latest
     hostname: pi-hole
     domainname: yourdomain.lan
-    mac_address: 00-A1-31-73-65-D6
+    mac_address: 00-A1-31-73-65-D7
     depends_on:
       - unbound
     cap_add:
@@ -14,26 +14,26 @@ services:
       - NET_BIND_SERVICE
     networks:
       dns-network:
-        ipv4_address: PI-HOLE-IP-ADDRESS
+        ipv4_address: PI-HOLE-IP-ADDRESS #e.g. 192.168.1.254
     dns:
-      - UNBOUND-IP-ADDRESS
+      - UNBOUND-IP-ADDRESS #e.g. 192.168.1.253
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 67:67/udp
       - 80:80/tcp
     environment:
-      ServerIP: PI-HOLE-IP-ADDRESS   
+      ServerIP: PI-HOLE-IP-ADDRESS #e.g 192.168.1.254
       VIRTUAL_HOST: pi-hole.yourdomain.lan 
       WEBPASSWORD: password 
       TZ: "YOURTIMEZONE"
       CORS_HOSTS: yourdomain.lan
-      PIHOLE_DNS_: UNBOUND-IP-ADDRESS#5335
+      PIHOLE_DNS_: UNBOUND-IP-ADDRESS#5335 #e.g. 192.168.1.253
       IPv6: "false"    
       DNS_BOGUS_PRIV: "true"
       DNS_FQDN_REQUIRED: "true"
       REV_SERVER: "true"
-      REV_SERVER_TARGET: GATEWAY-IP-ADDRESS
+      REV_SERVER_TARGET: GATEWAY-IP-ADDRESS #e.g. 192.168.1.1
       REV_SERVER_DOMAIN: yourdomain.lan
       REV_SERVER_CIDR: SUBNET #e.g. 192.168.1.0/24
     volumes:
@@ -47,7 +47,7 @@ services:
   unbound:
     container_name: unbound
     image: madnuttah/unbound:latest
-    mac_address: 00-A1-31-73-65-D7
+    mac_address: 00-A1-31-73-65-D6
     hostname: unbound
     domainname: yourdomain.lan
     ports:
@@ -55,7 +55,7 @@ services:
       - 5335:5335/udp
     networks:
       dns-network:
-        ipv4_address: UNBOUND-IP-ADDRESS
+        ipv4_address: UNBOUND-IP-ADDRESS #e.g. 192.168.1.253
     environment: 
       TZ: "YOURTIMEZONE"
       ServerIP: UNBOUND-IP-ADDRESS  
@@ -72,9 +72,9 @@ networks:
   dns-network:
     driver: macvlan
     driver_opts:
-      parent: bond0
+      parent: eth0
     ipam:
       config:
         - subnet: SUBNET #e.g. 192.168.1.0/24      
           gateway: GATEWAY-IP-ADDRESS     
-          ip_range: NETWORKRANGE #e.g. 192.168.1.252/30    
+          ip_range: NETWORKRANGE #e.g. 192.168.1.253/30    
