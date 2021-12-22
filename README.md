@@ -1,3 +1,7 @@
+<p align="center">
+    <img width=200 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
+</p>
+
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Docker Image
 
 ![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")
