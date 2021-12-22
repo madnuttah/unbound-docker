@@ -17,6 +17,7 @@
 - [Installation](#Installation)
 - [How to use this image](#How-to-use-this-image)
   - [Environment Variables](#Environment-Variables)
+- [Documentation and feedback](#Documentation-and-feedback)
    
 ## What is Unbound
 
