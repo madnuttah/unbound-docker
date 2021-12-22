@@ -68,12 +68,12 @@ RUN set -xe; \
     /tmp/* \
     /var/tmp/* \
     /var/log/* \
-    find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all \
-    strip --strip-all /etc/unbound/unbound.d/sbin/unbound \
-    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-anchor \
-    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-checkconf  \
-    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-control \
-    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-host
+    && find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all \
+    && strip --strip-all /etc/unbound/unbound.d/sbin/unbound \
+    && strip --strip-all /etc/unbound/unbound.d/sbin/unbound-anchor \
+    && strip --strip-all /etc/unbound/unbound.d/sbin/unbound-checkconf  \
+    && strip --strip-all /etc/unbound/unbound.d/sbin/unbound-control \
+    && strip --strip-all /etc/unbound/unbound.d/sbin/unbound-host
 
 FROM alpine:latest
 LABEL maintainer="Madnuttah"
