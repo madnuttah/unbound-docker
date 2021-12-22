@@ -17,6 +17,7 @@
 - [Installation](#Installation)
 - [How to use this image](#How-to-use-this-image)
   - [Environment Variables](#Environment-Variables)
+  - [Standard usage](#Standard-usage)
 - [Documentation and feedback](#Documentation-and-feedback)
 - [Licenses](#Licenses)
    
