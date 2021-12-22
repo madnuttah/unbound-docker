@@ -37,11 +37,7 @@ services:
       REV_SERVER_DOMAIN: yourdomain.lan
       REV_SERVER_CIDR: SUBNET #e.g. 192.168.1.0/24
     volumes:
-      - /volume1/docker/pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/:rw
-      - /volume1/docker/pihole/etc/pihole/:/etc/pihole/:rw
-      - /volume1/docker/pihole/etc/hosts.list:/etc/hosts:rw
-      - /volume1/docker/pihole/etc/resolv.conf:/etc/resolv.conf:rw
-      - /volume1/docker/pihole/etc/hostname:/etc/hostname:rw
+      - ./pihole/etc//:/etc/:rw
     restart: unless-stopped
      
   unbound:
