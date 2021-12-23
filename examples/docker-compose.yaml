@@ -26,7 +26,7 @@ services:
       ServerIP: PI-HOLE-IP-ADDRESS #e.g 192.168.1.254
       VIRTUAL_HOST: pi-hole.yourdomain.lan 
       WEBPASSWORD: password 
-      TZ: "YOURTIMEZONE"
+      TZ: "YOURTIMEZONE" #e.g. "America/New_York"
       CORS_HOSTS: yourdomain.lan
       PIHOLE_DNS_: UNBOUND-IP-ADDRESS#5335 #e.g. 192.168.1.253
       IPv6: "false"    
