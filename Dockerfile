@@ -143,6 +143,8 @@ COPY root/unbound.sh \
   /usr/local/sbin/
 	
 RUN touch /etc/unbound/log.d/unbound.log && \
+  chown -R _unbound:_unbound \
+    /etc/unbound/ && \
   chmod -R 0777 \
     /etc/unbound/ && \
   chmod 0777 \
