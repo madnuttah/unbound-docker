@@ -5,9 +5,9 @@ ARG UNBOUND_VERSION=1.14.0
 ARG UNBOUND_SHA256=6ef91cbf02d5299eab39328c0857393de7b4885a2fe7233ddfe3c124ff5a89c8
 
 ENV NAME=unbound \
-    UNBOUND_VERSION=${UNBOUND_VERSION} \
-    UNBOUND_SHA256=${UNBOUND_SHA256} \ 
-    UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
+  UNBOUND_VERSION=${UNBOUND_VERSION} \
+  UNBOUND_SHA256=${UNBOUND_SHA256} \ 
+  UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
 
 WORKDIR /tmp/src
 
@@ -100,25 +100,25 @@ ARG IMAGE_REV=1
 ARG UNBOUND_VERSION=1.14.0
 
 ENV NAME=Unbound \
-    VENDOR_NAME=${IMAGE_VEN} \
-    VERSION=${UNBOUND_VERSION} \
-    IMAGE_REVISION=${IMAGE_REV} \
-    IMAGE_BUILD_DATE=${BUILD_DATE} \
-    SUMMARY="Unbound is a validating, recursive, and caching DNS resolver." \
-    DESCRIPTION="Unbound is a validating, recursive, and caching DNS resolver." 
+  VENDOR_NAME=${IMAGE_VEN} \
+  VERSION=${UNBOUND_VERSION} \
+  IMAGE_REVISION=${IMAGE_REV} \
+  IMAGE_BUILD_DATE=${BUILD_DATE} \
+  SUMMARY="Unbound is a validating, recursive, and caching DNS resolver." \
+  DESCRIPTION="Unbound is a validating, recursive, and caching DNS resolver." 
 
 LABEL org.opencontainers.image.created=$BUILD_DATE \
-    org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
-    org.opencontainers.image.title="madnuttah/unbound" \
-    org.opencontainers.image.description=$DESCRIPTION \
-    org.opencontainers.image.summary=$SUMMARY \
-    org.opencontainers.image.url=$IMAGE_URL \
-    org.opencontainers.image.source=$IMAGE_URL \
-    org.opencontainers.image.authors=$IMAGE_VEN \
-    org.opencontainers.image.vendor=$IMAGE_VEN \
-    org.opencontainers.image.licenses="MIT" \
-    org.opencontainers.image.version=$UNBOUND_VERSION \
-    org.opencontainers.image.revision=$IMAGE_REV
+   org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
+   org.opencontainers.image.title="madnuttah/unbound" \
+   org.opencontainers.image.description=$DESCRIPTION \
+   org.opencontainers.image.summary=$SUMMARY \
+   org.opencontainers.image.url=$IMAGE_URL \
+   org.opencontainers.image.source=$IMAGE_URL \
+   org.opencontainers.image.authors=$IMAGE_VEN \
+   org.opencontainers.image.vendor=$IMAGE_VEN \
+   org.opencontainers.image.licenses="MIT" \
+   org.opencontainers.image.version=$UNBOUND_VERSION \
+   org.opencontainers.image.revision=$IMAGE_REV
 	
 RUN set -xe; \
   addgroup -S _unbound -g 1000 && \
