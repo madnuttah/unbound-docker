@@ -33,12 +33,12 @@ RUN set -xe; \
   && ./configure \
     --prefix=/etc/unbound/unbound.d \
     --with-conf-file=/etc/unbound/unbound.conf \
-    --sysconfdir=/etc/unbound \
+    --sysconfdir=/etc/unbound/unbound.d \
     --libdir=/etc/unbound/unbound.d/lib \
-    --localstatedir=/etc/unbound \ 
+    --localstatedir=/etc/unbound/unbiound.d \ 
     --with-chroot-dir=/etc/unbound \
     --with-pidfile=/etc/unbound/unbound.pid \ 
-    --with-run-dir=/etc/unbound \ 
+    --with-run-dir=/etc/unbound/unbound.d \ 
     --with-rootkey-file=/etc/unbound/iana.d/root.key \
     --with-username=_unbound \
     --with-pthreads \
@@ -47,7 +47,6 @@ RUN set -xe; \
     --without-pyunbound \
     --enable-event-api \
     --enable-dnscrypt \
-    --enable-static \
     --enable-tfo-server \
     --enable-tfo-client \
     --enable-event-api \
@@ -135,7 +134,7 @@ RUN touch /etc/unbound/log.d/unbound.log \
     /var/tmp/* \
     /var/log/*
 	
-ENV PATH=/etc/unbound:/etc/unbound/unbound.d/sbin:/etc/unbound/unbound.d/lib:"$PATH"
+ENV PATH=/etc/unbound/unbound.d/sbin:/etc/unbound/unbound.d/lib:"$PATH"
       
 VOLUME [ \
   "/etc/unbound/iana.d", \
