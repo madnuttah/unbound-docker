@@ -154,7 +154,7 @@ RUN touch /etc/unbound/log.d/unbound.log && \
     /var/tmp/* \
     /var/log/*
 	
-ENV PATH=/etc/unbound/unbound.d/sbin:/usr/bin/openssl3:"$PATH"
+ENV PATH=/etc/unbound/unbound.d/sbin:"$PATH"
       
 EXPOSE 5335/tcp 5335/udp
 
