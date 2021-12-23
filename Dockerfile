@@ -23,8 +23,8 @@ RUN set -xe; \
   expat \
   curl \
   file \ 
-  binutils \
-  apk --update --no-cache add --virtual .build-deps && \
+  binutils && \
+  apk --update --no-cache add --virtual .build-deps \
     build-base \
     libsodium-dev \
     libevent-dev \
@@ -33,29 +33,28 @@ RUN set -xe; \
     libssl3 \
     nghttp2-libs \
     expat-dev \
-    apk-tools \
+    apk-tools && \
   curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz &&  \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
-  tar -xzf unbound.tar.gz --strip-components=1 && \
+  tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
   cd unbound-${UNBOUND_VERSION} && \
   addgroup -S _unbound -g 1000 && \
   adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound && \
-  ./configure && \
+  ./configure \
     --prefix=/etc/unbound/unbound.d \
     --with-conf-file=/etc/unbound/unbound.conf \
     --sysconfdir=/etc/unbound/unbound.d \
     --libdir=/etc/unbound/unbound.d/lib \
     --mandir=/usr/share/man \
     --libexecdir=/etc/unbound/unbound.d/lib \
-    --localstatedir=/etc/unbound/unbiound.d \ 
+    --localstatedir=/etc/unbound/unbound.d \ 
     --with-chroot-dir=/etc/unbound \
-    --with-pidfile=/etc/unbound/unbound.pid \ 
+    --with-pidfile=/etc/unbound/unbound.d/unbound.pid \ 
     --with-run-dir=/etc/unbound/unbound.d \ 
     --with-rootkey-file=/etc/unbound/iana.d/root.key \
     --with-username=_unbound \
     --with-pthreads \
-    --disable-rpath \
     --without-pythonmodule \
     --without-pyunbound \
     --enable-event-api \
@@ -66,13 +65,9 @@ RUN set -xe; \
     --with-deprecate-rsa-1024 \
     --with-libevent \
     --with-ssl \
-    --disable-flto=no \
-    --disable-shared=no \
-    --enable-static=no \
     --enable-pie \
     --enable-fast-install \
-    --with-systemd=no \
-    --disable-dependency-tracking \
+    --enable-relro-now && \
   make && \
   make install && \
   apk del --no-cache .build-deps && \
@@ -86,34 +81,31 @@ RUN set -xe; \
     /usr/share/docs \
     /tmp/* \
     /var/tmp/* \
-    /var/log/* 
-
-RUN find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all && \
-    strip --strip-all /etc/unbound/unbound.d/unbound && \
-    strip --strip-all /etc/unbound/unbound.d/unbound-anchor && \
-    strip --strip-all /etc/unbound/unbound.d/unbound-checkconf  && \
-    strip --strip-all /etc/unbound/unbound.d/unbound-control && \
+    /var/log/* && \
+    find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all && \
+    strip --strip-all /etc/unbound/unbound.d/sbin/unbound && \
+    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-anchor && \
+    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-checkconf  && \
+    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-control && \
     strip --strip-all /etc/unbound/unbound.d/sbin/unbound-host
 
 FROM alpine:latest
 LABEL maintainer="madnuttah"
 
-ARG BUILD_DATE="2021-012-22"
+ARG BUILD_DATE="2021-012-23"
 ARG IMAGE_URL="https://github.com/madnuttah/unbound-docker" 
 ARG IMAGE_BASE_NAME="https://hub.docker.com/r/madnuttah/unbound-docker:latest" 
 ARG IMAGE_VEN="madnuttah"
 ARG IMAGE_REV=1
 ARG UNBOUND_VERSION=1.14.0
 
-ENV NAME=unbound \
+ENV NAME=Unbound \
     VENDOR_NAME=${IMAGE_VEN} \
     VERSION=${UNBOUND_VERSION} \
     IMAGE_REVISION=${IMAGE_REV} \
     IMAGE_BUILD_DATE=${BUILD_DATE} \
-    SUMMARY="${NAME} is a validating, recursive, and caching DNS resolver." \
-    DESCRIPTION="${NAME} Unbound is a validating, recursive, caching DNS resolver." \
-	  "It is designed to be fast and lean and incorporates modern features based on open standards." \
-	    "Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever."
+    SUMMARY="Unbound is a validating, recursive, and caching DNS resolver." \
+    DESCRIPTION="Unbound is a validating, recursive, and caching DNS resolver." 
 
 LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
@@ -151,12 +143,10 @@ COPY root/unbound.sh \
   /usr/local/sbin/
 	
 RUN touch /etc/unbound/log.d/unbound.log && \
-  chmod -R 0664 \
+  chmod -R 0777 \
     /etc/unbound/ && \
-  chmod 0755 \
+  chmod 0777 \
     /usr/local/sbin/unbound.sh && \
-  chmod -R 0755 \
-    /etc/unbound/unbound.d/sbin/ && \ 
   rm -rf \
     /usr/share/man \
     /usr/share/docs \
@@ -164,19 +154,8 @@ RUN touch /etc/unbound/log.d/unbound.log && \
     /var/tmp/* \
     /var/log/*
 	
-ENV PATH=/etc/unbound/unbound.d/sbin:/etc/unbound/unbound.d/lib:/usr/bin/openssl3:"$PATH"
+ENV PATH=/etc/unbound/unbound.d/sbin:/usr/bin/openssl3:"$PATH"
       
-VOLUME [ \
-  "/etc/unbound/iana.d", \
-  "/etc/unbound/conf.d", \
-  "/etc/unbound/zones.d", \
-  "/etc/unbound/log.d" \
-  ] 
-
 EXPOSE 5335/tcp 5335/udp
-	
-HEALTHCHECK --interval=1m --timeout=3s --start-period=10s \
- CMD /etc/unbound/bin/unbound-control -c \
-   /etc/unbound/unbound.conf status -s 127.0.0.1:5335 || exit 1
 
 CMD [ "/usr/local/sbin/unbound.sh" ]
