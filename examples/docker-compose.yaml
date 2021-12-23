@@ -37,7 +37,7 @@ services:
       REV_SERVER_DOMAIN: yourdomain.lan
       REV_SERVER_CIDR: SUBNET #e.g. 192.168.1.0/24
     volumes:
-      - ./pihole/etc//:/etc/:rw
+      - ./pihole/etc/:/etc/:rw
     restart: unless-stopped
      
   unbound:
@@ -58,10 +58,8 @@ services:
       VIRTUAL_HOST: unbound.yourdomain.lan 
     volumes:
       - ./unbound/unbound.conf:/etc/unbound/unbound.conf:rw
-      - ./unbound/conf.d/:/etc/unbound/conf.d:rw
-      - ./unbound/iana.d/:/etc/unbound/iana.d:rw
-      - ./unbound/log.d/:/etc/unbound/log.d:rw
-      - ./unbound/zones.d/:/etc/unbound/zones.d:rw
+      - ./unbound/iana.d/:/etc/unbound/iana.d/:rw
+      - ./unbound/log.d/:/etc/unbound/log.d/:rw
     restart: unless-stopped
     
 networks:
