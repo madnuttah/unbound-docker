@@ -12,29 +12,42 @@ ENV NAME=unbound \
 WORKDIR /tmp/src
 
 RUN set -xe; \
-  apk add --no-cache --virtual .build-deps \
+  apk --update --no-cache add \
   ca-certificates \
-  libsodium-dev \
-  libevent-dev \
-  linux-headers \
-  openssl3-dev \
-  nghttp2-libs \
-  expat-dev \
-  build-base \
+  dns-root-hints \
+  dnssec-root \
+  libsodium \
+  libevent \
+  openssl3 \
+  nghttp2 \
+  expat \
   curl \
   file \ 
-  && curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz \
-  && echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - \
-  && tar -xzf unbound.tar.gz \
-  && rm unbound.tar.gz \
-  && cd unbound-${UNBOUND_VERSION} \
-  && addgroup -S _unbound -g 1000 \
-  && adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound \
-  && ./configure \
+  binutils \
+  apk --update --no-cache add --virtual .build-deps && \
+    build-base \
+    libsodium-dev \
+    libevent-dev \
+    linux-headers \
+    openssl3-dev \
+    libssl3 \
+    nghttp2-libs \
+    expat-dev \
+    apk-tools \
+  curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz &&  \
+  echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
+  tar -xzf unbound.tar.gz --strip-components=1 && \
+  rm unbound.tar.gz && \
+  cd unbound-${UNBOUND_VERSION} && \
+  addgroup -S _unbound -g 1000 && \
+  adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound && \
+  ./configure && \
     --prefix=/etc/unbound/unbound.d \
     --with-conf-file=/etc/unbound/unbound.conf \
     --sysconfdir=/etc/unbound/unbound.d \
     --libdir=/etc/unbound/unbound.d/lib \
+    --mandir=/usr/share/man \
+    --libexecdir=/etc/unbound/unbound.d/lib \
     --localstatedir=/etc/unbound/unbiound.d \ 
     --with-chroot-dir=/etc/unbound \
     --with-pidfile=/etc/unbound/unbound.pid \ 
@@ -53,10 +66,17 @@ RUN set -xe; \
     --with-deprecate-rsa-1024 \
     --with-libevent \
     --with-ssl \
-  && make \
-  && make install \
-  && apk del --no-cache .build-deps \
-  && rm -rf \
+    --disable-flto=no \
+    --disable-shared=no \
+    --enable-static=no \
+    --enable-pie \
+    --enable-fast-install \
+    --with-systemd=no \
+    --disable-dependency-tracking \
+  make && \
+  make install && \
+  apk del --no-cache .build-deps && \
+  rm -rf \
     /etc/unbound/unbound.d/share \
     /etc/unbound/etc \
     /etc/unbound/unbound.d/lib/pkgconfig \
@@ -67,6 +87,13 @@ RUN set -xe; \
     /tmp/* \
     /var/tmp/* \
     /var/log/* 
+
+RUN find /etc/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all && \
+    strip --strip-all /etc/unbound/unbound.d/unbound && \
+    strip --strip-all /etc/unbound/unbound.d/unbound-anchor && \
+    strip --strip-all /etc/unbound/unbound.d/unbound-checkconf  && \
+    strip --strip-all /etc/unbound/unbound.d/unbound-control && \
+    strip --strip-all /etc/unbound/unbound.d/sbin/unbound-host
 
 FROM alpine:latest
 LABEL maintainer="madnuttah"
@@ -79,11 +106,14 @@ ARG IMAGE_REV=1
 ARG UNBOUND_VERSION=1.14.0
 
 ENV NAME=unbound \
+    VENDOR_NAME=${IMAGE_VEN} \
     VERSION=${UNBOUND_VERSION} \
     IMAGE_REVISION=${IMAGE_REV} \
     IMAGE_BUILD_DATE=${BUILD_DATE} \
     SUMMARY="${NAME} is a validating, recursive, and caching DNS resolver." \
-    DESCRIPTION="${NAME} is a validating, recursive, and caching DNS resolver."
+    DESCRIPTION="${NAME} Unbound is a validating, recursive, caching DNS resolver." \
+	  "It is designed to be fast and lean and incorporates modern features based on open standards." \
+	    "Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever."
 
 LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.base.name=$IMAGE_BASE_NAME \
@@ -99,9 +129,9 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.revision=$IMAGE_REV
 	
 RUN set -xe; \
-  addgroup -S _unbound -g 1000 \
-  && adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound 2>/dev/null \
-  && apk add --no-cache \
+  addgroup -S _unbound -g 1000 && \
+  adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound && \
+  apk add --no-cache \
     ca-certificates \
     libsodium \
     libevent \
@@ -120,21 +150,21 @@ COPY --from=unbound /etc/unbound/unbound.d/ \
 COPY root/unbound.sh \
   /usr/local/sbin/
 	
-RUN touch /etc/unbound/log.d/unbound.log \
-  && chmod -R 0664 \
-    /etc/unbound/ \
-  && chmod 0755 \
-    /usr/local/sbin/unbound.sh \
-  && chmod -R 0755 \
-    /etc/unbound/unbound.d/sbin/ \ 
-  && rm -rf \
+RUN touch /etc/unbound/log.d/unbound.log && \
+  chmod -R 0664 \
+    /etc/unbound/ && \
+  chmod 0755 \
+    /usr/local/sbin/unbound.sh && \
+  chmod -R 0755 \
+    /etc/unbound/unbound.d/sbin/ && \ 
+  rm -rf \
     /usr/share/man \
     /usr/share/docs \
     /tmp/* \
     /var/tmp/* \
     /var/log/*
 	
-ENV PATH=/etc/unbound/unbound.d/sbin:/etc/unbound/unbound.d/lib:"$PATH"
+ENV PATH=/etc/unbound/unbound.d/sbin:/etc/unbound/unbound.d/lib:/usr/bin/openssl3:"$PATH"
       
 VOLUME [ \
   "/etc/unbound/iana.d", \
