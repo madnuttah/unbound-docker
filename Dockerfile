@@ -145,9 +145,11 @@ COPY root/unbound.sh \
 RUN touch /etc/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound \
     /etc/unbound/ && \
-  chmod -R 0777 \
+  chmod -R 770 \
     /etc/unbound/ && \
-  chmod 0777 \
+  chmod -R +x \
+    /etc/unbound/unbound.d/sbin/ && \
+  chmod +x \
     /usr/local/sbin/unbound.sh && \
   rm -rf \
     /usr/share/man \
