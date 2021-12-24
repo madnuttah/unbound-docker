@@ -2,5 +2,5 @@
 
    ### Initial release
       - Alpine Base 3.15
-	  - OpenSSL 3
+	  - OpenSSL3
 	  - Unbound 1.14.0
