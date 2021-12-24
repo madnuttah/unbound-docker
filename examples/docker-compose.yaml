@@ -58,8 +58,6 @@ services:
       VIRTUAL_HOST: unbound.yourdomain.lan 
     volumes:
       - ./unbound/unbound.conf:/etc/unbound/unbound.conf:rw
-      - ./unbound/iana.d/:/etc/unbound/iana.d/:rw
-      - ./unbound/log.d/:/etc/unbound/log.d/:rw
     restart: unless-stopped
     
 networks:
