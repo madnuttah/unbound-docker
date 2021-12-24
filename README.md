@@ -66,7 +66,7 @@ Current builds of the image are available on [Docker Hub](https://hub.docker.com
 
 ## How to use this image
 
-You should adapt the [`/etc/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/etc/unbound/unbound.conf) file and my [`Example docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs.
+You should adapt the [`/etc/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/etc/unbound/unbound.conf) file and my [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs.
 
 ### Environment Variables
 
