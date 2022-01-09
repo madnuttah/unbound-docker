@@ -5,7 +5,7 @@ services:
     container_name: pi-hole
     image: pihole/pihole:latest
     hostname: pi-hole
-    domainname: yourdomain.lan
+    domainname: <yourdomain.lan>
     mac_address: 00-A1-31-73-65-D7
     depends_on:
       - unbound
@@ -14,30 +14,30 @@ services:
       - NET_BIND_SERVICE
     networks:
       dns-network:
-        ipv4_address: PI-HOLE-IP-ADDRESS #e.g. 192.168.1.254
+        ipv4_address: <PI-HOLE-IP-ADDRESS> #e.g. 192.168.1.254
     dns:
-      - UNBOUND-IP-ADDRESS #e.g. 192.168.1.253
+      - <UNBOUND-IP-ADDRESS> #e.g. 192.168.1.253
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 67:67/udp
       - 80:80/tcp
     environment:
-      ServerIP: PI-HOLE-IP-ADDRESS #e.g 192.168.1.254
-      VIRTUAL_HOST: pi-hole.yourdomain.lan 
-      WEBPASSWORD: password 
-      TZ: "YOURTIMEZONE" #e.g. "America/New_York"
-      CORS_HOSTS: yourdomain.lan
-      PIHOLE_DNS_: UNBOUND-IP-ADDRESS#5335 #e.g. 192.168.1.253
+      ServerIP: <PI-HOLE-IP-ADDRESS> #e.g 192.168.1.254
+      VIRTUAL_HOST: <pi-hole.yourdomain.lan>
+      WEBPASSWORD: <password>
+      TZ: <YOURTIMEZONE> #e.g. "America/New_York"
+      CORS_HOSTS: <yourdomain.lan>
+      PIHOLE_DNS_: <UNBOUND-IP-ADDRESS#5335> #e.g. 192.168.1.253#5335
       IPv6: "false"    
       DNS_BOGUS_PRIV: "true"
       DNS_FQDN_REQUIRED: "true"
       REV_SERVER: "true"
-      REV_SERVER_TARGET: GATEWAY-IP-ADDRESS #e.g. 192.168.1.1
-      REV_SERVER_DOMAIN: yourdomain.lan
-      REV_SERVER_CIDR: SUBNET #e.g. 192.168.1.0/24
+      REV_SERVER_TARGET: <GATEWAY-IP-ADDRESS> #e.g. 192.168.1.1
+      REV_SERVER_DOMAIN: <yourdomain.lan>
+      REV_SERVER_CIDR: <SUBNET> #e.g. 192.168.1.0/24
     volumes:
-      - ./pihole/etc/:/etc/:rw
+      - <LOCAL_PIHOLE_VOLUME_PATH>/pihole/etc/:/etc/:rw #Your path to Pi-hole
     restart: unless-stopped
      
   unbound:
@@ -45,22 +45,22 @@ services:
     image: madnuttah/unbound:latest
     mac_address: 00-A1-31-73-65-D6
     hostname: unbound
-    domainname: yourdomain.lan
+    domainname: <yourdomain.lan>
     ports:
       - 5335:5335/tcp
       - 5335:5335/udp
     networks:
       dns-network:
-        ipv4_address: UNBOUND-IP-ADDRESS #e.g. 192.168.1.253
+        ipv4_address: <UNBOUND-IP-ADDRESS> #e.g. 192.168.1.253
     environment: 
-      TZ: "YOURTIMEZONE" #e.g. "America/New_York"
-      ServerIP: UNBOUND-IP-ADDRESS  
-      VIRTUAL_HOST: unbound.yourdomain.lan 
+      TZ: <YOURTIMEZONE> #e.g. "America/New_York"
+      ServerIP: <UNBOUND-IP-ADDRESS>
+      VIRTUAL_HOST: <unbound.yourdomain.lan>
     volumes:       
-      - ./unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw
-      - ./unbound/conf.d/:/usr/local/unbound/conf.d/:rw
-      - ./unbound/log.d/unbound.log/:/usr/local/unbound/log.d/unbound.log:rw
-      - ./unbound/zones.d/:/usr/local/unbound/zones.d/:rw
+      - <LOCAL_UNBOUND_VOLUME_PATH>/unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw #Your path to Unbound
+      - <LOCAL_UNBOUND_VOLUME_PATH>/unbound/conf.d/:/usr/local/unbound/conf.d/:rw
+      - <LOCAL_UNBOUND_VOLUME_PATH>/unbound/log.d/unbound.log/:/usr/local/unbound/log.d/unbound.log:rw
+      - <LOCAL_UNBOUND_VOLUME_PATH>/unbound/zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped
     
   watchtower:
@@ -72,7 +72,7 @@ services:
     network_mode: bridge
     environment:
       WATCHTOWER_SCHEDULE: "0 0 4 * * *" #Check every day at 4:00 AM
-      TZ: "YOURTIMEZONE" #e.g. "America/New_York"
+      TZ: <YOURTIMEZONE> #e.g. "America/New_York"
       WATCHTOWER_CLEANUP: "true"
       WATCHTOWER_DEBUG: "true"
       WATCHTOWER_INCLUDE-STOPPED: "true"
@@ -84,9 +84,9 @@ networks:
   dns-network:
     driver: macvlan
     driver_opts:
-      parent: eth0
+      parent: <eth0>
     ipam:
       config:
-        - subnet: SUBNET #e.g. 192.168.1.0/24      
-          gateway: GATEWAY-IP-ADDRESS #e.g. 192.168.1.1    
-          ip_range: NETWORKRANGE #e.g. 192.168.1.253/30    
+        - subnet: <SUBNET> #e.g. 192.168.1.0/24      
+          gateway: <GATEWAY-IP-ADDRESS> #e.g. 192.168.1.1    
+          ip_range: <NETWORKRANGE> #e.g. 192.168.1.253/30    
