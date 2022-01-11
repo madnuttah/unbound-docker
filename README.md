@@ -28,7 +28,7 @@
 
 #### Changes
 
-- [`Changelog`](https://github.com/madnuttah/unbound-docker/blob/master/CHANGELOG.md)
+- [`Changelog`](https://github.com/madnuttah/unbound-docker/blob/main/CHANGELOG.md)
 
 ## Table of Contents
 
@@ -41,7 +41,7 @@
   - [Standard usage](#Standard-usage)
 - [Documentation and feedback](#Documentation-and-feedback)
   - [Documentation](#Documentation)
-  - [Feature requests or issues](#Feedback)
+  - [Feedback](#Feedback)
 - [Acknowledgements](#Acknowledgements)
 - [Licenses](#Licenses)
    
@@ -67,7 +67,7 @@ Current multiarch-builds of the image are available on [Docker Hub](https://hub.
 
 ## How to use this image
 
-You should adapt the [`/etc/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
+You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
 
 For a better structuring of the unbound.conf file, folders for storing zone and other configuration files have been created and can be mounted as volumes: 
 
@@ -130,7 +130,9 @@ Below is an incomplete list of available options that can be used to customize y
 
 ### Standard usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a working Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample that makes use of a MCVLAN network which **must** be adapted to your network environment and to suit your needs for development or production use.
+The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a MACVLAN network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets needs your very attention**! 
+
+*I prefer using a [MACVLAN](https://docs.docker.com/network/macvlan/) network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well*
 
 Anyway, you can also run this container with the following command:
 
@@ -141,8 +143,6 @@ docker run --name madnuttah-unbound -d \
 --restart=unless-stopped \
 madnuttah/unbound:latest
 ```
-
-*I recommend using a [MCVLAN](https://docs.docker.com/network/macvlan/) network configuration instead of a bridged or rather unsafe host network*
 
 # Documentation and feedback
 
