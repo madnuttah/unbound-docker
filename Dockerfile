@@ -298,6 +298,12 @@ RUN mkdir -p \
   touch /usr/local/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound \
     /usr/local/unbound/ && \
+  ln -s /dev/random /dev/urandom /dev/null \
+    /usr/local/unbound/unbound.d/ && \
+  chown -Rh _unbound:_unbound \
+    /usr/local/unbound/unbound.d/random \
+      /usr/local/unbound/unbound.d/null \
+        /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/ && \
   chmod -R +x \
