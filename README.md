@@ -8,7 +8,7 @@
 ![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")
 ![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")
 ![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")<br>
-[![Build Unbound-Docker](https://github.com/madnuttah/unbound-docker/actions/workflows/build-docker-image.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-docker-image.yaml)
+[![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
 
 <p align="Left">
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
