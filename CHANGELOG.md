@@ -1,3 +1,10 @@
+## 1.14.0 2021-01-20 <madnuttah>
+
+   ### Update
+      - Changed workflow to a pipeline process
+      - Added linux/386 to the multiarch build
+	  - Optimizations
+
 ## 1.14.0 2021-01-08 <madnuttah>
 
    ### Update

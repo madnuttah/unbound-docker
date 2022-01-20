@@ -42,6 +42,7 @@
 - [Documentation and feedback](#Documentation-and-feedback)
   - [Documentation](#Documentation)
   - [Feedback](#Feedback)
+  - [Contributing](#Contributing)
 - [Acknowledgements](#Acknowledgements)
 - [Licenses](#Licenses)
    
@@ -63,7 +64,7 @@ Unbound is configured as an DNSSEC aware DNS resolver, which directly queries DN
 
 ## Installation
 
-Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended method of installation on any arm, arm64 or amd64 platform.
+Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended method of installation on any Linux 386, arm, arm64 or amd64 platform.
 
 ## How to use this image
 
@@ -156,6 +157,10 @@ In-depth documentation for Unbound is available on the [Unbound project's websit
 
 Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests for new features or encounter problems with this image.
 
+## Contributing
+
+If you intend to contribute to this repo, just go ahead. I'd love to see what you made to improve the image.
+
 ## Acknowledgements
 
 - [Alpine Linux](https://www.alpinelinux.org/)
@@ -165,6 +170,7 @@ Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/
 - [libevent](https://libevent.org/)
 - [Pi-hole](https://pi-hole.net/)
 - [Watchtower](https://containrrr.dev/watchtower/)
+- You. Thank you for using my image.
 
 ## Licenses
 
