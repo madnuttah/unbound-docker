@@ -9,16 +9,9 @@ env:
   VERSION: 1.14.0
   
 jobs:
-  pre-flight:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set build date
-        run: |
-          date >> build-date
  
   linux_x86:
     runs-on: ubuntu-latest
-    needs: pre-flight
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -53,7 +46,6 @@ jobs:
 
   linux_arm_v6:
     runs-on: ubuntu-latest
-    needs: pre-flight
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -88,7 +80,6 @@ jobs:
       
   linux_arm_v7:
     runs-on: ubuntu-latest
-    needs: pre-flight
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -123,7 +114,6 @@ jobs:
             
   linux_arm64:
     runs-on: ubuntu-latest
-    needs: pre-flight
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -158,7 +148,6 @@ jobs:
  
   linux_amd64:
     runs-on: ubuntu-latest
-    needs: pre-flight
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
