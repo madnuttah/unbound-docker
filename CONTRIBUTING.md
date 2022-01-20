@@ -8,12 +8,10 @@ I :heart: [Pull Requests](https://help.github.com/articles/about-pull-requests/)
 for fixing issues or adding features. Thanks for your contribution!
 
 For small changes, especially documentation, you can simply use the "Edit" button
-to update the Markdown file, and start the
-[pull request](https://help.github.com/articles/about-pull-requests/) process.
+to update the Markdown file, and start the pull request process.
+
 Use the preview tab in GitHub to make sure that it is properly
 formatted before committing.
-A pull request will cause integration tests to run automatically, so please review
-the results of the pipeline and correct any mistakes that are reported.
 
 If you plan to contribute often or have a larger change to make, it is best to
 setup an environment for contribution.
