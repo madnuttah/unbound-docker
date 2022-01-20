@@ -2,8 +2,8 @@
 
    ### Update
       - Changed workflow to a pipeline process
-      - Added linux/386 to the multiarch build
-	  - Optimizations
+      - Added linux/386 to the multiarch build, the image is now on par with architectures Pi-hole uses
+      - Optimizations
 
 ## 1.14.0 2021-01-08 <madnuttah>
 
