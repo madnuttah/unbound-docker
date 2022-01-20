@@ -159,7 +159,7 @@ Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/
 
 ## Contributing
 
-If you intend to contribute to this repo, just go ahead and make a [pull request](https://github.com/madnuttah/unbound-docker/pulls). I'd love to see what you made to improve the image.
+If you intend to contribute to this repo, just go ahead and make a [`pull request`](https://github.com/madnuttah/unbound-docker/pulls). I'd love to see what you made to improve the image.
 
 ## Acknowledgements
 
