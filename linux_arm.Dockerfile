@@ -243,7 +243,7 @@ RUN set -xe; \
 FROM alpine:latest
 LABEL maintainer="madnuttah"
 
-ARG BUILD_DATE=$(cat build-date) \
+ARG BUILD_DATE=2022-01-20 \
   IMAGE_URL="https://github.com/madnuttah/unbound-docker" \
   IMAGE_BASE_NAME="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   IMAGE_VEN="madnuttah" \
