@@ -8,31 +8,30 @@
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
 </p>
 
-![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker "Issues")
-![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")
-![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")
-![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")<br>
+[![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
+[![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
+[![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker "Issues")](https://github.com/madnuttah/unbound-docker/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/pulls)
+[![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")](https://github.com/madnuttah/unbound-docker/network/members)
+[![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")](https://github.com/madnuttah/unbound-docker/stargazers)
+[![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
 [![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
 
 <p align="Left">
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
 </p>
 
-![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")
-![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")
-![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")
+[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")](https://hub.docker.com/r/madnuttah/unbound/)
   
 ## Maintainer
 
 - [`madnuttah`](https://github.com/madnuttah/)
 
-## Supported tags and respective `Dockerfile` links
+## Supported Docker tags
 
-- [`1.14.0`, `latest` (*1.14.0/Dockerfile*)](Dockerfile)
-
-## Changes
-
-- [`Changelog`](https://github.com/madnuttah/unbound-docker/blob/main/CHANGELOG.md)
+- [1.14.0, latest](https://hub.docker.com/r/madnuttah/unbound/tags)
 
 ## Table of Contents
 
