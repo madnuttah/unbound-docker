@@ -66,6 +66,8 @@ The unbound process runs in the context of a non-root user, is sealed with chroo
 
 Unbound is configured as an DNSSEC aware DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server.
 
+The image is completely built online via a [Github action](https://github.com/features/actions) and not locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
+
 ## Installation
 
 Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended method of installation on any Linux 386, arm, arm64 or amd64 platform.
