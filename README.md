@@ -3,9 +3,10 @@
 </p>
 
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Docker Image
+
 <p align="Left">
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
-</p>
+</p><br>
 
 [![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
