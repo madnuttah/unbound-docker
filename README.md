@@ -8,10 +8,11 @@
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
 </p>
 
+[![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)<br>
 [![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
 [![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
 [![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
-[![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
+
 
 <a href="https://github.com/madnuttah">
   <img align="top" style="margin:0.5rem" src=https://github-readme-stats.vercel.app/api?username=madnuttah&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide=contribs,commits&count_private=false&hide_title=true)
@@ -35,8 +36,14 @@
 
 ## Supported Docker tags
 
-- [1.14.0, latest](https://hub.docker.com/r/madnuttah/unbound/tags)
-
+<details> 
+    
+  <summary>Tags</summary>
+    
+   - [1.14.0, latest](https://hub.docker.com/r/madnuttah/unbound/tags)
+    
+</details>
+    
 ## Table of Contents
 
 - [What is Unbound](#What-is-Unbound)
@@ -89,8 +96,11 @@ For a better structuring of the unbound.conf file, folders for storing zone and 
 
 ### Folder structure
 
+<details> 
+    
+  <summary>/usr/local/</summary>
+    
 ```
-/usr/local/
 ├── libevent
 │   └── ...
 ├── openssl
@@ -99,7 +109,8 @@ For a better structuring of the unbound.conf file, folders for storing zone and 
 │   ├── conf.d/
 │   │   └── *.conf
 │   ├── iana.d/
-readme│   │   ├── root.key
+│   │   ├── root.hints
+│   │   ├── root.key
 │   │   └── root.zone
 │   ├── unbound.d/
 │   │   ├── lib/
@@ -123,6 +134,8 @@ readme│   │   ├── root.key
 ├── ...
 ...
 ```
+    
+</details>
 
 ### Environment Variables
 
