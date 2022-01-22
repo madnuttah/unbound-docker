@@ -44,7 +44,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-386
-            ${{ env.DOCKERHUB_SLUG }}:latest-386
 
   linux_arm_v6:
     runs-on: ubuntu-latest
@@ -78,7 +77,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv6
-            ${{ env.DOCKERHUB_SLUG }}:latest-armv6
       
   linux_arm_v7:
     runs-on: ubuntu-latest
@@ -112,7 +110,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
-            ${{ env.DOCKERHUB_SLUG }}:latest-armv7
             
   linux_arm64:
     runs-on: ubuntu-latest
@@ -146,7 +143,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-arm64
-            ${{ env.DOCKERHUB_SLUG }}:latest-arm64        
  
   linux_amd64:
     runs-on: ubuntu-latest
@@ -180,7 +176,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-amd64
-            ${{ env.DOCKERHUB_SLUG }}:latest-amd64
         
   manifest:
     runs-on: ubuntu-latest
@@ -213,9 +208,9 @@ jobs:
             --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
           docker manifest push ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}
           docker manifest create ${{ env.DOCKERHUB_SLUG }}:latest \
-            --amend ${{ env.DOCKERHUB_SLUG }}:latest-386 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:latest-arm64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:latest-amd64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:latest-armv6 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:latest-armv7
+            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-386 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-arm64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-amd64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv6 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
           docker manifest push ${{ env.DOCKERHUB_SLUG }}:latest
