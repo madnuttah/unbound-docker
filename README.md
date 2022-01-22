@@ -74,13 +74,13 @@ Late 2019, Unbound has been rigorously audited, which means that the code base i
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
 The unbound process runs in the context of a non-root user, is sealed with chroot and utilizes unprivileged ports (5335 tcp/udp).
 
-Unbound is configured as an DNSSEC aware DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server.
-
-The image is completely built online via a [Github action](https://github.com/features/actions) and not locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
-
+Unbound is configured as an DNSSEC aware DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. Even though the image is intended to run a "hyperlocal" setup, it does not neccessarily mean that it has to be used that way. You are free to edit the unbound.conf file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features.
+    
+**The image is completely built online via a [Github action](https://github.com/features/actions) and not locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+  
 ## Installation
 
-Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended method of installation on any Linux 386, arm, arm64 or amd64 platform.
+Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended method of installation on any Linux based 386, arm, arm64 or amd64 platform.
 
 ## How to use this image
 
@@ -152,9 +152,9 @@ Below is an incomplete list of available options that can be used to customize y
 
 ### Standard usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a MACVLAN network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets needs your very attention**! 
+The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a MACVLAN network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention**! 
 
-*I prefer using a [MACVLAN](https://docs.docker.com/network/macvlan/) network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well*
+*I prefer using a [MACVLAN](https://docs.docker.com/network/macvlan/) network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
 
 Anyway, you can also run this container with the following command:
 
@@ -170,7 +170,7 @@ madnuttah/unbound:latest
 
 ## Documentation
 
-You can find the documentation of this image here: [`RREADME.md`](https://github.com/madnuttah/unbound-docker/blob/master/README.md).
+You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound-docker/blob/main/README.md).
 
 In-depth documentation for Unbound is available on the [Unbound project's website](https://unbound.net/).
 
@@ -191,7 +191,7 @@ If you intend to contribute to this repo, just go ahead and make a [`pull reques
 - [libevent](https://libevent.org/)
 - [Pi-hole](https://pi-hole.net/)
 - [Watchtower](https://containrrr.dev/watchtower/)
-- You. Thank you for using my image.
+- :heart: **You. Thank you for using my image!** :heart:
 
 ## Licenses
 
