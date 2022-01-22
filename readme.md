@@ -10,12 +10,16 @@
 
 [![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
 [![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
-[![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker "Issues")](https://github.com/madnuttah/unbound-docker/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/pulls)
-[![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker "Forks")](https://github.com/madnuttah/unbound-docker/network/members)
-[![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker "Stars")](https://github.com/madnuttah/unbound-docker/stargazers)
 [![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
 [![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
+
+<a href="https://github.com/madnuttah">
+  <img align="top" style="margin:0.0rem" src=https://github-readme-stats.vercel.app/api?username=madnuttah&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide=contribs,commits&count_private=false&hide_title=true)
+/>
+
+<a href="https://github.com/madnuttah">
+  <img align="top" style="margin:0.0rem" src=https://github-readme-stats.vercel.app/api/top-langs/?username=madnuttah&&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide_title=true)
+/><br>
 
 <p align="Left">
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
@@ -95,8 +99,7 @@ For a better structuring of the unbound.conf file, folders for storing zone and 
 │   ├── conf.d/
 │   │   └── *.conf
 │   ├── iana.d/
-│   │   ├── root.hints
-│   │   ├── root.key
+readme│   │   ├── root.key
 │   │   └── root.zone
 │   ├── unbound.d/
 │   │   ├── lib/
@@ -154,7 +157,7 @@ madnuttah/unbound:latest
 
 ## Documentation
 
-You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound-docker/blob/master/README.md).
+You can find the documentation of this image here: [`readme.md`](https://github.com/madnuttah/unbound-docker/blob/master/readme.md).
 
 In-depth documentation for Unbound is available on the [Unbound project's website](https://unbound.net/).
 
