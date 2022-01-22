@@ -3,6 +3,8 @@ name: Build Multiarch Unbound Docker Images
 on:
   push:
     branches: [ main ]
+    paths:
+      - '*.Dockerfile'
     
 env:
   DOCKERHUB_SLUG: madnuttah/unbound
