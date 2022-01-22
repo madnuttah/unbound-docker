@@ -3,25 +3,6 @@
 </p>
 
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Docker Image
-
-<p align="Left">
-    <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
-</p>
-
-[![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)<br>
-[![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
-[![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
-[![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
-
-
-<a href="https://github.com/madnuttah/unbound-docker">
-  <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api?username=madnuttah&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide=contribs,commits&count_private=false&hide_title=true)
-/>
-
-<a href="https://github.com/madnuttah/unbound-docker">
-  <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api/top-langs/?username=madnuttah&&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide_title=true&layout=default)
-/><br>
-
 <p align="Left">
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
 </p>
@@ -29,7 +10,25 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
 [![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")](https://hub.docker.com/r/madnuttah/unbound/)
-  
+<br><br>
+
+<p align="Left">
+    <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
+</p>
+
+<a href="https://github.com/madnuttah/unbound-docker">
+  <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api?username=madnuttah&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide=contribs,commits&count_private=false&hide_title=true)
+/><br>
+
+<a href="https://github.com/madnuttah/unbound-docker">
+  <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api/top-langs/?username=madnuttah&&repo=unbound-docker&layout=compact&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide_title=true)
+/><br><br>
+    
+[![Build Multiarch Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml/badge.svg?branch=main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
+[![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
+[![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
+[![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
+
 ## Maintainer
 
 - [`madnuttah`](https://github.com/madnuttah/)
