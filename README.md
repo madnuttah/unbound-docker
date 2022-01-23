@@ -59,6 +59,7 @@
   - [Contributing](#Contributing)
 - [Acknowledgements](#Acknowledgements)
 - [Licenses](#Licenses)
+- [Social](#Social)
    
 ## What is Unbound
 
@@ -206,3 +207,9 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 - Unbound: [BSD License](https://unbound.nlnetlabs.nl/svn/trunk/LICENSE)
 - OpenSSL: [Apache-style license](https://www.openssl.org/source/license.html)
 - libevent: [BSD License](https://libevent.org/LICENSE.txt)
+    
+## Social
+    
+### Twitter
+
+[![Follow me on Twitter](https://img.shields.io/twitter/follow/madnuttah?style=social)](https://twitter.com/madnuttah)
