@@ -89,9 +89,9 @@ You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madn
 
 For a better structuring of the unbound.conf file, folders for storing zone and other configuration files have been created and can be mounted as volumes: 
 
-- "/usr/local/unbound/conf.d/" for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
+- `/usr/local/unbound/conf.d/` for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
 
-- "/usr/local/unbound/zones.d/" for your zone configuration files like auth-zone.conf, stub-zone.conf, etc.
+- `/usr/local/unbound/zones.d/` for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf etc.
 
 **These files must be named with the suffix .conf.**
 
