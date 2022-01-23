@@ -38,7 +38,7 @@ RUN set -xe; \
       no-weak-ssl-ciphers \
       no-ssl3 \
       no-err \
-      shared \
+      no-shared \
       -DOPENSSL_NO_HEARTBEATS \
       -fstack-protector-strong \
       --prefix=/usr/local/openssl \
@@ -94,7 +94,6 @@ RUN set -xe; \
       --prefix=/usr/local/libevent \
       --disable-static \
       --disable-libevent-regress \
-      --disable-debug-mode \
       --disable-samples \
       --disable-debug-mode \
       --enable-gcc-hardening && \
