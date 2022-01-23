@@ -76,7 +76,7 @@ The unbound process runs in the context of a non-root user, is sealed with chroo
 
 Unbound is configured as an DNSSEC aware DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. Even though the image is intended to run a "hyperlocal" setup, it does not neccessarily mean that it has to be used that way. You are free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features.
     
-**The image is completely built online via a [Github action](https://github.com/features/actions) and not locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+**The image is completely built online via a [Github action](https://github.com/features/actions) and _not_ locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
   
 ## Installation
 
