@@ -328,7 +328,7 @@ ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
       
 VOLUME [ \
   "/usr/local/unbound/conf.d/" \
-  "/usr/local/certs.d/" \
+  "/usr/local/unbound/certs.d/" \
   "/usr/local/unbound/zones.d/" \
   "/usr/local/unbound/log.d/" \
   ] 
