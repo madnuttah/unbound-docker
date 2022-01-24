@@ -89,7 +89,7 @@ Current multiarch-builds of the image are available on [Docker Hub](https://hub.
 
 You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
 
-For a better structuring of the unbound.conf file, folders for storing zone and other configuration files have been created and can be mounted as volumes: 
+For a better structuring of the unbound.conf file, folders for storing zone and other configuration files as well as for your certificates have been created and can be mounted as volumes: 
     
 - `/usr/local/unbound/certs.d/` for storing your certificates.
 
