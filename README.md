@@ -52,7 +52,7 @@
 - [How to use this Image](#How-to-use-this-Image)
   - [Folder Structure](#Folder-Structure)
   - [Environment Variables](#Environment-Variables)
-  - [Standard usage](#Standard-usage)
+  - [Standard Usage](#Standard-Usage)
 - [Documentation and Feedback](#Documentation-and-Feedback)
   - [Documentation](#Documentation)
   - [Feedback](#Feedback)
@@ -219,6 +219,6 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
     
 ### Twitter
     
-Stay up-to-date with the development by following my fresh Twitter account
+Stay up-to-date with the development by following my fresh Twitter account.
 
 [![Follow me on Twitter](https://img.shields.io/twitter/follow/madnuttah?style=social)](https://twitter.com/madnuttah)
