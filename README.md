@@ -47,13 +47,13 @@
 ## Table of Contents
 
 - [What is Unbound](#What-is-Unbound)
-- [About this image](#About-this-Image)
+- [About this Image](#About-this-Image)
 - [Installation](#Installation)
-- [How to use this image](#How-to-use-this-Image)
-  - [Folder structure](#Folder-Structure)
+- [How to use this Image](#How-to-use-this-Image)
+  - [Folder Structure](#Folder-Structure)
   - [Environment Variables](#Environment-Variables)
   - [Standard usage](#Standard-usage)
-- [Documentation and feedback](#Documentation-and-Feedback)
+- [Documentation and Feedback](#Documentation-and-Feedback)
   - [Documentation](#Documentation)
   - [Feedback](#Feedback)
   - [Contributing](#Contributing)
@@ -75,7 +75,7 @@ Late 2019, Unbound has been rigorously audited, which means that the code base i
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
 The unbound process runs in the context of a non-root user, is sealed with chroot and utilizes unprivileged ports (5335 tcp/udp).
 
-Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. Even though the image is intended to run a "hyperlocal" setup, it does not neccessarily mean that it has to be used that way. You are free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features.
+Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. However, even though the image is intended to run a "hyperlocal" setup, it does not neccessarily mean that it has to be used that way. You are free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features.
     
 **The image is completely built online via a [Github action](https://github.com/features/actions) and _not_ locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
     
@@ -184,11 +184,11 @@ In-depth documentation for Unbound is available on the [Unbound project's websit
 
 ## Feedback
 
-Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests for new features or encounter problems with this image.
+Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests for new features or encounter problems with the image.
 
 ## Contributing
 
-If you intend to contribute to this repo, just go ahead and make a [`pull request`](https://github.com/madnuttah/unbound-docker/pulls). I'd love to see what you made to improve the image.
+If you like to contribute to this repository, don't hesitate making a [`pull request`](https://github.com/madnuttah/unbound-docker/pulls). I'd love to see what you have prepared to make the image even greater. Anyhow, it might be a good idea to ask me before making a pull request because of a bug you've found or a feature enhancement you'd like to have added because I may already have implemented it in my development environment.
 
 ## Acknowledgements
 
