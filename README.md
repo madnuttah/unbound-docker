@@ -4,6 +4,8 @@
 
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Multiarch Docker Image
 
+## Statistics
+
 <p align="Left">
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
 </p><br>
@@ -219,6 +221,6 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
     
 ### Twitter
     
-Stay up-to-date with the development by following my fresh Twitter account.
+Stay up-to-date with the development by following my Twitter account.
 
 [![Follow me on Twitter](https://img.shields.io/twitter/follow/madnuttah?style=social)](https://twitter.com/madnuttah)
