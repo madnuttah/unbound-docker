@@ -247,8 +247,8 @@ ARG BUILD_DATE=2022-01-20 \
   IMAGE_URL="https://github.com/madnuttah/unbound-docker" \
   IMAGE_BASE_NAME="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   IMAGE_VEN="madnuttah" \
-  IMAGE_REV=5 \
-  UNBOUND_VERSION=1.14.0
+  IMAGE_REV=0 \
+  UNBOUND_VERSION=1.14.1
 
 ENV NAME=Unbound \
   VENDOR_NAME=${IMAGE_VEN} \
@@ -299,8 +299,9 @@ COPY root/unbound.sh \
 		  
 RUN mkdir -p \
   "/usr/local/unbound/conf.d/" \
-    "/usr/local/unbound/zones.d/" \
-      "/usr/local/unbound/log.d/" && \
+    "/usr/local/unbound/certs.d/" \
+      "/usr/local/unbound/zones.d/" \
+        "/usr/local/unbound/log.d/" && \
   touch /usr/local/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound \
     /usr/local/unbound/ && \
@@ -326,7 +327,8 @@ RUN mkdir -p \
 ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
       
 VOLUME [ \
-  "/usr/local/unbound/conf.d/", \
+  "/usr/local/unbound/conf.d/" \
+  "/usr/local/certs.d/" \
   "/usr/local/unbound/zones.d/" \
   "/usr/local/unbound/log.d/" \
   ] 
