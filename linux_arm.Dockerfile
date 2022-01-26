@@ -178,7 +178,6 @@ RUN set -xe; \
     --with-libevent=/usr/local/libevent \
     --with-ssl=/usr/local/openssl \
     --enable-pie \
-    --enable-fast-install \
     --enable-relro-now && \
   make && \
   make install && \
