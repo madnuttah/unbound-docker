@@ -4,7 +4,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '*.Dockerfile'
+      - '!**'
+      - '.github/workflows/build-multiarch-docker-images.yaml'
     
 env:
   DOCKERHUB_SLUG: madnuttah/unbound
