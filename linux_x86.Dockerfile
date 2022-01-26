@@ -38,7 +38,7 @@ RUN set -xe; \
       no-weak-ssl-ciphers \
       no-ssl3 \
       no-err \
-      no-shared \
+      shared \
       -DOPENSSL_NO_HEARTBEATS \
       -fstack-protector-strong \
       --prefix=/usr/local/openssl \
