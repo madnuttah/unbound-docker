@@ -34,7 +34,7 @@ RUN set -xe; \
       no-weak-ssl-ciphers \
       no-ssl3 \
       no-err \
-      no-shared \
+      shared \
       enable-ec_nistp_64_gcc_128 \
       -DOPENSSL_NO_HEARTBEATS \
       -fstack-protector-strong \
