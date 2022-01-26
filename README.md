@@ -4,6 +4,10 @@
 
 # Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Multiarch Docker Image
 
+## Maintainer
+
+- [`madnuttah`](https://github.com/madnuttah/)
+
 ## Statistics
 
 <p align="Left">
@@ -31,10 +35,6 @@
 [![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
 [![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
 [![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
-
-## Maintainer
-
-- [`madnuttah`](https://github.com/madnuttah/)
 
 ## Supported Docker Tags
 
@@ -65,11 +65,12 @@
    
 ## What is Unbound
 
-Unbound is a validating, recursive, caching DNS resolver. 
+_Unbound is a validating, recursive, caching DNS resolver._
 
-It is designed to be fast and lean and incorporates modern features based on open standards. 
-Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever.
+_It is designed to be fast and lean and incorporates modern features based on open standards. 
+Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever._
 
+Source:
 > [unbound.net](https://unbound.net/)
 
 ## About this Image
@@ -78,10 +79,16 @@ This container image is based on Alpine Linux with focus on security, performanc
 The unbound process runs in the context of a non-root user, is sealed with chroot and utilizes unprivileged ports (5335 tcp/udp).
 
 Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. However, even though the image is intended to run a "hyperlocal" setup, it does not neccessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features.
+       
+To provide always the latest versions, the following software components are compiled in the build process and not just installed:
+    
+- Unbound
+- libevent
+- openssl
     
 **The image is completely built online via a [Github action](https://github.com/features/actions) and _not_ locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
     
-**I hope you enjoy the image as much as I do!**
+_I hope you enjoy the image as much as I do._
   
 ## Installation
 
@@ -162,9 +169,9 @@ Below is an incomplete list of available options that can be used to customize y
 
 ### Standard Usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a MACVLAN network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention**! 
+The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
-*I prefer using a [MACVLAN](https://docs.docker.com/network/macvlan/) network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
+*I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
 
 Anyway, you can also spin up this container with the following command:
 
@@ -182,7 +189,7 @@ madnuttah/unbound:latest
 
 You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound-docker/blob/main/README.md).
 
-In-depth documentation for Unbound is available on the [Unbound project's website](https://unbound.net/) and here is a direct link to the documentation of the default [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file.
+In-depth documentation for Unbound is available on the [Unbound project's website](https://unbound.net/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) is a direct link to the documentation of the default unbound.conf file.
 
 ## Feedback
 
