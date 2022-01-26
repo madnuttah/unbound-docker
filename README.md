@@ -86,7 +86,7 @@ To provide always the latest versions, the following software components are sel
 - Libevent
 - OpenSSL
     
-**The image is completely built online via a [Github action](https://github.com/features/actions) and _not_ locally on my systems. All downloads are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+**The image is completely built online via a [Github action](https://github.com/features/actions) and _not_ locally on my systems. All components are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
     
 _I hope you enjoy the image as much as I do._
   
