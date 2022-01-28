@@ -107,10 +107,14 @@ For a better structuring of the unbound.conf file, folders for optionally storin
 - `/usr/local/unbound/certs.d/` for storing your certificates.
 
 - `/usr/local/unbound/conf.d/` for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
+    
+- `/usr/local/unbound/log.d/` for your logfile in case you need to view it for troubleshooting and debugging.
 
 - `/usr/local/unbound/zones.d/` for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
 
 **These files must be named with the suffix .conf.**
+    
+_You can find splitted configuration files underneath the [`Examples folder`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) to get an impression on how to structure the config files. Please mind that those files are just examples which also need to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your unbound.conf will perfectly do the job. Speaking for myself I like it better having the config separated like so._
 
 ### Folder Structure
 
