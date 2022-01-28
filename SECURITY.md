@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-All "latest" versions and it's corresponding version will be updated as soon as possible in case a vulnerability was found or has been reported by you.
+All "latest" versions and their corresponding version will be updated as soon as possible in case a vulnerability was found by me or has been reported by you.
 
 | Version | Supported          |
 | ------- | ------------------ |
