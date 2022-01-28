@@ -46,6 +46,10 @@
     
 </details>
     
+## Changes
+    
+You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unbound-docker/releases) section.
+    
 ## Table of Contents
 
 - [What is Unbound](#What-is-Unbound)
@@ -173,7 +177,7 @@ The best way to get started is using [docker-compose](https://docs.docker.com/co
 
 *I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
 
-Anyway, you can also spin up this container with the following command:
+Anyway, you can also spin up the container with the following command:
 
 ```console
 docker run --name madnuttah-unbound -d \
@@ -193,11 +197,11 @@ In-depth documentation for Unbound is available on the [Unbound project's websit
 
 ## Feedback
 
-Feel free to contact me through a [`GitHub issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests for new features or encounter problems with the image.
+Feel free to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests for new features or encounter problems with the image.
 
 ## Contributing
 
-If you like to contribute to this repository, don't hesitate making a [`pull request`](https://github.com/madnuttah/unbound-docker/pulls). I'd love to see what you have prepared to make the image even better. Anyhow, it might be a good idea to contact me before making a pull request because of a bug you've found or a feature enhancement you'd like to have added because I may already have implemented it in my development environment.
+If you like to contribute to this repository, take a look at the [`Contributing Guidelines`](https://github.com/madnuttah/unbound-docker/blob/main/CONTRIBUTING.md).
 
 ## Acknowledgements
 
@@ -208,7 +212,7 @@ If you like to contribute to this repository, don't hesitate making a [`pull req
 - [Libevent](https://libevent.org/)
 - [Pi-hole](https://pi-hole.net/)
 - [Watchtower](https://containrrr.dev/watchtower/)
-- **You. Thank you for using my image!** :heart:
+- **Thank you for using my image** :heart:
 
 ## Licenses
 
@@ -222,7 +226,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 - Docker: [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)
 - Unbound: [BSD License](https://unbound.nlnetlabs.nl/svn/trunk/LICENSE)
 - OpenSSL: [Apache-style license](https://www.openssl.org/source/license.html)
-- libevent: [BSD License](https://libevent.org/LICENSE.txt)
+- Libevent: [BSD License](https://libevent.org/LICENSE.txt)
     
 ## Social
     
