@@ -90,7 +90,7 @@ To provide always the latest versions, the following software components are sel
 - Libevent
 - OpenSSL
     
-**The image is completely built online via a [Github action](https://github.com/features/actions) and _not_ locally on my systems. All components are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+**The image is completely built online via a [GitHub Action](https://github.com/features/actions) and _not_ locally on my systems. All components are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
     
 _I hope you enjoy the image as much as I do._
   
@@ -112,7 +112,7 @@ To provide a better structuring of the unbound.conf file, folders for optionally
 
 - `/usr/local/unbound/zones.d/` for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
     
-_You can find splitted configuration files underneath the_ [`Examples folder`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) _to get an impression on how to structure the config files. Please mind that those files are just examples which also need to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your unbound.conf will perfectly do the job. Speaking for myself, I prefer having the configs separated like so._
+_You can find splitted configuration files underneath the_ [`Examples`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) _folder to get an impression on how to structure the config files. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your unbound.conf will perfectly do the job. Speaking for myself, I prefer having the configs separated like so._
     
 **These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
 
