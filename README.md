@@ -100,21 +100,21 @@ Current multiarch-builds of the image are available on [Docker Hub](https://hub.
 
 ## How to use this Image
 
-You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
+You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
 
-For a better structuring of the unbound.conf file, folders for optionally storing zone and other configuration files as well as for your certificates have been created and can be mounted as volumes: 
+To provide a better structuring of the unbound.conf file, folders for optionally storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
 - `/usr/local/unbound/certs.d/` for storing your certificates.
 
 - `/usr/local/unbound/conf.d/` for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
     
-- `/usr/local/unbound/log.d/` for your logfile in case you need to view it for troubleshooting and debugging.
+- `/usr/local/unbound/log.d/` for your unbound.log in case you need to view it for troubleshooting and debugging purposes.
 
 - `/usr/local/unbound/zones.d/` for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
-
-**These files must be named with the suffix .conf.**
     
-_You can find splitted configuration files underneath the [`Examples folder`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) to get an impression on how to structure the config files. Please mind that those files are just examples which also need to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your unbound.conf will perfectly do the job. Speaking for myself I like it better having the config separated like so._
+_You can find splitted configuration files underneath the_ [`Examples folder`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) _to get an impression on how to structure the config files. Please mind that those files are just examples which also need to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your unbound.conf will perfectly do the job. Speaking for myself, I prefer having the configs separated like so._
+    
+**These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
 
 ### Folder Structure
 
