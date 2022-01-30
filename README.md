@@ -14,7 +14,8 @@
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
 </p><br>
 
-[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Image Version](https://img.shields.io/docker/v/madnuttah/unbound/latest "Docker Image Version")](https://hub.docker.com/r/madnuttah/unbound/tags)
+[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
 [![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")](https://hub.docker.com/r/madnuttah/unbound/)
 <br><br>
@@ -92,7 +93,7 @@ To provide always the latest versions, the following software components are sel
     
 **The image is completely built online via a [GitHub Action](https://github.com/features/actions) and _not_ locally on my systems. All components are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
     
-_I hope you enjoy the image as much as I do._
+I hope you enjoy the image as much as I do.
   
 ## Installation
 
@@ -104,15 +105,15 @@ You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madn
 
 To provide a better structuring of the unbound.conf file, folders for optionally storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
-- `/usr/local/unbound/certs.d/` for storing your certificates.
+- [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
-- `/usr/local/unbound/conf.d/` for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
+- [`/usr/local/unbound/conf.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/conf.d/) for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
     
-- `/usr/local/unbound/log.d/` for your unbound.log in case you need to view it for troubleshooting and debugging purposes.
+- [`/usr/local/unbound/log.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/log.d/) for your unbound.log in case you need to view it for troubleshooting and debugging purposes.
 
-- `/usr/local/unbound/zones.d/` for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
+- [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
     
-_You can find splitted configuration files in the_ [`examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) _folder to get an impression on how to structure the config files. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your standard unbound.conf will perfectly do the job._
+_You can find splitted configuration files in the_ [`examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) _folder and it's subfolders to get an impression on how to structure the config files. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your standard unbound.conf will perfectly do the job._
     
 **These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
 
