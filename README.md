@@ -113,7 +113,7 @@ To provide a better structuring of the unbound.conf file, folders for optionally
 
 - [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
     
-_You can find splitted configuration files in the_ [`examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) _folder and it's subfolders to get an impression on how to structure the config files. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't really neccessary as your standard unbound.conf will perfectly do the job._
+The splitted configuration files located in [`examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) are meant to give you an impression on how to structure the configs. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't neccessary as your standard unbound.conf will perfectly do the job.
     
 **These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
 
@@ -196,9 +196,9 @@ madnuttah/unbound:latest
 
 ## Documentation
 
-You can find the documentation of this image here: [`README.md`](https://github.com/madnuttah/unbound-docker/blob/main/README.md).
-
-In-depth documentation for Unbound is available on the [Unbound project's website](https://unbound.net/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) is a direct link to the documentation of the default unbound.conf file.
+In-depth documentation for NLnetLabs Unbound is available on the [Unbound project's website](https://unbound.net/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) goes a direct link to the documentation of the default unbound.conf file. 
+    
+There'a also a dedicated Unbound documentation website which can be accessed using this [link](https://unbound.docs.nlnetlabs.nl/en/latest/).
 
 ## Feedback
 
