@@ -15,7 +15,7 @@ Steps to reproduce the behavior:
 1. First I '...'
 2. Then I '...'
 3. And then '...'
-4. 
+4. ...
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
