@@ -113,10 +113,10 @@ To provide a better structuring of the unbound.conf file, folders for optionally
 
 - [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
     
+**These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
+    
 The splitted configuration files located in [`examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) are meant to give you an impression on how to structure the configs. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't neccessary as your standard unbound.conf will perfectly do the job.
     
-**These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
-
 ### Folder Structure
 
 <details> 
