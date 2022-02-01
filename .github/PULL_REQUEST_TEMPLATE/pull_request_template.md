@@ -1,5 +1,5 @@
 <!--
-Please make sure you've read and understood my [`contributing guidelines`](https://github.com/madnuttah/unbound-docker/blob/main/CONTRIBUTING.md)
+Please make sure you've read and understood my [`Contributing Guidelines`](https://github.com/madnuttah/unbound-docker/blob/main/CONTRIBUTING.md)
 
 If this is a bug fix, make sure your description includes "fixes #xxxx", or
 "closes #xxxx"
