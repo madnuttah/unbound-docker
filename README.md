@@ -125,10 +125,14 @@ The splitted configuration files located in [`examples/usr/local/unbound`](https
     
 ```
 /usr/local/
-├── libevent
+├── libevent/
 │   └── ...
-├── openssl
+├── openssl/
 │   └── ... 
+├── sbin/
+│   ├── unbound.sh 
+│   ├── update-rootkey.sh
+│   └── ...
 ├── unbound/
 │   ├── certs.d/
 │   │   └── ...
