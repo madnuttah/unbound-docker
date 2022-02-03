@@ -131,7 +131,6 @@ The splitted configuration files located in [`examples/usr/local/unbound`](https
 │   └── ... 
 ├── sbin/
 │   ├── unbound.sh 
-│   ├── update-rootkey.sh
 │   └── ...
 ├── unbound/
 │   ├── certs.d/
