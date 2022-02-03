@@ -1,7 +1,7 @@
 FROM alpine:latest AS openssl
 LABEL maintainer="madnuttah"
 
-ENV OPENSSL_VERSION=openssl-3.0.1 \
+ARG OPENSSL_VERSION=openssl-3.0.1 \
   OPENSSL_SHA256="c311ad853353bce796edad01a862c50a8a587f62e7e2100ef465ab53ec9b06d1 " \
   OPENSSL_DOWNLOAD_URL=https://www.openssl.org/source/ \
   OPENSSL_PGP=8657ABB260F056B1E5190839D9C4D26D0E604491
@@ -55,7 +55,7 @@ RUN set -xe; \
 FROM alpine:latest AS libevent
 LABEL maintainer="madnuttah"
 
-ENV LIBEVENT_VERSION=2.1.12 \
+ARG LIBEVENT_VERSION=2.1.12 \
   LIBEVENT_DOWNLOAD_URL=https://github.com/libevent/libevent/releases/download/release \
   LIBEVENT_PGP="9E3AC83A27974B84D1B3401DB86086848EF8686D"
   
@@ -108,16 +108,11 @@ RUN set -xe; \
 FROM alpine:latest AS unbound
 LABEL maintainer="madnuttah"
 
-ARG UNBOUND_VERSION=1.14.1 \
+ARG UNBOUND_VERSION=1.14.0 \
+  UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
   UNBOUND_PGP="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
   UNBOUND_SHA256=6ef91cbf02d5299eab39328c0857393de7b4885a2fe7233ddfe3c124ff5a89c8 \
-  INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5"
-	
-ENV NAME=unbound \
-  UNBOUND_VERSION=${UNBOUND_VERSION} \
-  UNBOUND_SHA256=${UNBOUND_SHA256} \ 
-  UNBOUND_PGP=${UNBOUND_PGP} \
-  UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
+  INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5" \
 
 WORKDIR /tmp/src
 
@@ -165,6 +160,8 @@ RUN set -xe; \
     --with-pidfile=/usr/local/unbound/unbound.d/unbound.pid \ 
     --with-run-dir=/usr/local/unbound/unbound.d \ 
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
+    --with-libevent=/usr/local/libevent \
+    --with-ssl=/usr/local/openssl \
     --with-username=_unbound \
     --with-pthreads \
     --without-pythonmodule \
@@ -174,9 +171,6 @@ RUN set -xe; \
     --enable-tfo-server \
     --enable-tfo-client \
     --enable-event-api \
-    --with-deprecate-rsa-1024 \
-    --with-libevent=/usr/local/libevent \
-    --with-ssl=/usr/local/openssl \
     --enable-pie \
     --enable-relro-now && \
   make && \
@@ -241,12 +235,12 @@ RUN set -xe; \
 FROM alpine:latest
 LABEL maintainer="madnuttah"
 
-ARG BUILD_DATE=2022-01-20 \
+ARG BUILD_DATE="2022-02-02" \
   IMAGE_URL="https://github.com/madnuttah/unbound-docker" \
   IMAGE_BASE_NAME="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   IMAGE_VEN="madnuttah" \
   IMAGE_REV=0 \
-  UNBOUND_VERSION=1.14.1
+  UNBOUND_VERSION="1.14.0"
 
 ENV NAME=Unbound \
   VENDOR_NAME=${IMAGE_VEN} \
@@ -294,6 +288,9 @@ COPY --from=unbound /usr/local/unbound/ \
 
 COPY root/unbound.sh \
   /usr/local/sbin/
+  
+COPY root/update-rootkey.sh \
+  /usr/local/sbin/
 		  
 RUN mkdir -p \
   "/usr/local/unbound/conf.d/" \
@@ -311,10 +308,10 @@ RUN mkdir -p \
         /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/ && \
-  chmod -R +x \
-    /usr/local/unbound/unbound.d/sbin/ && \
-  chmod +x \
-    /usr/local/sbin/unbound.sh && \
+  chmod -R 770 \
+    /usr/local/sbin/ && \
+  ln -s /usr/local/sbin/update-rootkey.sh \
+    /etc/periodic/weekly/ && \
   rm -rf \
     /usr/share/man \
     /usr/share/docs \
@@ -325,6 +322,7 @@ RUN mkdir -p \
 ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
       
 VOLUME [ \
+  "/usr/local/unbound/iana.d/" \
   "/usr/local/unbound/conf.d/" \
   "/usr/local/unbound/certs.d/" \
   "/usr/local/unbound/zones.d/" \
