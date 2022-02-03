@@ -289,9 +289,6 @@ COPY --from=unbound /usr/local/unbound/ \
 
 COPY root/unbound.sh \
   /usr/local/sbin/
-  
-COPY root/update-rootkey.sh \
-  /usr/local/sbin/
 		  
 RUN mkdir -p \
   "/usr/local/unbound/conf.d/" \
