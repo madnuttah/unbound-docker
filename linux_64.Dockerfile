@@ -308,8 +308,6 @@ RUN mkdir -p \
     /usr/local/unbound/ && \
   chmod -R 770 \
     /usr/local/sbin/ && \
-  ln -s /usr/local/sbin/update-rootkey.sh \
-    /etc/periodic/weekly/ && \
   rm -rf \
     /usr/share/man \
     /usr/share/docs \
