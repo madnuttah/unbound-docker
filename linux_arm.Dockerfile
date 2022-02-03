@@ -288,9 +288,6 @@ COPY --from=unbound /usr/local/unbound/ \
 
 COPY root/unbound.sh \
   /usr/local/sbin/
-  
-COPY root/update-rootkey.sh \
-  /usr/local/sbin/
 		  
 RUN mkdir -p \
   "/usr/local/unbound/conf.d/" \
@@ -310,8 +307,6 @@ RUN mkdir -p \
     /usr/local/unbound/ && \
   chmod -R 770 \
     /usr/local/sbin/ && \
-  ln -s /usr/local/sbin/update-rootkey.sh \
-    /etc/periodic/weekly/ && \
   rm -rf \
     /usr/share/man \
     /usr/share/docs \
