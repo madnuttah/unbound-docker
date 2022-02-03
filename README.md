@@ -109,6 +109,8 @@ To provide a better structuring of the unbound.conf file, folders for optionally
 
 - [`/usr/local/unbound/conf.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/conf.d/) for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
     
+- [`/usr/local/unbound/iana.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/iana.d/) for the root.key, root.hints and root.zone files in case you need to update or view them for troubleshooting and debugging purposes.
+    
 - [`/usr/local/unbound/log.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/log.d/) for your unbound.log in case you need to view it for troubleshooting and debugging purposes.
 
 - [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
