@@ -110,7 +110,7 @@ FROM alpine:latest AS unbound
 LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION=1.14.0 \
-  UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz
+  UNBOUND_DOWNLOAD_URL=https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz \
   UNBOUND_PGP="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
   UNBOUND_SHA256=6ef91cbf02d5299eab39328c0857393de7b4885a2fe7233ddfe3c124ff5a89c8 \
   INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5"
