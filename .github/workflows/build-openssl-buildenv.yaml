@@ -8,7 +8,7 @@ on:
       - '.github/workflows/build-openssl-buildenv.yaml'
         
 env:
-  DOCKERHUB_SLUG: madnuttah/unbound-libevent-buildenv
+  DOCKERHUB_SLUG: madnuttah/unbound-buildenv
   VERSION: "3.0.1"
   
 jobs:
@@ -40,7 +40,7 @@ jobs:
           file: ./openssl/linux_x86.Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-386   
+            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-386   
           
   linux_arm_v6:
     runs-on: ubuntu-latest
@@ -70,7 +70,7 @@ jobs:
           file: ./openssl/linux_arm.Dockerfile          
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv6
+            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv6
       
   linux_arm_v7:
     runs-on: ubuntu-latest
@@ -100,7 +100,7 @@ jobs:
           file: ./openssl/linux_arm.Dockerfile           
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
+            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv7
                       
   linux_arm64:
     runs-on: ubuntu-latest
@@ -130,7 +130,7 @@ jobs:
           file: ./openssl/linux_64.Dockerfile     
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-arm64
+            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-arm64
  
   linux_amd64:
     runs-on: ubuntu-latest
@@ -160,7 +160,7 @@ jobs:
           file: ./openssl/linux_64.Dockerfile     
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-amd64
+            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-amd64
         
   create-manifest-list:
     runs-on: ubuntu-latest
@@ -184,17 +184,17 @@ jobs:
       - name: Create and push multiarch manifests
         if: github.event_name != 'pull_request'
         run: |
-          docker manifest create ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }} \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-386 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-arm64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-amd64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv6 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
-          docker manifest push ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}
-          docker manifest create ${{ env.DOCKERHUB_SLUG }}:latest \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-386 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-arm64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-amd64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv6 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
-          docker manifest push ${{ env.DOCKERHUB_SLUG }}:latest
+          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }} \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-386 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-arm64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-amd64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv6 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv7
+          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}
+          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-latest \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-386 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-arm64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-amd64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv6 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv7
+          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-latest
