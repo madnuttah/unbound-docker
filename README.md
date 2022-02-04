@@ -14,10 +14,10 @@
     <img width=100 src="https://www.docker.com/sites/default/files/d8/2019-07/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
 </p><br>
 
-[![Docker Image Version](https://img.shields.io/docker/v/madnuttah/unbound/latest "Docker Image Version")](https://hub.docker.com/r/madnuttah/unbound/tags)
-[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/tags)
-[![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
-[![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound "Docker Start")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Image Version](https://img.shields.io/docker/v/madnuttah/unbound/latest?style=flat-square "Docker Image Version")](https://hub.docker.com/r/madnuttah/unbound/tags)
+[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest?style=flat-square "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/tags)
+[![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound?style=flat-square "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound?style=flat-square "Docker Start")](https://hub.docker.com/r/madnuttah/unbound/)
 <br><br>
 
 <p align="Left">
@@ -32,10 +32,10 @@
   <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api/top-langs/?username=madnuttah&&repo=unbound-docker&layout=compact&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide_title=true)
 /><br><br>
     
-[![Build Multiarch Unbound Docker Images](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20Unbound%20Docker%20Images/main)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
-[![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker)](https://github.com/madnuttah/unbound-docker/releases)
-[![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main)](https://github.com/madnuttah/unbound-docker/commits/main)
-[![License](https://img.shields.io/github/license/madnuttah/unbound-docker "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
+[![Build Multiarch Unbound Docker Images](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20Unbound%20Docker%20Images/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-multiarch-docker-images.yaml)
+[![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
+[![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
+[![License](https://img.shields.io/github/license/madnuttah/unbound-docker?style=flat-square "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
 
 ## Supported Docker Tags
 
