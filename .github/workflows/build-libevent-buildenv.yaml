@@ -8,7 +8,7 @@ on:
       - '.github/workflows/build-libevent-buildenv.yaml'
 
 env:
-  DOCKERHUB_SLUG: madnuttah/unbound-libevent-buildenv
+  DOCKERHUB_SLUG: madnuttah/unbound-buildenv
   VERSION: "2.1.12"
   
 jobs:
@@ -40,5 +40,5 @@ jobs:
           file: ./libevent/Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}
-            ${{ env.DOCKERHUB_SLUG }}:latest
+            ${{ env.DOCKERHUB_SLUG }}:libevent-${{ env.VERSION }}
+            ${{ env.DOCKERHUB_SLUG }}:libevent-latest
