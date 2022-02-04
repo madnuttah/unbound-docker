@@ -198,4 +198,3 @@ jobs:
             --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv6 \
             --amend ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}-armv7
           docker manifest push ${{ env.DOCKERHUB_SLUG }}:latest
-  
