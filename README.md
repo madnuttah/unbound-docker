@@ -101,23 +101,23 @@ Current multiarch-builds of the image are available on [Docker Hub](https://hub.
 
 ## How to use this Image
 
-You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
+You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
 
 To provide a better structuring of the unbound.conf file, folders for optionally storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
-- [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/certs.d/) for storing your certificate files.
+- [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
-- [`/usr/local/unbound/conf.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/conf.d/) for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
+- [`/usr/local/unbound/conf.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/conf.d/) for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
     
-- [`/usr/local/unbound/iana.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/iana.d/) for the root.key, root.hints and root.zone files in case you need to update or view them for troubleshooting and debugging purposes.
+- [`/usr/local/unbound/iana.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/iana.d/) for the root.key, root.hints and root.zone files in case you need to update or view them for troubleshooting and debugging purposes.
     
-- [`/usr/local/unbound/log.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/log.d/) for your unbound.log in case you need to view it for troubleshooting and debugging purposes.
+- [`/usr/local/unbound/log.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/log.d/) for your unbound.log in case you need to view it for troubleshooting and debugging purposes.
 
-- [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
+- [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
     
 **These config files must be named with the suffix .conf - except the unbound.log and your certificate files of course.**
     
-The splitted configuration files located in [`examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/examples/usr/local/unbound) are meant to give you an impression on how to structure the configs. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't neccessary as your standard unbound.conf will perfectly do the job.
+The splitted configuration files located in [`unbound/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound) are meant to give you an impression on how to structure the configs. Please mind that those files are just examples which also needs to be edited to make them work for your environment. Other than that, splitting ain't neccessary as your standard unbound.conf will perfectly do the job.
     
 ### Folder Structure
 
@@ -183,7 +183,7 @@ Below is an incomplete list of available options that can be used to customize y
 
 ### Standard Usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
 
