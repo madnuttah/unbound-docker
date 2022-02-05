@@ -161,10 +161,10 @@ RUN set -xe; \
 	
 WORKDIR /usr/local/unbound
 
-COPY ./Unbound/root/usr/local/unbound/ \
+COPY ./unbound/root/usr/local/unbound/ \
   /usr/local/unbound/
 
-COPY ./Unbound/root/unbound.sh \
+COPY ./unbound/root/unbound.sh \
   /usr/local/sbin/
 
 COPY --from=unbound /usr/local/openssl/ \
