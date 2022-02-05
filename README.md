@@ -92,12 +92,32 @@ To provide always the latest versions, the following software components are sel
 - OpenSSL
     
 **The image is completely built online via a [GitHub Action](https://github.com/features/actions) and _not_ locally on my systems. All components are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+      
+<details> 
     
-I hope you enjoy the image as much as I do.
-  
+  <summary>Features</summary>
+    
+| Feature                                  | Supported          |
+| ---------------------------------------- | ------------------ |
+| DNSSEC                                   | :white_check_mark: |
+| DNSCrypt                                 | :white_check_mark: |
+| DNSTap                                   | :x:                |
+| DNS64                                    | :white_check_mark: |
+| DNS over HTTPS                           | :white_check_mark: |
+| DNS over TLS                             | :white_check_mark: |
+| QName Minimization                       | :white_check_mark: |
+| Auth. zones with local copy of root zone | :white_check_mark: |
+| Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
+| Response Policy Zones                    | :white_check_mark: |
+| EDNS Client Subnet                       | :x:                |
+    
+</details>
+
+I hope you enjoy the image as much as I do. 
+    
 ## Installation
 
-Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended method of installation on any Linux-based 386, arm, arm64 or amd64 platform.
+Current multiarch-builds of the image are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound) and is the recommended source of installation on any Linux-based 386, arm, arm64 or amd64 platform.
 
 ## How to use this Image
 
@@ -183,7 +203,7 @@ Below is an incomplete list of available options that can be used to customize y
 
 ### Standard Usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a combined Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
 
@@ -203,7 +223,7 @@ madnuttah/unbound:latest
 
 In-depth documentation for NLnetLabs Unbound is available on the [Unbound project's website](https://unbound.net/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) goes a direct link to the documentation of the default unbound.conf file. 
     
-There'a also a dedicated Unbound documentation website which can be accessed using this [link](https://unbound.docs.nlnetlabs.nl/en/latest/).
+There's also a dedicated Unbound documentation website which can be accessed using this [link](https://unbound.docs.nlnetlabs.nl/en/latest/).
 
 ## Feedback
 
