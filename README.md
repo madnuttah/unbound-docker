@@ -22,20 +22,21 @@
 
 <p align="Left">
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
-</p>
+</p><br>
 
-<a href="https://github.com/madnuttah/unbound-docker">
-  <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api?username=madnuttah&repo=unbound-docker&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide=contribs&count_private=false&hide_title=true)
-/><br>
-
-<a href="https://github.com/madnuttah/unbound-docker">
-  <img align="top" style="margin:1.0rem" src=https://github-readme-stats.vercel.app/api/top-langs/?username=madnuttah&&repo=unbound-docker&layout=compact&show_icons=true&title_color=9f9f9f&icon_color=79ff97&text_color=9f9f9f&bg_color=00ff0000&disable_animations=true&hide_border=true&hide_title=true)
-/><br><br>
-    
-[![Build Multiarch Unbound Docker Image](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20Unbound%20Docker%20Image/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
 [![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 [![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
 [![License](https://img.shields.io/github/license/madnuttah/unbound-docker?style=flat-square "License")](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE)
+
+[![Commit Activity](https://img.shields.io/github/commit-activity/y/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
+[![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker?style=flat-square "Forks")](https://github.com/madnuttah/unbound-docker/network/members)
+[![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker?style=flat-square "Stars")](https://github.com/madnuttah/unbound-docker/stargazers)
+[![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker?style=flat-square "Issues")](https://github.com/madnuttah/unbound-docker/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/pulls)
+
+[![Build Multiarch Unbound Docker Image](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20Unbound%20Docker%20Image/main?label=Unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
+[![Build Multiarch OpenSSL BuildEnv Docker Image](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20OpenSSL%20BuildEnv%20Docker%20Image/main?label=OpenSSL%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
+[![Build Multiarch Libevent BuildEnv Docker Image](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20Libevent%20BuildEnv%20Docker%20Image/main?label=Libevent%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-libevent-buildenv.yaml)
 
 ## Supported Docker Tags
 
