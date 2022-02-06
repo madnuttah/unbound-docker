@@ -43,8 +43,8 @@
 
 <details> 
     
-  <summary>Tags</summary>
-     
+  <summary>Tags</summary><br>  
+    
    - [1.15.0rc1](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.14.0, latest](https://hub.docker.com/r/madnuttah/unbound/tags)
     
@@ -98,7 +98,7 @@ To provide always the latest versions, the following software components are sel
       
 <details> 
     
-  <summary>Features</summary>
+  <summary>Features</summary><br>
     
 | Feature                                  | Supported          |
 | ---------------------------------------- | ------------------ |
@@ -146,7 +146,7 @@ The splitted configuration files located in [`unbound/examples/usr/local/unbound
 
 <details> 
     
-  <summary>Filesystem</summary>
+  <summary>Filesystem</summary><br>
     
 ```
 /usr/local/
