@@ -15,9 +15,9 @@
 </p><br>
 
 [![Docker Image Version](https://img.shields.io/docker/v/madnuttah/unbound/latest?style=flat-square "Docker Image Version")](https://hub.docker.com/r/madnuttah/unbound/tags)
-[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest?style=flat-square "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/tags)
-[![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound?style=flat-square "Docker Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
-[![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound?style=flat-square "Docker Start")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Image Size](https://img.shields.io/docker/image-size/madnuttah/unbound/latest?label=compressed%20image%20size&style=flat-square "Docker Image Size")](https://hub.docker.com/r/madnuttah/unbound/tags)
+[![Docker Pulls](https://img.shields.io/docker/pulls/madnuttah/unbound?label=pulls&style=flat-square "Pulls")](https://hub.docker.com/r/madnuttah/unbound/)
+[![Docker Stars](https://img.shields.io/docker/stars/madnuttah/unbound?label=stars&style=flat-square "Stars")](https://hub.docker.com/r/madnuttah/unbound/)
 <br><br>
 
 <p align="Left">
