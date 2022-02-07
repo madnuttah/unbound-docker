@@ -8,7 +8,7 @@ on:
       - '.github/workflows/build-openssl-buildenv.yaml'
         
 env:
-  DOCKERHUB_SLUG: madnuttah/unbound
+  DOCKERHUB_SLUG: "madnuttah/unbound"
   VERSION: "3.0.1"
   
 jobs:
