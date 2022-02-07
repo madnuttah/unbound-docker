@@ -17,7 +17,6 @@ RUN set -xe; \
   ca-certificates \
   gnupg \
   curl \
-  binutils \
   file && \
   apk --update --no-cache add --virtual .build-deps \
     build-base \
