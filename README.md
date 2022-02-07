@@ -264,7 +264,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 - OpenSSL: [Apache-style license](https://www.openssl.org/source/license.html)
 - Libevent: [BSD License](https://libevent.org/LICENSE.txt)
 
-### Legal
+## Legal
 
 Please note that this is a work of a private contributor and I'm neither affiliated with NLnetLabs or Pi-Hole nor is NLnetLabs or Pi-Hole involved in the development of the image. The marks and properties, 'Unbound' and 'Pi-Hole' are properties of NLnetLabs and Pi-Hole. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
     
