@@ -8,7 +8,7 @@ on:
       - '.github/workflows/build-libevent-buildenv.yaml'
 
 env:
-  DOCKERHUB_SLUG: madnuttah/unbound-buildenv
+  DOCKERHUB_SLUG: madnuttah/unbound
   VERSION: "2.1.12"
   
 jobs:
