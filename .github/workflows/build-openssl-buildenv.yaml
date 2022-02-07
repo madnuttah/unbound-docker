@@ -41,9 +41,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-386   
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
-          cache-to: inline
-          continue-on-error: true
           
   linux_arm_v6:
     runs-on: ubuntu-latest
@@ -74,9 +71,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
-          cache-to: inline
-          continue-on-error: true
       
   linux_arm_v7:
     runs-on: ubuntu-latest
@@ -107,9 +101,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
-          cache-to: inline
-          continue-on-error: true
                       
   linux_arm64:
     runs-on: ubuntu-latest
@@ -140,10 +131,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-arm64
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
-          cache-to: inline
-          continue-on-error: true
- 
+
   linux_amd64:
     runs-on: ubuntu-latest
     steps:
@@ -173,9 +161,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
-          cache-to: inline
-          continue-on-error: true
         
   create-manifest-list:
     runs-on: ubuntu-latest
