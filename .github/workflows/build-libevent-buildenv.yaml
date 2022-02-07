@@ -40,6 +40,6 @@ jobs:
           file: ./libevent/Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:libevent-${{ env.VERSION }}
-            ${{ env.DOCKERHUB_SLUG }}:libevent-latest
+            ${{ env.DOCKERHUB_SLUG }}:libevent-buildenv-${{ env.VERSION }}
+            ${{ env.DOCKERHUB_SLUG }}:libevent-buildenv-latest
      
