@@ -2,7 +2,7 @@ ARG IMAGE_BUILD_DATE="2022-02-03" \
   UNBOUND_VERSION="1.15.0rc1" \
   IMAGE_REVISION="0"
 
-FROM madnuttah/unbound-buildenv:libevent-latest AS unbound
+FROM madnuttah/unbound:libevent-latest AS unbound
 LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION
