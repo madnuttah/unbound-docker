@@ -40,7 +40,10 @@ jobs:
           file: ./openssl/linux_x86.Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-386   
+            ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-386   
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
+          cache-to: inline
+          continue-on-error: true
           
   linux_arm_v6:
     runs-on: ubuntu-latest
@@ -70,7 +73,10 @@ jobs:
           file: ./openssl/linux_arm.Dockerfile          
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv6
+            ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
+          cache-to: inline
+          continue-on-error: true
       
   linux_arm_v7:
     runs-on: ubuntu-latest
@@ -100,7 +106,10 @@ jobs:
           file: ./openssl/linux_arm.Dockerfile           
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv7
+            ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
+          cache-to: inline
+          continue-on-error: true
                       
   linux_arm64:
     runs-on: ubuntu-latest
@@ -130,7 +139,10 @@ jobs:
           file: ./openssl/linux_64.Dockerfile     
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-arm64
+            ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-arm64
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
+          cache-to: inline
+          continue-on-error: true
  
   linux_amd64:
     runs-on: ubuntu-latest
@@ -160,7 +172,10 @@ jobs:
           file: ./openssl/linux_64.Dockerfile     
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-amd64
+            ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-latest
+          cache-to: inline
+          continue-on-error: true
         
   create-manifest-list:
     runs-on: ubuntu-latest
@@ -184,17 +199,17 @@ jobs:
       - name: Create and push multiarch manifests
         if: github.event_name != 'pull_request'
         run: |
-          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }} \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-386 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-arm64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-amd64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv6 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv7
-          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}
-          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-latest \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-386 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-arm64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-amd64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv6 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-${{ env.VERSION }}-armv7
-          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-latest
+          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }} \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-386 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-arm64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
+          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}
+          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-latest \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-386 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-arm64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6 \
+            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
+          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-latest
