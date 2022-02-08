@@ -85,7 +85,7 @@ Source:
 ## About this Image
 
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
-The unbound process runs in the context of a non-root user, is sealed with chroot and utilizes unprivileged ports (5335 tcp/udp).
+The unbound process runs in the context of a non-root user, is sealed with chroot and makes use of unprivileged ports (5335 tcp/udp).
 
 Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. However, even though the image is intended to run a "hyperlocal" setup, it does not neccessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features.
        
@@ -127,7 +127,7 @@ Current multiarch-builds of the image are available on [Docker Hub](https://hub.
 
 You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) file to your needs. The compose file also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
 
-To provide a better structuring of the unbound.conf file, directories for optionally storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
+To provide a better structuring of the unbound.conf file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
 - [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
@@ -141,7 +141,7 @@ To provide a better structuring of the unbound.conf file, directories for option
     
 **The config files in the `conf.d` and `zones.d` folders must be named with the suffix .conf to prevent issues with specific host configurations.**
     
-The splitted configuration files located in [`unbound/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited and even updated (root.key, root.zone, root.hints in the `iana.d` folder) to make them work for your environment if you intend to use them. It might be neccessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. You can access the _running_ image by executing the following command in your shell: `sudo docker exec -ti madnuttah/unbound:latest /bin/sh`.
+The splitted configuration files located in [`unbound/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited and even updated (root.key, root.zone, root.hints in the `iana.d` folder) to make them work for your environment if you intend to use them. It might be neccessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. You can access the _running_ image by executing the following command in your shell: `sudo docker exec -ti madnuttah-unbound /bin/sh`. If you have assigned a different name for the image than `madnuttah-unbound`, this must be adjusted of course.
 
 Other than that, splitting ain't neccessary as your standard unbound.conf will perfectly do the job.
     
