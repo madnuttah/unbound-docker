@@ -7,5 +7,6 @@ All supported "latest" versions and their corresponding version will be updated 
 | Version   | Supported          |
 | --------- | ------------------ |
 | latest    | :white_check_mark: |
+| 1.15.0    | :white_check_mark: |
 | 1.15.0rc1 | :x:                |
-| 1.14.0    | :white_check_mark: |
+| 1.14.0    | :x:                |
