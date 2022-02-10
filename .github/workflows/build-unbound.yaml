@@ -41,4 +41,4 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}
-            ${{ env.DOCKERHUB_SLUG }}:latest
+            ${{ env.DOCKERHUB_SLUG }}:latest   
