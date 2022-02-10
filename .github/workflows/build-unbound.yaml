@@ -8,8 +8,8 @@ on:
       - '.github/workflows/build-unbound.yaml'
          
 env:
-  DOCKERHUB_SLUG: madnuttah/unbound
-  VERSION: "1.15.0rc1"
+  DOCKERHUB_SLUG: "madnuttah/unbound"
+  VERSION: "1.15.0"
   
 jobs:
   build:
@@ -41,5 +41,4 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}
-    # ${{ env.DOCKERHUB_SLUG }}:latest
- 
+            ${{ env.DOCKERHUB_SLUG }}:latest
