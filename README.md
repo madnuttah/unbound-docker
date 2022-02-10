@@ -44,9 +44,10 @@
 <details> 
     
   <summary>Tags</summary><br>  
-    
+
+   - [1.15.0, latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.14.0, latest](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.14.0](https://hub.docker.com/r/madnuttah/unbound/tags)
     
 </details>
     
@@ -79,8 +80,7 @@ _Unbound is a validating, recursive, caching DNS resolver._
 _It is designed to be fast and lean and incorporates modern features based on open standards. 
 Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever._
 
-Source:
-> [unbound.net](https://unbound.net/)
+Source: [unbound.net](https://unbound.net/)
 
 ## About this Image
 
@@ -269,7 +269,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 
 ## Legal
 
-Please note that this is a work of a private contributor and I'm neither affiliated with NLnetLabs or Pi-Hole nor is NLnetLabs or Pi-Hole involved in the development of the image. The marks and properties, 'Unbound' and 'Pi-Hole' are properties of NLnetLabs and Pi-Hole. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+Please note that this is a work of a private contributor and I'm neither affiliated with NLnetLabs or Pi-hole nor is NLnetLabs or Pi-hole involved in the development of the image. The marks and properties, 'Unbound' and 'Pi-hole' are properties of NLnetLabs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
     
 ## Social
     
