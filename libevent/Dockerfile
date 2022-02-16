@@ -25,8 +25,8 @@ RUN set -xe; \
     curl -sSL "${LIBEVENT_DOWNLOAD_URL}"-"${LIBEVENT_VERSION}"-stable/libevent-"${LIBEVENT_VERSION}"-stable.tar.gz.asc -o libevent.tar.gz.asc && \
     GNUPGHOME="$(mktemp -d)" && \
     export GNUPGHOME && \
-    gpg --no-tty --keyserver pgp.mit.edu --recv-keys "${LIBEVENT_PGP}" || \
-    gpg --no-tty --keyserver keyserver.ubuntu.com --recv-keys "${LIBEVENT_PGP}" && \
+    gpg --no-tty --keyserver hkps://pgp.mit.edu --recv-keys "${LIBEVENT_PGP}" || \
+    gpg --no-tty --keyserver hkps://keyserver.ubuntu.com --recv-keys "${LIBEVENT_PGP}" && \
     gpg --batch --verify libevent.tar.gz.asc libevent.tar.gz && \
     tar xzf libevent.tar.gz && \
     rm libevent.tar.gz && \
