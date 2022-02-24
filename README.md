@@ -45,8 +45,8 @@
     
   <summary>Tags</summary><br>  
 
-   - [1.15.0, (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0rc1, (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.15.0 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.15.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.14.0](https://hub.docker.com/r/madnuttah/unbound/tags)
     
 </details>
@@ -62,7 +62,7 @@ You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unb
 - [Installation](#Installation)
 - [How to use this Image](#How-to-use-this-Image)
   - [Folder Structure](#Folder-Structure)
-  - [Environment Variables](#Environment-Variables)
+  - [Networking](#Networking)
   - [Standard Usage](#Standard-Usage)
 - [Documentation and Feedback](#Documentation-and-Feedback)
   - [Documentation](#Documentation)
@@ -95,7 +95,7 @@ To provide always the latest versions, the following software components are sel
 - [`Libevent`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-libevent-buildenv.yaml)
 - [`OpenSSL`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
     
-**The image is completely built online via a [GitHub Action](https://github.com/features/actions) and _not_ locally on my systems. All components are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+**The image is completely built online via a [GitHub Action](https://github.com/features/actions) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
       
 <details> 
     
@@ -196,13 +196,6 @@ Other than that, splitting ain't neccessary as your standard unbound.conf will p
 ```
     
 </details>
-
-### Environment Variables
-
-Below is an incomplete list of available options that can be used to customize your installation.
-
-| Parameter | Description    | Default |
-| --------- | -------------- | ------- |
 
 ### Networking
 
