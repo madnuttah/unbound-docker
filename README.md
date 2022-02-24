@@ -204,6 +204,8 @@ Other than that, splitting ain't neccessary as your standard unbound.conf will p
 | --------- | ------------------------ |
 | `5335`    | Listening Port (TCP/UDP) |
 
+If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf.
+
 ### Standard Usage
 
 The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a combined Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
