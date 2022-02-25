@@ -204,7 +204,7 @@ Other than that, splitting ain't neccessary as your standard unbound.conf will p
 | --------- | ------------------------ |
 | `5335`    | Listening Port (TCP/UDP) |
 
-If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf.
+If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml.
 
 ### Standard Usage
 
@@ -247,7 +247,7 @@ If you like to contribute to this repository, take a look at the [`Contributing 
 - [Libevent](https://libevent.org/)
 - [Pi-hole](https://pi-hole.net/)
 - [Watchtower](https://containrrr.dev/watchtower/)
-- **Thank you for using my image** :heart:
+- **Thank you for using my image** ❤️
 
 ## Licenses
 
