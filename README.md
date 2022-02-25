@@ -98,7 +98,7 @@ To provide always the latest versions, the following software components are sel
     
 **The image is completely built online via a [GitHub Action](https://github.com/features/actions) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
 
-**Unbound is compiled with hardening security features such as PIE (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and RELRO (Relocation Read-Only) which also can mitigate exploitations.**
+**Unbound is compiled with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations.**
       
 <details> 
     
