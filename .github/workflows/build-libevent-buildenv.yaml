@@ -18,7 +18,18 @@ jobs:
     
       - uses: step-security/harden-runner@bdb12b622a910dfdc99a31fdfe6f45a16bc287a4 # v1
         with:
-          egress-policy: audit
+          egress-policy: block
+          disable-telemetry: true
+          allowed-endpoints: 
+            dl-cdn.alpinelinux.org:443
+            github.com:443
+            auth.docker.io:443
+            registry-1.docker.io:443
+            production.cloudflare.docker.com:443
+            objects.githubusercontent.com:443
+            pgp.mit.edu:443
+            keyserver.ubuntu.com:443
+            pipelines.actions.githubusercontent.com:443
         
       - name: Checkout source
         uses: actions/checkout@v2
