@@ -46,7 +46,8 @@
     
   <summary>Tags</summary><br>  
 
-   - [1.15.0 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.15.0-1 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.15.0](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.14.0](https://hub.docker.com/r/madnuttah/unbound/tags)
     
@@ -77,7 +78,6 @@ You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unb
 ## What is Unbound
 
 > _Unbound is a validating, recursive, caching DNS resolver._
-
 > _It is designed to be fast and lean and incorporates modern features based on open standards. 
 Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever._
 
