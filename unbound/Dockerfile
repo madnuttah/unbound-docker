@@ -1,6 +1,6 @@
-ARG IMAGE_BUILD_DATE="2022-03-16" \
+ARG IMAGE_BUILD_DATE="2022-03-17" \
   UNBOUND_VERSION="1.15.0" \
-  IMAGE_REVISION="1"
+  IMAGE_REVISION="2"
 
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
 LABEL maintainer="madnuttah"
