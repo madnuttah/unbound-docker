@@ -278,5 +278,3 @@ Stay up-to-date with the development by following my social media accounts:
 [![Follow me on Mastodon](https://img.shields.io/mastodon/follow/107779375129112763?domain=https%3A%2F%2Ffosstodon.org%2F&style=social)](https://fosstodon.org/@madnuttah)
 <br>
 [![Follow me on Twitter](https://img.shields.io/twitter/follow/madnuttah?style=social)](https://twitter.com/madnuttah) 
-  
-<a rel="me" href="https://fosstodon.org/@madnuttah"/>
