@@ -93,7 +93,7 @@ services:
 networks:
   dns-network:
     #enable_ipv6: <false> #Enable if using IPv6
-    driver: <macvlan> #Choose macvlan, bridged, host, etc.
+    driver: <macvlan>
     driver_opts:
       parent: <eth0> #Your parent network interface
     ipam:
