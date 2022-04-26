@@ -1,4 +1,5 @@
-#Sample docker-compose.yaml deploying Pi-hole, Unbound and Watchtower.
+#Sample docker-compose.yaml deploying Pi-hole, Unbound and Watchtower
+#with a macvlan Network.
 #This example needs to be modified to reflect your network environment,
 #especially the values in angle brackets (<>) must be adapted to your needs.
 #This file is the one I'm using and was slightly modified with added IPv6
