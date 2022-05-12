@@ -25,7 +25,7 @@ RUN set -xe; \
     libevent-dev \
     linux-headers \
     apk-tools && \
-    curl -sSL "${OPENSSL_DOWNLOAD_URL}"-"{$OPENSSL_VERSION}".tar.gz -o openssl.tar.gz && \
+    curl -sSL "${OPENSSL_DOWNLOAD_URL}"-"${OPENSSL_VERSION}".tar.gz -o openssl.tar.gz && \
     echo "${OPENSSL_SHA256} ./openssl.tar.gz" | sha256sum -c - && \
     curl -L "${OPENSSL_DOWNLOAD_URL}"-"${OPENSSL_VERSION}".tar.gz.asc -o openssl.tar.gz.asc && \
     GNUPGHOME="$(mktemp -d)" && \
