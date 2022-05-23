@@ -40,7 +40,11 @@
 [![Build Multiarch OpenSSL BuildEnv Docker Image](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20OpenSSL%20BuildEnv%20Docker%20Image/main?label=OpenSSL%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
 [![Build Multiarch Libevent BuildEnv Docker Image](https://img.shields.io/github/workflow/status/madnuttah/unbound-docker/Build%20Multiarch%20Libevent%20BuildEnv%20Docker%20Image/main?label=Libevent%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-libevent-buildenv.yaml)
 
-[![Current NLnetLabs Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20NLnetLabs%20Unbound%20release)](https://github.com/NLnetLabs/unbound/tags)
+## Image Components Versions
+
+[![Current NLnetLabs Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20NLnetLabs%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
+[![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
+[![Current Libevent release](https://img.shields.io/github/v/tag/libevent/libevent?label=Current%20Libevent%20release&style=flat-square)](https://github.com/libevent/libevent/tags)
 
 ## Available Docker Tags
 
