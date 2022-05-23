@@ -42,7 +42,7 @@
 
 ## Image Components Versions
 
-[![Current NLnetLabs Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20NLnetLabs%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
+[![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
 [![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
 [![Current Libevent release](https://img.shields.io/github/v/tag/libevent/libevent?label=Current%20Libevent%20release&style=flat-square)](https://github.com/libevent/libevent/tags)
 
