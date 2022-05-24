@@ -17,7 +17,7 @@ RUN set -xe; \
   file && \
   apk --update --no-cache add --virtual .build-deps \
     build-base \
-    python2 \
+    python3 \
     zlib-dev \
     linux-headers \
     apk-tools && \
