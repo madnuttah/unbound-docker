@@ -1,7 +1,7 @@
 ARG IMAGE_BUILD_DATE="2022-05-24" \
   UNBOUND_VERSION="1.15.0" \
   IMAGE_REVISION="7"
-
+   
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
 LABEL maintainer="madnuttah"
 
@@ -33,6 +33,8 @@ RUN set -xe; \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}".asc -o unbound.tar.gz.asc && \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
+  
+  
   export GNUPGHOME && \
   gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$UNBOUND_PGP" && \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
