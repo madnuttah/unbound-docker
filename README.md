@@ -51,8 +51,9 @@
 <details> 
     
   <summary>Tags</summary><br>  
-
-   - [1.15.0-6 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+    
+   - [1.15.0-7 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.15.0-6](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-4](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-3](https://hub.docker.com/r/madnuttah/unbound/tags)
