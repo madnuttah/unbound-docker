@@ -6,11 +6,13 @@ All supported "latest" versions and their corresponding version will be updated 
 
 | Version           | Supported          |
 | ----------------- | ------------------ |
-| 1.15.0-5 (latest) | :white_check_mark: |
-| 1.15.0-4          | :white_check_mark: |
-| 1.15.0-3          | :white_check_mark: |
-| 1.15.0-2          | :white_check_mark: |
-| 1.15.0-1          | :white_check_mark: |
+| 1.15.0-7 (latest) | :white_check_mark: |
+| 1.15.0-6          | :x:                |
+| 1.15.0-5          | :x:                |
+| 1.15.0-4          | :x:                |
+| 1.15.0-3          | :x:                |
+| 1.15.0-2          | :x:                |
+| 1.15.0-1          | :x:                |
 | 1.15.0            | :x:                |
 | 1.15.0rc1         | :x:                |
 | 1.14.0            | :x:                |
