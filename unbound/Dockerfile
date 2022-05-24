@@ -33,8 +33,6 @@ RUN set -xe; \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}".asc -o unbound.tar.gz.asc && \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
-  
-  
   export GNUPGHOME && \
   gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$UNBOUND_PGP" && \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
