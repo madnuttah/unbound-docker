@@ -6,6 +6,7 @@ All supported "latest" versions and their corresponding version will be updated 
 
 | Version           | Supported          |
 | ----------------- | ------------------ |
+| 1.16.0rc1         | :x:                |
 | 1.15.0-7 (latest) | :white_check_mark: |
 | 1.15.0-6          | :white_check_mark: |
 | 1.15.0-5          | :white_check_mark: |
