@@ -52,7 +52,7 @@
     
   <summary>Tags</summary><br>  
     
-   - [1.16.0rc1 (Pre release)](https://hub.docker.com/r/madnuttah/unbound/tags)    
+   - [1.16.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)    
    - [1.15.0-7 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-6](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
@@ -221,7 +221,7 @@ If you want to use this image as a standalone DNS resolver _without_ Pi-hole, th
 
 ### Standard Usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided a combined Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml) sample which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/) samples which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
 
