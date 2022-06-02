@@ -1,5 +1,5 @@
-ARG IMAGE_BUILD_DATE="2022-05-27" \
-  UNBOUND_VERSION="1.16.0rc1" \
+ARG IMAGE_BUILD_DATE="2022-06-02" \
+  UNBOUND_VERSION="1.16.0" \
   IMAGE_REVISION="0"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
@@ -10,7 +10,7 @@ ARG UNBOUND_VERSION
 ENV UNBOUND_VERSION=${UNBOUND_VERSION} \
   UNBOUND_DOWNLOAD_URL="https://www.nlnetlabs.nl/downloads/unbound/unbound-"${UNBOUND_VERSION}".tar.gz" \
   UNBOUND_PGP="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
-  UNBOUND_SHA256="d26a5bc0f9bcef71c5eef9fff4473221d9e4d569d27ad7ef370a1f765a23d4f9" \
+  UNBOUND_SHA256="6701534c938eb019626601191edc6d012fc534c09d2418d5b92827db0cbe48a5" \
   INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5"
 
 WORKDIR /tmp/src
@@ -28,6 +28,7 @@ RUN set -xe; \
     linux-headers \
     nghttp2-libs \
     expat-dev \
+    protobuf-c-dev \
     apk-tools && \
   curl -sSL "$UNBOUND_DOWNLOAD_URL" -o unbound.tar.gz && \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}".asc -o unbound.tar.gz.asc && \
@@ -56,6 +57,7 @@ RUN set -xe; \
     --with-libevent=/usr/local/libevent \
     --with-ssl=/usr/local/openssl \
     --with-username=_unbound \
+    --enable-dnstap \
     --with-pthreads \
     --without-pythonmodule \
     --without-pyunbound \
@@ -157,6 +159,7 @@ RUN set -xe; \
     ca-certificates \
     libsodium \
     nghttp2 \
+    protobuf-c \
     expat
 	
 WORKDIR /usr/local/unbound
