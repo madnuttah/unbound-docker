@@ -217,3 +217,4 @@ VOLUME [ \
 EXPOSE 5335/tcp 5335/udp
 
 CMD [ "/usr/local/sbin/unbound.sh" ]
+   
