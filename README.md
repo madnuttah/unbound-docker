@@ -52,8 +52,9 @@
     
   <summary>Tags</summary><br>  
     
+   - [1.16.0 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)    
-   - [1.15.0-7 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.15.0-7](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-6](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.15.0-4](https://hub.docker.com/r/madnuttah/unbound/tags)
@@ -123,7 +124,7 @@ To provide always the latest versions, the following software components are sel
 | Unprivileged user                        | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
 | DNSCrypt                                 | :white_check_mark: |
-| DNSTap                                   | :x:                |
+| DNSTap                                   | :white_check_mark: |
 | DNS64                                    | :white_check_mark: |
 | Draft-0x20 (caps-for-id: yes)            | :white_check_mark: |    
 | DNS over HTTPS                           | :white_check_mark: |
