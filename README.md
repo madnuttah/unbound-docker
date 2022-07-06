@@ -52,6 +52,7 @@
     
   <summary>Tags</summary><br>  
   
+   - [1.16.1rc1-1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.1rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.0-1 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.0](https://hub.docker.com/r/madnuttah/unbound/tags)
