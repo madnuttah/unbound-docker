@@ -9,7 +9,7 @@ All supported "latest" versions and their corresponding version will be updated 
 | 1.16.1rc1-1       | :x:                |
 | 1.16.1rc1         | :x:                |
 | 1.16.0-2 (latest) | :white_check_mark: |
-| 1.16.0-1 (latest) | :white_check_mark: |
+| 1.16.0-1          | :white_check_mark: |
 | 1.16.0            | :white_check_mark: |
 | 1.16.0rc1         | :x:                |
 | 1.15.0-7          | :x:                |
