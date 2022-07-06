@@ -54,7 +54,8 @@
   
    - [1.16.1rc1-1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.1rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.0-1 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.16.0-2 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.16.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.0](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.16.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)    
    - [1.15.0-7](https://hub.docker.com/r/madnuttah/unbound/tags)
