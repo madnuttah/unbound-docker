@@ -60,3 +60,4 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}      
             ${{ env.DOCKERHUB_SLUG }}:latest
   
+          
