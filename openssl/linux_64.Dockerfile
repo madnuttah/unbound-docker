@@ -31,6 +31,7 @@ RUN set -xe; \
     GNUPGHOME="$(mktemp -d)" && \
     export GNUPGHOME && \
     gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${OPENSSL_PGP}" && \
+    gpg --recv-keys "7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C " && \
     gpg --batch --verify openssl.tar.gz.asc openssl.tar.gz && \
     tar xzf openssl.tar.gz && \
     cd openssl-"${OPENSSL_VERSION}" && \
