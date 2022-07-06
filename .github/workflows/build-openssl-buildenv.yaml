@@ -28,6 +28,7 @@ jobs:
             production.cloudflare.docker.com:443
             objects.githubusercontent.com:443
             keys.openpgp.org:443
+            keyserver.ubuntu.com:443
             pipelines.actions.githubusercontent.com:443
             www.openssl.org:443
           
@@ -73,6 +74,7 @@ jobs:
             production.cloudflare.docker.com:443
             objects.githubusercontent.com:443
             keys.openpgp.org:443
+            keyserver.ubuntu.com:443
             pipelines.actions.githubusercontent.com:443
             www.openssl.org:443
           
@@ -118,6 +120,7 @@ jobs:
             production.cloudflare.docker.com:443
             objects.githubusercontent.com:443
             keys.openpgp.org:443
+            keyserver.ubuntu.com:443
             pipelines.actions.githubusercontent.com:443
             www.openssl.org:443
 
@@ -163,6 +166,7 @@ jobs:
             production.cloudflare.docker.com:443
             objects.githubusercontent.com:443
             keys.openpgp.org:443
+            keyserver.ubuntu.com:443
             pipelines.actions.githubusercontent.com:443
             www.openssl.org:443
           
@@ -208,6 +212,7 @@ jobs:
             production.cloudflare.docker.com:443
             objects.githubusercontent.com:443
             keys.openpgp.org:443
+            keyserver.ubuntu.com:443
             pipelines.actions.githubusercontent.com:443
             www.openssl.org:443
           
