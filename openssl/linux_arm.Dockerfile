@@ -8,6 +8,7 @@ ARG OPENSSL_VERSION
 ENV OPENSSL_VERSION=${OPENSSL_VERSION} \
   OPENSSL_SHA256="aa7d8d9bef71ad6525c55ba11e5f4397889ce49c2c9349dcea6d3e4f0b024a7a " \
   OPENSSL_DOWNLOAD_URL="https://www.openssl.org/source/openssl" \
+  OPENSSL_LEVITTE_RSA="7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C" \
   OPENSSL_PGP="8657ABB260F056B1E5190839D9C4D26D0E604491"
 
 WORKDIR /tmp/src
@@ -31,7 +32,7 @@ RUN set -xe; \
     GNUPGHOME="$(mktemp -d)" && \
     export GNUPGHOME && \
     gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${OPENSSL_PGP}" && \
-    gpg --recv-keys "7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C " && \
+    gpg --recv-keys "${OPENSSL_LEVITTE_RSA}" && \
     gpg --batch --verify openssl.tar.gz.asc openssl.tar.gz && \
     tar xzf openssl.tar.gz && \
     cd openssl-"${OPENSSL_VERSION}" && \
@@ -39,7 +40,9 @@ RUN set -xe; \
       no-weak-ssl-ciphers \
       no-ssl3 \
       no-err \
+      no-tests \
       shared \
+  # enable-quic \
       -DOPENSSL_NO_HEARTBEATS \
       -fstack-protector-strong \
       --prefix=/usr/local/openssl \
