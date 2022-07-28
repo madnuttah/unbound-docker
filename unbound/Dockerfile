@@ -65,7 +65,6 @@ RUN set -xe; \
     --enable-dnscrypt \
     --enable-tfo-server \
     --enable-tfo-client \
-    --enable-event-api \
     --enable-pie \
     --enable-relro-now && \
   make && \
