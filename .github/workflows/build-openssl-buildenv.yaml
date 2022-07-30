@@ -33,7 +33,7 @@ jobs:
             www.openssl.org:443
           
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
             
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -79,7 +79,7 @@ jobs:
             www.openssl.org:443
           
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
             
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -125,7 +125,7 @@ jobs:
             www.openssl.org:443
 
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
             
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -171,7 +171,7 @@ jobs:
             www.openssl.org:443
           
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
     
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -217,7 +217,7 @@ jobs:
             www.openssl.org:443
           
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
             
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -265,7 +265,7 @@ jobs:
             pipelines.actions.githubusercontent.com:443
           
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
     
       - name: Login to Dockerhub        
         if: github.event_name != 'pull_request'   
