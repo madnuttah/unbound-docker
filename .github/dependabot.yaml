@@ -6,6 +6,14 @@ updates:
       interval: weekly
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "./libevent/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "./openssl/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "./unbound/"
     schedule:
       interval: "weekly"
