@@ -42,6 +42,7 @@
 
 ## Image Dependencies Versions
 
+[![Current Alpine Linux release](https://img.shields.io/docker/v/_/alpine/latest?label=Current%20Alpine%20Linux%20Release&style=flat-square)](https://github.com/alpinelinux/docker-alpine)
 [![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
 [![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
 [![Current Libevent release](https://img.shields.io/github/v/tag/libevent/libevent?label=Current%20Libevent%20release&style=flat-square)](https://github.com/libevent/libevent/tags)
