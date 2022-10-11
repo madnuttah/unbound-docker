@@ -9,8 +9,8 @@ on:
          
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "1.17.0rc1"
-  REVISION: "0"
+  VERSION: "1.16.3-1"
+  REVISION: "1"
   
 jobs:
   build:
@@ -58,4 +58,4 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}      
-#            ${{ env.DOCKERHUB_SLUG }}:latest
+            ${{ env.DOCKERHUB_SLUG }}:latest
