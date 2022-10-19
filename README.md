@@ -2,7 +2,7 @@
     <img src="https://repository-images.githubusercontent.com/440215882/b79c7ae3-c3d4-4a6a-a1d7-d27fa626754b" alt="Logo">
 </p>
 
-# Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Server Multiarch Docker Image
+# Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Resolver Multiarch Docker Image
 
 ## Maintainer
 
@@ -42,7 +42,7 @@
 
 ## Image Dependencies Versions
 
-[![Current Alpine Linux release](https://img.shields.io/docker/v/_/alpine/latest?label=Current%20Alpine%20Linux%20Release&style=flat-square)](https://github.com/alpinelinux/docker-alpine)
+[![Current Alpine Linux release](https://img.shields.io/docker/v/_/alpine/latest?label=Current%20Alpine%20Linux%20release&style=flat-square)](https://github.com/alpinelinux/docker-alpine)
 [![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
 [![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
 [![Current Libevent release](https://img.shields.io/github/v/tag/libevent/libevent?label=Current%20Libevent%20release&style=flat-square)](https://github.com/libevent/libevent/tags)
