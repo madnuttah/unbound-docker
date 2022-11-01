@@ -1,6 +1,8 @@
-ARG IMAGE_BUILD_DATE="2022-10-13" \
+ARG IMAGE_BUILD_DATE="2022-11-01" \
+  OPENSSL_VERSION="3.0.7" \
+  LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.17.0" \
-  IMAGE_REVISION="1"
+  IMAGE_REVISION="2"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
 LABEL maintainer="madnuttah"
@@ -130,26 +132,29 @@ FROM alpine:latest
 LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION \
+  OPENSSL_VERSION \
+  LIBEVENT_VERSION \
   IMAGE_BUILD_DATE \
   IMAGE_REVISION
 
-ENV VERSION=${UNBOUND_VERSION} \
-  REVISION=${IMAGE_REVISION} \
-  BUILD_DATE=${IMAGE_BUILD_DATE}
-
+ENV BUILD_DATE=${IMAGE_BUILD_DATE} \
+  IMAGE_REVISION=${IMAGE_REVISION} \
+  UNBOUND_VERSION=${UNBOUND_VERSION} \
+  OPENSSL_VERSION=${OPENSSL_VERSION} \
+  LIBEVENT_VERSION=${LIBEVENT_VERSION} \
+  
 LABEL org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.created=$BUILD_DATE \
-  org.opencontainers.image.version=$VERSION \
-  org.opencontainers.image.revision=$REVISION \
+  org.opencontainers.image.version=$UNBOUND_VERSION \
+  org.opencontainers.image.revision=$IMAGE_REVISION \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
-  org.opencontainers.image.summary="Unbound is a validating, recursive, and caching DNS resolver." \
+  org.opencontainers.image.summary="This multiarch Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
   org.opencontainers.image.base.name="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   org.opencontainers.image.url="https://github.com/madnuttah/unbound-docker" \
   org.opencontainers.image.source="https://github.com/madnuttah/unbound-docker" \
   org.opencontainers.image.authors="madnuttah" \
   org.opencontainers.image.vendor="madnuttah" \
   org.opencontainers.image.licenses="MIT"
-
 	
 RUN set -xe; \
   addgroup -S _unbound -g 1000 && \
@@ -216,4 +221,3 @@ VOLUME [ \
 EXPOSE 5335/tcp 5335/udp
 
 CMD [ "/usr/local/sbin/unbound.sh" ]
-   
