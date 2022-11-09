@@ -16,7 +16,7 @@ jobs:
   linux_x86:
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@v1
+      - uses: step-security/harden-runner@v2
         with:
           egress-policy: block
           disable-telemetry: true
@@ -62,7 +62,7 @@ jobs:
   linux_arm_v6:
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@v1
+      - uses: step-security/harden-runner@v2
         with:
           egress-policy: block
           disable-telemetry: true
@@ -108,7 +108,7 @@ jobs:
   linux_arm_v7:
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@v1
+      - uses: step-security/harden-runner@v2
         with:
           egress-policy: block
           disable-telemetry: true
@@ -154,7 +154,7 @@ jobs:
   linux_arm64:
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@v1
+      - uses: step-security/harden-runner@v2
         with:
           egress-policy: block
           disable-telemetry: true
@@ -200,7 +200,7 @@ jobs:
   linux_amd64:
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@v1
+      - uses: step-security/harden-runner@v2
         with:
           egress-policy: block
           disable-telemetry: true
@@ -252,7 +252,7 @@ jobs:
       - linux_arm64
       - linux_amd64
     steps:
-      - uses: step-security/harden-runner@v1
+      - uses: step-security/harden-runner@v2
         with:
           egress-policy: block
           disable-telemetry: true
