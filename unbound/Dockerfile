@@ -213,14 +213,6 @@ RUN mkdir -p \
 	
 ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
       
-VOLUME [ \
-  "/usr/local/unbound/iana.d/" \
-  "/usr/local/unbound/conf.d/" \
-  "/usr/local/unbound/certs.d/" \
-  "/usr/local/unbound/zones.d/" \
-  "/usr/local/unbound/log.d/" \
-  ] 
-      
 EXPOSE 5335/tcp 5335/udp
 
 CMD [ "/usr/local/sbin/unbound.sh" ]
