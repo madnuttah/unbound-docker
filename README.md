@@ -299,8 +299,6 @@ Please note that this is a work of a private contributor and I'm neither affilia
     
 ## Social
     
-Stay up-to-date with the development by following my social media accounts:
+Stay up-to-date with the development by following me:
 
 [![Follow me on Mastodon](https://img.shields.io/mastodon/follow/107779375129112763?domain=https%3A%2F%2Ffosstodon.org%2F&style=social)](https://fosstodon.org/@madnuttah)
-<br>
-[![Follow me on Twitter](https://img.shields.io/twitter/follow/madnuttah?style=social)](https://twitter.com/madnuttah) 
