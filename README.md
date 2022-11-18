@@ -295,7 +295,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 
 ## Legal
 
-Please note that this is a work of a private contributor and I'm neither affiliated with NLnetLabs or Pi-hole nor is NLnetLabs or Pi-hole involved in the development of the image. The marks and properties, 'Unbound' and 'Pi-hole' are properties of NLnetLabs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties, 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
     
 ## Social
     
