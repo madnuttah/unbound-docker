@@ -52,8 +52,9 @@
 <details> 
     
   <summary>Tags</summary><br>  
-
-   - [1.17.0-3 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags) 
+  
+   - [1.17.0-4 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags) 
+   - [1.17.0-3](https://hub.docker.com/r/madnuttah/unbound/tags) 
    - [1.17.0-2](https://hub.docker.com/r/madnuttah/unbound/tags) 
    - [1.17.0-1](https://hub.docker.com/r/madnuttah/unbound/tags) 
    - [1.17.0](https://hub.docker.com/r/madnuttah/unbound/tags) 
@@ -240,7 +241,9 @@ If you want to use this image as a standalone DNS resolver _without_ Pi-hole, th
 
 The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/) samples which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
-*I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.* I have added a custom bridge network to the [`MACVLAN example`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml%20(mcvlan)) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
+*I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.* 
+
+I have added a custom bridge network to the [`MACVLAN example`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml%20(mcvlan)) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
 Anyway, you can also spin up the container with the following command:
 
