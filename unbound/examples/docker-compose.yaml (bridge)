@@ -22,9 +22,6 @@ services:
       dns-network:
         ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 172.20.0.254
         #ipv6_address: <PI_HOLE_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::506
-      dns-bridge:
-        ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 192.168.0.0/16  
-        #ipv6_address: <PI_HOLE_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::506
     dns:
       - <UNBOUND_IP_ADDRESS> #e.g. 172.20.0.253 or fd11:aa:1234:1234::505
     ports:
@@ -101,11 +98,3 @@ networks:
           gateway: <GATEWAY_IPv4_ADDRESS> #e.g. 172.20.0.1  
         #- subnet: <IPv6_SUBNET> #e.g. fd11:aa:1234:1234::/126
         # gateway: <GATEWAY_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::11   
-
-  dns-bridge:
-    #enable_ipv6: <false> #Enable if using IPv6
-    driver: bridge
-    ipam:
-      config:
-        - subnet: <IPv4_SUBNET> #e.g. 192.168.0.0/16        
-        #- subnet: <IPv6_SUBNET> #e.g. fd11:bb:1234:1234::/126
