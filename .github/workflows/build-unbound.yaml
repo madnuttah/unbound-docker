@@ -9,8 +9,8 @@ on:
          
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "1.17.0-3"
-  REVISION: "3"
+  VERSION: "1.17.0-4"
+  REVISION: "4"
   
 jobs:
   build:
@@ -23,6 +23,8 @@ jobs:
           allowed-endpoints: 
             dl-cdn.alpinelinux.org:443
             github.com:443
+            docker.io
+            index.docker.io
             auth.docker.io:443
             registry-1.docker.io:443
             production.cloudflare.docker.com:443
