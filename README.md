@@ -161,7 +161,7 @@ Current multiarch-builds of the image are available on [Docker Hub](https://hub.
 
 ## How to use this Image
 
-You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples) files to your needs. The compose files also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking as well as [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. 
+You should adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples) files to your needs. The compose files also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking as well as [Watchtower](https://containrrr.dev/watchtower/) for keeping your images up to date. **Please mind [this warning](https://github.com/pi-hole/docker-pi-hole#note-on-watchtower) regarding Watchtower.** If you like to have your images updated automatically, simply uncomment the entries in the Watchtower section.
 
 To provide a better structuring of the unbound.conf file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
@@ -240,7 +240,7 @@ If you want to use this image as a standalone DNS resolver _without_ Pi-hole, th
 
 The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound/Watchtower [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/) samples which I'm using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs for development or production use. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
-*I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.*
+*I prefer using a MACVLAN network configuration instead of a bridged or rather unsafe host network, but other network configurations will run as well.* I have added a custom bridge network to the [`MACVLAN example`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml%20(mcvlan)) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
 Anyway, you can also spin up the container with the following command:
 
