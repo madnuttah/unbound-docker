@@ -22,6 +22,9 @@ services:
       dns-network:
         ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 172.20.0.254
         #ipv6_address: <PI_HOLE_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::506
+      dns-bridge:
+        ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 192.168.0.0/16  
+        #ipv6_address: <PI_HOLE_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::506
     dns:
       - <UNBOUND_IP_ADDRESS> #e.g. 172.20.0.253 or fd11:aa:1234:1234::505
     ports:
@@ -70,26 +73,21 @@ services:
       - <LOCAL_UNBOUND_VOLUME_PATH>/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - <LOCAL_UNBOUND_VOLUME_PATH>/zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped
-    
-  watchtower:
-    image: containrrr/watchtower:latest
-    container_name: watchtower
-    build:
-      context: ./
-      dockerfile: dockerfiles/Dockerfile.dev-self-contained
-    networks:
-      dns-network:
-        ipv4_address: <UNBOUND_IPv4_ADDRESS> #e.g. 172.20.0.252
-        #ipv6_address: <UNBOUND_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::504
-    environment:
-      WATCHTOWER_SCHEDULE: "0 0 4 * * *" #Check every day at 4:00 AM
-      TZ: <YOURTIMEZONE> #e.g. "America/New_York"
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_DEBUG: "true"
-      WATCHTOWER_INCLUDE-STOPPED: "true"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: unless-stopped
+  
+  # Uncomment if you like to use watchtower  
+  # watchtower:
+    # image: containrrr/watchtower:latest
+    # container_name: watchtower
+    # network_mode: bridge
+    # environment:
+      # WATCHTOWER_SCHEDULE: "0 0 4 * * *" #Check every day at 4:00 AM
+      # TZ: <YOURTIMEZONE> #e.g. "America/New_York"
+      # WATCHTOWER_CLEANUP: "true"
+      # WATCHTOWER_DEBUG: "true"
+      # WATCHTOWER_INCLUDE-STOPPED: "true"
+    # volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    # restart: unless-stopped
     
 networks:
   dns-network:
@@ -102,4 +100,12 @@ networks:
         - subnet: <IPv4_SUBNET> #e.g. 172.20.0.0/24     
           gateway: <GATEWAY_IPv4_ADDRESS> #e.g. 172.20.0.1  
         #- subnet: <IPv6_SUBNET> #e.g. fd11:aa:1234:1234::/126
-        # gateway: <GATEWAY_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::11          
+        # gateway: <GATEWAY_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::11   
+
+  dns-bridge:
+    #enable_ipv6: <false> #Enable if using IPv6
+    driver: bridge
+    ipam:
+      config:
+        - subnet: <IPv4_SUBNET> #e.g. 192.168.0.0/16        
+        #- subnet: <IPv6_SUBNET> #e.g. fd11:bb:1234:1234::/126
