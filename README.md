@@ -259,7 +259,7 @@ madnuttah/unbound:latest
 
 ## Documentation
 
-In-depth documentation for NLnetLabs Unbound is available on the [Unbound project's website](https://unbound.net/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) goes a direct link to the documentation of the default unbound.conf file. 
+In-depth documentation for NLnet Labs Unbound is available on the [Unbound project's website](https://unbound.net/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) goes a direct link to the documentation of the default unbound.conf file. 
     
 There's also a dedicated Unbound documentation website which can be accessed using this [link](https://unbound.docs.nlnetlabs.nl/en/latest/).
 
