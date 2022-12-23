@@ -67,7 +67,7 @@ services:
     volumes:       
       - <LOCAL_UNBOUND_VOLUME_PATH>/unbound.conf:/usr/local/unbound/unbound.conf:rw #Your local path to Unbound
       - <LOCAL_UNBOUND_VOLUME_PATH>/conf.d/:/usr/local/unbound/conf.d/:rw
-      - <LOCAL_UNBOUND_VOLUME_PATH>/conf.d/:/usr/local/unbound/iana.d/:rw
+      - <LOCAL_UNBOUND_VOLUME_PATH>/iana.d/:/usr/local/unbound/iana.d/:rw
       - <LOCAL_UNBOUND_VOLUME_PATH>/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - <LOCAL_UNBOUND_VOLUME_PATH>/zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped
