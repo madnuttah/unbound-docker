@@ -1,9 +1,9 @@
-ARG IMAGE_BUILD_DATE="2022-11-13" \
+ARG IMAGE_BUILD_DATE="2022-12-23" \
   ALPINE_VERSION="3.17.0" \
   OPENSSL_VERSION="3.0.7" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.17.0" \
-  IMAGE_REVISION="4"
+  IMAGE_REVISION="5"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
 LABEL maintainer="madnuttah"
@@ -164,6 +164,7 @@ RUN set -xe; \
   adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound && \
   apk --update --no-cache add \
     ca-certificates \
+    tzdata \
     libsodium \
     nghttp2 \
     protobuf-c \
