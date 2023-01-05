@@ -24,7 +24,7 @@
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
 </p><br>
 
-[![Maintenance](https://img.shields.io/maintenance/yes/2022?style=flat-square)](https://github.com/madnuttah/unbound-docker/)
+[![Maintenance](https://img.shields.io/maintenance/yes/2023?style=flat-square)](https://github.com/madnuttah/unbound-docker/)
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 [![Release date](https://img.shields.io/github/release-date/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 [![Latest commit main branch](https://img.shields.io/github/last-commit/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
