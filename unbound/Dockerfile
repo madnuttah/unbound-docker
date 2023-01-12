@@ -3,7 +3,7 @@ ARG IMAGE_BUILD_DATE="2023-01-12" \
   OPENSSL_VERSION="3.0.7" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.17.1" \
-  IMAGE_REVISION="0"
+  IMAGE_REVISION="1"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
 LABEL maintainer="madnuttah"
