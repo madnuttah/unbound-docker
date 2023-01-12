@@ -1,8 +1,8 @@
-ARG IMAGE_BUILD_DATE="2023-01-06" \
-  ALPINE_VERSION="3.17.0" \
+ARG IMAGE_BUILD_DATE="2023-01-12" \
+  ALPINE_VERSION="3.17.1" \
   OPENSSL_VERSION="3.0.7" \
   LIBEVENT_VERSION="2.1.12" \
-  UNBOUND_VERSION="1.17.1rc2" \
+  UNBOUND_VERSION="1.17.1" \
   IMAGE_REVISION="0"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
@@ -13,7 +13,7 @@ ARG UNBOUND_VERSION
 ENV UNBOUND_VERSION=${UNBOUND_VERSION} \
   UNBOUND_DOWNLOAD_URL="https://www.nlnetlabs.nl/downloads/unbound/unbound-"${UNBOUND_VERSION}".tar.gz" \
   UNBOUND_PGP="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
-  UNBOUND_SHA256="bbda76baca8c438e1149af98347b52afba064a898d725f271e3306b02e7b2b07" \
+  UNBOUND_SHA256="ee4085cecce12584e600f3d814a28fa822dfaacec1f94c84bfd67f8a5571a5f4" \
   INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5"
 
 WORKDIR /tmp/src
@@ -176,7 +176,8 @@ COPY ./unbound/root/usr/local/unbound/ \
   /usr/local/unbound/
 
 COPY ./unbound/root/unbound.sh \
-  /usr/local/sbin/
+  ./unbound/root/healthcheck.sh \
+    /usr/local/sbin/
 
 COPY --from=unbound /usr/local/openssl/ \
   /usr/local/openssl/
@@ -213,6 +214,8 @@ RUN mkdir -p \
     /var/log/* 
 	
 ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
+
+HEALTHCHECK --interval=1m CMD /usr/local/sbin/healthcheck.sh
       
 EXPOSE 5335/tcp 5335/udp
 
