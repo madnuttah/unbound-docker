@@ -1,4 +1,4 @@
-#Sample docker-compose.yaml deploying Pi-hole, Unbound and Watchtower 
+#Sample docker-compose.yaml deploying Pi-hole and Unbound 
 #with a Bridged Network.
 #This example needs to be modified to reflect your network environment,
 #especially the values in angle brackets (<>) must be adapted to your needs.
@@ -73,21 +73,6 @@ services:
     restart: unless-stopped
     healthcheck:
       disable: false # Set to true if the container won't start due to the healthcheck
-  
-  # Uncomment if you like to use watchtower  
-  # watchtower:
-    # image: containrrr/watchtower:latest
-    # container_name: watchtower
-    # network_mode: bridge
-    # environment:
-      # WATCHTOWER_SCHEDULE: "0 0 4 * * *" #Check every day at 4:00 AM
-      # TZ: <YOURTIMEZONE> #e.g. "America/New_York"
-      # WATCHTOWER_CLEANUP: "true"
-      # WATCHTOWER_DEBUG: "true"
-      # WATCHTOWER_INCLUDE-STOPPED: "true"
-    # volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock:ro
-    # restart: unless-stopped
     
 networks:
   dns-network:
