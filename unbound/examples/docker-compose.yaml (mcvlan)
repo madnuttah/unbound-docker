@@ -1,4 +1,4 @@
-#Sample docker-compose.yaml deploying Pi-hole, Unbound and Watchtower
+#Sample docker-compose.yaml deploying Pi-hole and Unbound
 #with a macvlan Network and an additional bridge network to enable host
 #container communication.
 #This example needs to be modified to reflect your network environment,
@@ -77,22 +77,7 @@ services:
       - <LOCAL_UNBOUND_VOLUME_PATH>/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - <LOCAL_UNBOUND_VOLUME_PATH>/zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped
-    
-  # Uncomment if you like to use watchtower  
-  # watchtower:
-    # image: containrrr/watchtower:latest
-    # container_name: watchtower
-    # network_mode: bridge
-    # environment:
-      # WATCHTOWER_SCHEDULE: "0 0 4 * * *" #Check every day at 4:00 AM
-      # TZ: <YOURTIMEZONE> #e.g. "America/New_York"
-      # WATCHTOWER_CLEANUP: "true"
-      # WATCHTOWER_DEBUG: "true"
-      # WATCHTOWER_INCLUDE-STOPPED: "true"
-    # volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock:ro
-    # restart: unless-stopped
-    
+
 networks:
   dns-network:
     #enable_ipv6: <false> #Enable if using IPv6
