@@ -1,9 +1,9 @@
-ARG IMAGE_BUILD_DATE="2023-01-12" \
+ARG IMAGE_BUILD_DATE="2023-02-07" \
   ALPINE_VERSION="3.17.1" \
-  OPENSSL_VERSION="3.0.7" \
+  OPENSSL_VERSION="3.0.8" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.17.1" \
-  IMAGE_REVISION="1"
+  IMAGE_REVISION="4"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
 LABEL maintainer="madnuttah"
@@ -170,13 +170,10 @@ RUN set -xe; \
     protobuf-c \
     expat
 	
-WORKDIR /usr/local/unbound
-
 COPY ./unbound/root/usr/local/unbound/ \
   /usr/local/unbound/
 
-COPY ./unbound/root/unbound.sh \
-  ./unbound/root/healthcheck.sh \
+COPY ./unbound/root/*.sh \
     /usr/local/sbin/
 
 COPY --from=unbound /usr/local/openssl/ \
@@ -203,9 +200,7 @@ RUN mkdir -p \
       /usr/local/unbound/unbound.d/null \
         /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
-    /usr/local/unbound/ && \
-  chmod -R 770 \
-    /usr/local/sbin/ && \
+    /usr/local/sbin/*.sh && \
   rm -rf \
     /usr/share/man \
     /usr/share/docs \
@@ -216,7 +211,5 @@ RUN mkdir -p \
 ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
 
 HEALTHCHECK --interval=1m CMD /usr/local/sbin/healthcheck.sh
-      
-EXPOSE 5335/tcp 5335/udp
 
 CMD [ "/usr/local/sbin/unbound.sh" ]
