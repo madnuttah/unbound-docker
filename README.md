@@ -128,7 +128,15 @@ Source: [unbound.net](https://unbound.net/)
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
 The unbound process runs in the context of a non-root user, is sealed with chroot and makes use of unprivileged ports (5335 tcp/udp).
 
-Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. However, even though the image is intended to run a "hyperlocal" setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides DoT or DoH features instead of using the "hyperlocal" feature.
+Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) to build a "hyperlocal" setup as an upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
+
+__There's a really nice explanation at the [Pi-hole documentation page](https://docs.pi-hole.net/guides/dns/unbound/) of what that means without becoming too technical:__
+
+>__Whom can you trust?__ Recently, more and more small (and not so small) DNS upstream providers have appeared on the market, advertising free and private DNS service, but how can you know that they keep their promises? Right, you can't.
+>Furthermore, from the point of an attacker, the DNS servers of larger providers are very worthwhile targets, as they only need to poison one DNS server, but millions of users might be affected. Instead of your bank's actual IP address, you could be sent to a phishing site hosted on some island. This scenario has already happened and it isn't unlikely to happen again...
+>When you operate your own (tiny) recursive DNS server, then the likeliness of getting affected by such an attack is greatly reduced.
+
+However, even though the image is intended to run a "hyperlocal" setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features instead of using the "hyperlocal" feature.
        
 To provide always the latest versions, the following software components are self compiled in the build process using separated workflows and are not just installed:
     
@@ -136,7 +144,7 @@ To provide always the latest versions, the following software components are sel
 - [`Libevent`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-libevent-buildenv.yaml)
 - [`OpenSSL`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
     
-**The image is completely built online via a [GitHub Action](https://github.com/features/actions) with [hardened runners](https://github.com/step-security/harden-runner) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+**The image is completely built online via a [GitHub Action](https://github.com/features/actions) with [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
 
 **Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
       
@@ -291,6 +299,8 @@ If you like to contribute to this repository, take a look at the [`Contributing 
 - [OpenSSL](https://www.openssl.org/)
 - [Libevent](https://libevent.org/)
 - [Pi-hole](https://pi-hole.net/)
+- [StepSecurity](https://www.stepsecurity.io/)
+- The many Docker Images which got me inspired
 - **Thank you for using my image** ❤️
 
 ## Licenses
@@ -309,7 +319,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 
 ## Legal
 
-Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties, 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
     
 ## Social
     
