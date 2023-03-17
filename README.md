@@ -258,7 +258,7 @@ If you want to use this image as a standalone DNS resolver _without_ Pi-hole, th
 
 ### Usage
 
-The best way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
 
@@ -286,7 +286,7 @@ In-depth documentation for NLnet Labs Unbound is available on the [Unbound docum
 
 ## Feedback
 
-Feel free to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image.
+I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. You can also reach me on Fosstodon, please find the link in the [Social](#Social) section.
 
 ## Contributing
 
