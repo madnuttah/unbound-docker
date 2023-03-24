@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+
+  - package-ecosystem: "docker"
+    directory: "./libevent/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "./openssl/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "./unbound/"
+    schedule:
+      interval: "daily"
