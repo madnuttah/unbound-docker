@@ -31,8 +31,8 @@ RUN set -xe; \
     tar xzf libevent.tar.gz && \
     rm libevent.tar.gz && \
     cd libevent-"${LIBEVENT_VERSION}"-stable && \
-    env CPPFLAGS='-I/usr/local/openssl/include' \
-      LDFLAGS='-L/usr/local/openssl/lib' \
+    env CPPFLAGS='-I/usr/local/openssl/include -fPIC' \
+      LDFLAGS='-L/usr/local/openssl/lib -fPIC' \
     ./configure \
       --prefix=/usr/local/libevent \
       --disable-static \
