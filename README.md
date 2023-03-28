@@ -64,13 +64,11 @@ This is an actively maintained, lightweight and trustworthy Alpine Linux based D
 
 ## Feedback
 
-I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. You can also reach me on Fosstodon:
+I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. 
+
+You can also reach me on Fosstodon: 
 
 [![Follow me on Mastodon](https://img.shields.io/mastodon/follow/107779375129112763?domain=https%3A%2F%2Ffosstodon.org%2F&style=social)](https://fosstodon.org/@madnuttah)
-
-## Contributing
-
-If you like to contribute to this repository, please mind the [`Contributing Guidelines`](https://github.com/madnuttah/unbound-docker/blob/main/CONTRIBUTING.md).
 
 ## Acknowledgements
 
