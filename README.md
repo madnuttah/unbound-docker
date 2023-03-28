@@ -2,7 +2,7 @@
     <img src="https://repository-images.githubusercontent.com/440215882/b79c7ae3-c3d4-4a6a-a1d7-d27fa626754b" alt="Logo">
 </p>
 
-# Alpine Linux Based Unbound DNSSEC Validating Recursive DNS Resolver Docker Image
+# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
 This is an actively maintained, lightweight and trustworthy Alpine Linux based Docker image that runs Unbound, an open source high-performance DNS resolver brought to you by the nice folks [@NLnetLabs](https://github.com/NLnetLabs) running as your own recursive DNS resolver.
 
