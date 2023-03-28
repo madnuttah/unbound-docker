@@ -58,13 +58,13 @@ You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unb
 
 ## About this Image
 
-This is an actively maintained, lightweight and trustworthy Alpine Linux based Docker image that runs Unbound, an open source high-performance DNS resolver brought to you by the nice folks [@NLnetLabs](https://github.com/NLnetLabs) running as your own recursive DNS server.
+This is an actively maintained, lightweight and trustworthy Alpine Linux based Docker image that runs Unbound, an open source high-performance DNS resolver brought to you by the nice folks [@NLnetLabs](https://github.com/NLnetLabs) running as your own recursive DNS resolver.
 
 [`Detailed Readme`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README_EN.md)
 
 ## Feedback
 
-I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. You can also reach me on Fosstodon, please find the link in the [Social](#Social) section.
+I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. You can also reach me on Fosstodon, please find the link in the [`Social`](#Social) section.
 
 ## Contributing
 
