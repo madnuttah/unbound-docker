@@ -100,4 +100,46 @@ You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unb
 # About this Image
 Are you looking for a simple and secure way to run your own DNS resolver? Do you want to block ads, malware, and trackers at the network level with an actively maintained Docker image? Here's my lightweight and trustworthy Alpine Linux based Docker image that runs Unbound, a high-performance recursive DNS server brought to you by the nice folks @nlnetlabs.
 
-## [`Detailed Readme`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README_EN.md)
+[`Detailed Readme`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README_EN.md)
+
+## Feedback
+
+I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. You can also reach me on Fosstodon, please find the link in the [Social](#Social) section.
+
+## Contributing
+
+If you like to contribute to this repository, please mind the [`Contributing Guidelines`](https://github.com/madnuttah/unbound-docker/blob/main/CONTRIBUTING.md).
+
+## Acknowledgements
+
+- [Alpine Linux](https://www.alpinelinux.org/)
+- [Docker](https://www.docker.com/)
+- [Unbound](https://unbound.net/)
+- [OpenSSL](https://www.openssl.org/)
+- [Libevent](https://libevent.org/)
+- [Pi-hole](https://pi-hole.net/)
+- [StepSecurity](https://www.stepsecurity.io/)
+- The many Docker Images which got me inspired
+- **Thank you for using my image** ❤️
+
+## Licenses
+
+### License
+
+Unless otherwise specified, all code is released under the MIT license.
+See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE) for details.
+
+### Licenses for other components
+
+- Docker: [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)
+- Unbound: [BSD License](https://unbound.nlnetlabs.nl/svn/trunk/LICENSE)
+- OpenSSL: [Apache-style license](https://www.openssl.org/source/license.html)
+- Libevent: [BSD License](https://libevent.org/LICENSE.txt)
+
+## Legal
+
+Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+
+## Social
+
+[![Follow me on Mastodon](https://img.shields.io/mastodon/follow/107779375129112763?domain=https%3A%2F%2Ffosstodon.org%2F&style=social)](https://fosstodon.org/@madnuttah)
