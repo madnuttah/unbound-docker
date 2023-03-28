@@ -56,10 +56,11 @@
     
 You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unbound-docker/releases) section.
 
-# About this Image
-Are you looking for a simple and secure way to run your own DNS resolver? Do you want to block ads, malware, and trackers at the network level with an actively maintained Docker image? Here's my lightweight and trustworthy Alpine Linux based Docker image that runs Unbound, a high-performance recursive DNS server brought to you by the nice folks [@NLnetLabs](https://github.com/NLnetLabs).
+## About this Image
 
-[`Detailed Readme`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README_EN.md)
+This is a lightweight and trustworthy Alpine Linux based Docker image that runs Unbound, an open source high-performance recursive DNS server brought to you by the nice folks [@NLnetLabs](https://github.com/NLnetLabs).
+
+[`More detailed Readme`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README_EN.md)
 
 ## Feedback
 
