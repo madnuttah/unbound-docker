@@ -72,7 +72,11 @@ services:
       - <LOCAL_UNBOUND_VOLUME_PATH>/zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped
     healthcheck:
-      disable: false # Set to true if the container won't start due to the healthcheck
+      test: /usr/local/sbin/healthcheck.sh
+      interval: 60s
+      retries: 5
+      start_period: 15s
+      timeout: 30s
     
 networks:
   dns-network:
