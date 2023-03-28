@@ -1,11 +1,11 @@
-ARG IMAGE_BUILD_DATE="2023-03-14" \
+ARG IMAGE_BUILD_DATE="2023-xx-xx" \
   ALPINE_VERSION="3.17.2" \
   OPENSSL_VERSION="3.1.0" \
   LIBEVENT_VERSION="2.1.12" \
-  UNBOUND_VERSION="1.17.1" \
-  IMAGE_REVISION="3"
+  UNBOUND_VERSION="1.x.x" \
+  IMAGE_REVISION="x"
    
-FROM madnuttah/unbound:libevent-buildenv-latest AS unbound
+FROM madnuttah/unbound:libevent-buildenv-latest AS buildenv
 LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION
@@ -29,7 +29,7 @@ RUN set -xe; \
     build-base \
     libsodium-dev \
     linux-headers \
-    nghttp2-libs \
+    nghttp2-dev \
     expat-dev \
     protobuf-c-dev \
     apk-tools && \
@@ -59,6 +59,7 @@ RUN set -xe; \
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
     --with-libevent=/usr/local/libevent \
     --with-ssl=/usr/local/openssl \
+    --with-libnghttp2 \
     --with-username=_unbound \
     --enable-dnstap \
     --with-pthreads \
@@ -90,7 +91,7 @@ RUN set -xe; \
   gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$INTERNIC_PGP" && \
   gpg --verify /usr/local/unbound/iana.d/root.hints.sig /usr/local/unbound/iana.d/root.hints && \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
-  /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true && \
+    /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true && \
   pkill -9 gpg-agent && \
   pkill -9 dirmngr && \
   rm -rf \
@@ -128,9 +129,11 @@ RUN set -xe; \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
+    
+COPY ./unbound/root/usr/local/unbound/ \
+  /usr/local/unbound/
 	
 FROM alpine:latest
-LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION \
   ALPINE_VERSION \
@@ -144,9 +147,11 @@ ENV BUILD_DATE=${IMAGE_BUILD_DATE} \
   UNBOUND_VERSION=${UNBOUND_VERSION} \
   ALPINE_VERSION=${ALPINE_VERSION} \
   OPENSSL_VERSION=${OPENSSL_VERSION} \
-  LIBEVENT_VERSION=${LIBEVENT_VERSION}
+  LIBEVENT_VERSION=${LIBEVENT_VERSION} \
+  PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
   
-LABEL org.opencontainers.image.title="madnuttah/unbound" \
+LABEL maintainer="madnuttah" \
+  org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.created=$BUILD_DATE \
   org.opencontainers.image.version=$UNBOUND_VERSION \
   org.opencontainers.image.revision=$IMAGE_REVISION \
@@ -158,7 +163,19 @@ LABEL org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.authors="madnuttah" \
   org.opencontainers.image.vendor="madnuttah" \
   org.opencontainers.image.licenses="MIT"
-	
+		
+COPY ./unbound/root/*.sh \
+  /usr/local/sbin/
+
+COPY --from=buildenv /usr/local/openssl/ \
+  /usr/local/openssl/
+  
+COPY --from=buildenv /usr/local/libevent/ \
+  /usr/local/libevent/
+  
+COPY --from=buildenv /usr/local/unbound/ \
+  /usr/local/unbound/
+  
 RUN set -xe; \
   addgroup -S _unbound -g 1000 && \
   adduser -S -D -H -h /etc/unbound -u 1000 -s /sbin/nologin -G _unbound _unbound && \
@@ -168,28 +185,13 @@ RUN set -xe; \
     libsodium \
     nghttp2 \
     protobuf-c \
-    expat
-	
-COPY ./unbound/root/usr/local/unbound/ \
-  /usr/local/unbound/
-
-COPY ./unbound/root/*.sh \
-    /usr/local/sbin/
-
-COPY --from=unbound /usr/local/openssl/ \
-  /usr/local/openssl/
-  
-COPY --from=unbound /usr/local/libevent/ \
-  /usr/local/libevent/
-  
-COPY --from=unbound /usr/local/unbound/ \
-  /usr/local/unbound/
-
-RUN mkdir -p \
-  "/usr/local/unbound/conf.d/" \
+    expat && \
+  apk --purge del apk-tools && \
+  mkdir -p \
+    "/usr/local/unbound/conf.d/" \
     "/usr/local/unbound/certs.d/" \
-      "/usr/local/unbound/zones.d/" \
-        "/usr/local/unbound/log.d/" && \
+    "/usr/local/unbound/zones.d/" \
+    "/usr/local/unbound/log.d/" && \
   touch /usr/local/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound \
     /usr/local/unbound/ && \
@@ -197,19 +199,16 @@ RUN mkdir -p \
     /usr/local/unbound/unbound.d/ && \
   chown -Rh _unbound:_unbound \
     /usr/local/unbound/unbound.d/random \
-      /usr/local/unbound/unbound.d/null \
-        /usr/local/unbound/unbound.d/urandom && \
+    /usr/local/unbound/unbound.d/null \
+    /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/sbin/*.sh && \
   rm -rf \
+    /etc/apk \
     /usr/share/man \
     /usr/share/docs \
     /tmp/* \
     /var/tmp/* \
     /var/log/* 
-	
-ENV PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
-
-HEALTHCHECK --interval=1m CMD /usr/local/sbin/healthcheck.sh
 
 CMD [ "/usr/local/sbin/unbound.sh" ]
