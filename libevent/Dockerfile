@@ -9,6 +9,8 @@ ENV LIBEVENT_VERSION=${LIBEVENT_VERSION} \
   LIBEVENT_DOWNLOAD_URL="https://github.com/libevent/libevent/releases/download/release" \
   LIBEVENT_PGP="9E3AC83A27974B84D1B3401DB86086848EF8686D"
   
+WORKDIR /tmp/src
+
 RUN set -xe; \
   apk --update --no-cache add \
   ca-certificates \
