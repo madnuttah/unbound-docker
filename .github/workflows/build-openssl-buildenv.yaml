@@ -1,9 +1,9 @@
-name: Build Multiarch OpenSSL BuildEnv Docker Image
-   
+name: Build Multiarch OpenSSL BuildEnv Docker Image 
+
 on:
   push:
     branches: [ main ]
-    paths:
+    paths: 
       - '!**'
       - '.github/workflows/build-openssl-buildenv.yaml'
         
@@ -52,12 +52,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
   
       - name: linux_x86
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/386
           builder: ${{ steps.buildx.outputs.name }}
           file: ./openssl/linux_x86.Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
+          provenance: false
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-386   
           
@@ -100,12 +101,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: linux_arm_v6
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/arm/v6
           builder: ${{ steps.buildx.outputs.name }}
           file: ./openssl/linux_arm.Dockerfile          
           push: ${{ github.event_name != 'pull_request' }}
+          provenance: false
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6
       
@@ -148,12 +150,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}      
       
       - name: linux_arm_v7
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/arm/v7
           builder: ${{ steps.buildx.outputs.name }}
           file: ./openssl/linux_arm.Dockerfile           
           push: ${{ github.event_name != 'pull_request' }}
+          provenance: false          
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
                       
@@ -196,12 +199,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: linux_arm64
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/arm64
           builder: ${{ steps.buildx.outputs.name }}
           file: ./openssl/linux_64.Dockerfile     
           push: ${{ github.event_name != 'pull_request' }}
+          provenance: false
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-arm64
 
@@ -244,12 +248,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }} 
  
       - name: linux_amd64
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
           file: ./openssl/linux_64.Dockerfile     
           push: ${{ github.event_name != 'pull_request' }}
+          provenance: false          
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64
         
