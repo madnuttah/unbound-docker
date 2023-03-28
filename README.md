@@ -2,7 +2,7 @@
     <img src="https://repository-images.githubusercontent.com/440215882/b79c7ae3-c3d4-4a6a-a1d7-d27fa626754b" alt="Logo">
 </p>
 
-# Alpine Linux Based Unbound Hyperlocal & DNSSEC Validating DNS Resolver Multiarch Docker Image
+# Alpine Linux Based Unbound DNSSEC Validating Recursive DNS Resolver Docker Image
 
 ## Maintainer
 
