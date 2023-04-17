@@ -1,9 +1,9 @@
-ARG IMAGE_BUILD_DATE="2023-xx-xx" \
-  ALPINE_VERSION="3.17.2" \
+ARG IMAGE_BUILD_DATE="2023-04-17" \
+  ALPINE_VERSION="3.17.3" \
   OPENSSL_VERSION="3.1.0" \
   LIBEVENT_VERSION="2.1.12" \
-  UNBOUND_VERSION="1.x.x" \
-  IMAGE_REVISION="x"
+  UNBOUND_VERSION="1.17.1" \
+  IMAGE_REVISION="4"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS buildenv
 LABEL maintainer="madnuttah"
@@ -133,7 +133,7 @@ RUN set -xe; \
 COPY ./unbound/root/usr/local/unbound/ \
   /usr/local/unbound/
 	
-FROM alpine:latest
+FROM alpine:3.17.3
 
 ARG UNBOUND_VERSION \
   ALPINE_VERSION \
