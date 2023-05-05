@@ -13,6 +13,8 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 
 [`More details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
 
+**If you would like to see Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats).**
+
 ## Available Docker Tags
 
 <details> 
