@@ -133,7 +133,7 @@ RUN set -xe; \
 COPY ./unbound/root/usr/local/unbound/ \
   /usr/local/unbound/
 	
-FROM alpine:3.17.3
+FROM alpine:3.18.0
 
 ARG UNBOUND_VERSION \
   ALPINE_VERSION \
