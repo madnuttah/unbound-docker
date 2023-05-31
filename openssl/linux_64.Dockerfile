@@ -1,12 +1,12 @@
-ARG OPENSSL_VERSION="3.1.0" 
+ARG OPENSSL_VERSION="3.1.1" 
 
-FROM alpine:3.17.3 AS buildenv
+FROM alpine:3.18.0 AS buildenv
 LABEL maintainer="madnuttah"
 
 ARG OPENSSL_VERSION
 
 ENV OPENSSL_VERSION=${OPENSSL_VERSION} \
-  OPENSSL_SHA256="aaa925ad9828745c4cad9d9efeb273deca820f2cdcf2c3ac7d7c1212b7c497b4 " \
+  OPENSSL_SHA256="b3aa61334233b852b63ddb048df181177c2c659eb9d4376008118f9c08d07674 " \
   OPENSSL_DOWNLOAD_URL="https://www.openssl.org/source/openssl"
 
 WORKDIR /tmp/src
