@@ -9,8 +9,8 @@ on:
 
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "2.1.12-20"
-  REVISION: "20"
+  VERSION: "2.1.12-21"
+  REVISION: "21"
   
 jobs:
   build:
