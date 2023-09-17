@@ -32,6 +32,7 @@ RUN set -xe; \
     nghttp2-dev \
     expat-dev \
     protobuf-c-dev \
+    hiredis-dev \
     apk-tools && \
   curl -sSL "$UNBOUND_DOWNLOAD_URL" -o unbound.tar.gz && \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}".asc -o unbound.tar.gz.asc && \
@@ -60,6 +61,7 @@ RUN set -xe; \
     --with-libevent=/usr/local/libevent \
     --with-ssl=/usr/local/openssl \
     --with-libnghttp2 \
+    --with-libhiredis \
     --with-username=_unbound \
     --enable-dnstap \
     --with-pthreads \
@@ -185,6 +187,7 @@ RUN set -xe; \
     libsodium \
     nghttp2 \
     protobuf-c \
+    hiredis \
     expat && \
   apk --purge del apk-tools && \
   mkdir -p \
