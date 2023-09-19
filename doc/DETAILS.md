@@ -94,6 +94,7 @@ To provide always the latest stable versions, the following software components 
 | Auth. zones with local copy of root zone | :white_check_mark: |
 | Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
 | Response Policy Zones                    | :white_check_mark: |
+| REDIS                    | :white_check_mark: |
 | Python.                                  | :x:                |
 | EDNS Client Subnet                       | :x:                |
     
