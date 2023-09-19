@@ -1,4 +1,4 @@
-ARG OPENSSL_VERSION="3.1.2" 
+ARG OPENSSL_VERSION="3.1.3" 
 
 FROM alpine:3.18.3 AS buildenv
 LABEL maintainer="madnuttah"
