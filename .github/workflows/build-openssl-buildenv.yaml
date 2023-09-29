@@ -9,8 +9,8 @@ on:
         
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "3.1.3"
-  REVISION: "0" 
+  VERSION: "3.1.3-1"
+  REVISION: "1" 
   
 jobs:
   linux_x86:
