@@ -21,7 +21,8 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
     
   <summary>Tags</summary><br>  
   
-   - [1.18.0-1 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.18.0-2 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.18.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.18.0](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.18.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)  
    - [1.17.1-7](https://hub.docker.com/r/madnuttah/unbound/tags)
