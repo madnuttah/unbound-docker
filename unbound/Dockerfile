@@ -1,9 +1,9 @@
-ARG IMAGE_BUILD_DATE="2023-08-30" \
-  ALPINE_VERSION="3.18.3" \
+ARG IMAGE_BUILD_DATE="2023-09-29" \
+  ALPINE_VERSION="3.18.4" \
   OPENSSL_VERSION="3.1.3" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.18.0" \
-  IMAGE_REVISION="0"
+  IMAGE_REVISION="2"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS buildenv
 LABEL maintainer="madnuttah"
