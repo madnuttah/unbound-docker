@@ -1,4 +1,4 @@
-ARG OPENSSL_VERSION="3.1.3" 
+ARG OPENSSL_VERSION="3.1.4" 
 
 FROM alpine:3.18.4 AS buildenv
 LABEL maintainer="madnuttah"
@@ -6,8 +6,9 @@ LABEL maintainer="madnuttah"
 ARG OPENSSL_VERSION
 
 ENV OPENSSL_VERSION=${OPENSSL_VERSION} \
-  OPENSSL_SHA256="f0316a2ebd89e7f2352976445458689f80302093788c466692fb2a188b2eacf6 " \
-  OPENSSL_DOWNLOAD_URL="https://www.openssl.org/source/openssl"
+  OPENSSL_SHA256="840af5366ab9b522bde525826be3ef0fb0af81c6a9ebd84caa600fea1731eee3 " \
+  OPENSSL_DOWNLOAD_URL="https://www.openssl.org/source/openssl" \
+  OPENSSL_PGP=EFC0A467D613CB83C7ED6D30D894E2CE8B3D79F5 \
 
 WORKDIR /tmp/src
 
@@ -30,11 +31,7 @@ RUN set -xe; \
     GNUPGHOME="$(mktemp -d)" && \
     export GNUPGHOME && \
     gpg --no-tty --keyserver hkps://keys.openpgp.org \
-      --recv-keys "7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C" \
-        "8657ABB260F056B1E5190839D9C4D26D0E604491" \
-        "B7C1C14360F353A36862E4D5231C84CDDCC69C45" \
-        "A21FAB74B0088AA361152586B8EF1A6BA9DA2D5C" \
-        "EFC0A467D613CB83C7ED6D30D894E2CE8B3D79F5" && \
+      --recv-keys ${OPENSSL_PGP} && \
     gpg --batch --verify openssl.tar.gz.asc openssl.tar.gz && \
     tar xzf openssl.tar.gz && \
     cd openssl-"${OPENSSL_VERSION}" && \
