@@ -9,7 +9,7 @@ on:
         
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "3.1.4"
+  VERSION: "3.2.0"
   REVISION: "0" 
   
 jobs:
