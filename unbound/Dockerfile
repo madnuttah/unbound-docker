@@ -1,9 +1,9 @@
 ARG IMAGE_BUILD_DATE="2023-11-08" \
   ALPINE_VERSION="3.18.4" \
-  OPENSSL_VERSION="3.1.4" \
+  OPENSSL_VERSION="3.2.0" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.19.0" \
-  IMAGE_REVISION="0"
+  IMAGE_REVISION="1"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS buildenv
 LABEL maintainer="madnuttah"
@@ -63,12 +63,13 @@ RUN set -xe; \
     --with-libnghttp2 \
     --with-libhiredis \
     --with-username=_unbound \
-    --enable-dnstap \
     --with-pthreads \
     --without-pythonmodule \
     --without-pyunbound \
     --enable-event-api \
+    --enable-dnstap \
     --enable-dnscrypt \
+    --enable-cachedb \
     --enable-tfo-server \
     --enable-tfo-client \
     --enable-pie \
