@@ -35,15 +35,20 @@ RUN set -xe; \
     gpg --batch --verify openssl.tar.gz.asc openssl.tar.gz && \
     tar xzf openssl.tar.gz && \
     cd openssl-"${OPENSSL_VERSION}" && \
+	env CPPFLAGS='-arch i386' \
+      LDFLAGS='-arch i386' && \
     ./Configure \
+      linux-generic32 \
+      -m32 \
       no-weak-ssl-ciphers \
       no-apps \
       no-docs \
       no-legacy \
       no-ssl3 \
       no-err \
-      no-autoerrinit \      
+      no-autoerrinit \          
       shared \
+      386 \
       enable-tfo \
       enable-quic \
       enable-ktls \
@@ -65,3 +70,4 @@ RUN set -xe; \
     /tmp/* \
     /var/tmp/* \
     /var/log/* 
+      
