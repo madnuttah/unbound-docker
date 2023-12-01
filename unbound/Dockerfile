@@ -1,9 +1,9 @@
-ARG IMAGE_BUILD_DATE="2023-11-23" \
-  ALPINE_VERSION="3.18.4" \
+ARG IMAGE_BUILD_DATE="2023-12-01" \
+  ALPINE_VERSION="3.18.5" \
   OPENSSL_VERSION="3.2.0" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.19.0" \
-  IMAGE_REVISION="1"
+  IMAGE_REVISION="2"
    
 FROM madnuttah/unbound:libevent-buildenv-latest AS buildenv
 LABEL maintainer="madnuttah"
@@ -63,13 +63,13 @@ RUN set -xe; \
     --with-libnghttp2 \
     --with-libhiredis \
     --with-username=_unbound \
+    --enable-dnstap \
+    --enable-dnscrypt \
+    --enable-cachedb \
     --with-pthreads \
     --without-pythonmodule \
     --without-pyunbound \
     --enable-event-api \
-    --enable-dnstap \
-    --enable-dnscrypt \
-    --enable-cachedb \
     --enable-tfo-server \
     --enable-tfo-client \
     --enable-pie \
@@ -121,9 +121,9 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib/*.a \
     /usr/local/unbound/unbound.d/lib/*.la && \
+    find /usr/lib/lib* -type f | xargs strip --strip-all && \
+    find /usr/lib/engines-3/*.so -type f | xargs strip --strip-all && \
     find /usr/local/libevent/lib/lib* -type f | xargs strip --strip-all && \
-    strip --strip-all /usr/local/openssl/lib/ossl-modules/legacy.so && \
-    strip --strip-all /usr/local/openssl/bin/openssl && \
     find /usr/local/openssl/lib/lib* -type f | xargs strip --strip-all && \
     find /usr/local/openssl/lib/engines-3/*.so -type f | xargs strip --strip-all && \
     find /usr/local/unbound/unbound.d/lib/lib* -type f | xargs strip --strip-all && \
@@ -208,6 +208,7 @@ RUN set -xe; \
   chmod -R 770 \
     /usr/local/sbin/*.sh && \
   rm -rf \
+    /lib/apk \
     /etc/apk \
     /usr/share/man \
     /usr/share/docs \
