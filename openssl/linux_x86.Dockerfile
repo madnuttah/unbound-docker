@@ -1,6 +1,6 @@
 ARG OPENSSL_VERSION="3.2.0" 
 
-FROM alpine:3.18.4 AS buildenv
+FROM alpine:3.18.5 AS buildenv
 LABEL maintainer="madnuttah"
 
 ARG OPENSSL_VERSION
@@ -41,11 +41,17 @@ RUN set -xe; \
       linux-generic32 \
       -m32 \
       no-weak-ssl-ciphers \
+      no-apps \
+      no-docs \
+      no-legacy \
       no-ssl3 \
       no-err \
-      no-autoerrinit \      
-      no-tests \     
+      no-autoerrinit \          
       shared \
+      386 \
+      enable-tfo \
+      enable-quic \
+      enable-ktls \
       -fPIC \
       -DOPENSSL_NO_HEARTBEATS \
       -fstack-protector-strong \
