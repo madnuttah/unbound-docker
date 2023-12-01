@@ -121,8 +121,6 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib/*.a \
     /usr/local/unbound/unbound.d/lib/*.la && \
-    find /usr/lib/lib* -type f | xargs strip --strip-all && \
-    find /usr/lib/engines-3/*.so -type f | xargs strip --strip-all && \
     find /usr/local/libevent/lib/lib* -type f | xargs strip --strip-all && \
     find /usr/local/openssl/lib/lib* -type f | xargs strip --strip-all && \
     find /usr/local/openssl/lib/engines-3/*.so -type f | xargs strip --strip-all && \
