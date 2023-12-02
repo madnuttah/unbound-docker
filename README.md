@@ -11,6 +11,31 @@
 
 This is an actively maintained and trustworthy, lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server.
 
+<details> 
+    
+  <summary>Features</summary><br>
+    
+| Feature                                  | Supported          |
+| ---------------------------------------- | ------------------ |
+| chroot                                   | :white_check_mark: |
+| Unprivileged user                        | :white_check_mark: |
+| DNSSEC                                   | :white_check_mark: |
+| DNSCrypt                                 | :white_check_mark: |
+| DNSTap                                   | :white_check_mark: |
+| DNS64                                    | :white_check_mark: |
+| Draft-0x20 (caps-for-id: yes)            | :white_check_mark: |    
+| DNS over HTTPS                           | :white_check_mark: |
+| DNS over TLS                             | :white_check_mark: |
+| QName Minimization                       | :white_check_mark: |
+| Auth. zones with local copy of root zone | :white_check_mark: |
+| Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
+| Response Policy Zones                    | :white_check_mark: |
+| REDIS                    | :white_check_mark: |
+| Python.                                  | :x:                |
+| EDNS Client Subnet                       | :x:                |
+    
+</details>
+
 [`More details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
 
 **If you would like to have Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats)**
