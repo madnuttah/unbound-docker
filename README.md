@@ -38,6 +38,8 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 
 [`More details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
 
+[`Instructions on how to use the image with redis (socket)`](https://github.com/madnuttah/unbound-docker/blob/main/doc/redis/INSTRUCTIONS.md)
+
 **If you would like to have Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats)**
 
 ## Available Docker Tags
