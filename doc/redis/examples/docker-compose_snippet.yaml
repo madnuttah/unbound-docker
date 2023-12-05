@@ -1,4 +1,7 @@
-### Put this at the end of your docker compose *services:* section ###
+### Put this into your unbound service definition:
+### volumes_from:
+###   - redis-socket:rw
+### and put this at the end of your docker compose *services:* section ###
 
   redis-socket:
     image: busybox
