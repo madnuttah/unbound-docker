@@ -1,0 +1,23 @@
+### Put this at the end of your docker compose *services:* section ###
+
+  redis-socket:
+    image: busybox
+    container_name: redis-socket
+    tty: true
+    command:
+      - /bin/sh
+      - -c
+      - |
+        chown -R 999:1000 /usr/local/unbound/cachedb.d/
+        /bin/sh
+    volumes:
+       - /usr/local/unbound/cachedb.d/
+      
+  redis:
+    container_name: unbound-db
+    image: redis:alpine
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    volumes_from:
+      - redis-socket:rw
