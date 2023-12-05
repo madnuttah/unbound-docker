@@ -1,4 +1,4 @@
-### Put this into your unbound service definition:
+### Put this into your unbound docker-compose service definition:
 ### volumes_from:
 ###   - redis-socket:rw
 ### and put this at the end of your docker compose *services:* section ###
