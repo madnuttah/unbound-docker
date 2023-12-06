@@ -207,7 +207,7 @@ madnuttah/unbound:latest
 
 I prefer accessing the CacheDB rather via socket than via TCP, you can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
 
-Due to the `chroot` of the image, I wasn't able to just map and access the redis server's socket but had to use a "proxy" container which provides access from both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket.
+Due to the `chroot` environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket in an own volume.
 
 You need to enable the module in your `unbound.conf` first:
 
