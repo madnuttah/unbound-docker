@@ -218,7 +218,7 @@ server:
 
 Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/redis.conf) there.
 
-Place a new entry for cachedb in your `unbound.conf` from my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/cachedb.conf) or put the file in your `conf.d` directory.
+Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
 Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/docker-compose_snippet.yaml).
 
