@@ -19,6 +19,7 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 | ---------------------------------------- | ------------------ |
 | chroot                                   | :white_check_mark: |
 | Unprivileged user                        | :white_check_mark: |
+| Libevent                                 | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
 | DNSCrypt                                 | :white_check_mark: |
 | DNSTap                                   | :white_check_mark: |
@@ -30,8 +31,8 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 | Auth. zones with local copy of root zone | :white_check_mark: |
 | Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
 | Response Policy Zones                    | :white_check_mark: |
-| REDIS                    | :white_check_mark: |
-| Python.                                  | :x:                |
+| Redis                                    | :white_check_mark: |
+| Python                                   | :x:                |
 | EDNS Client Subnet                       | :x:                |
     
 </details>
@@ -44,7 +45,8 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
     
   <summary>Tags</summary><br>  
 
-   - [1.19.0-2 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.19.0-3 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.19.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
@@ -114,6 +116,7 @@ You can also reach me on Fosstodon:
 - [Unbound](https://unbound.net/)
 - [OpenSSL](https://www.openssl.org/)
 - [Libevent](https://libevent.org/)
+- [Redis](https://redis.io/)
 - [Pi-hole](https://pi-hole.net/)
 - [StepSecurity](https://www.stepsecurity.io/)
 - The many Docker Images which got me inspired
