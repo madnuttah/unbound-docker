@@ -1,6 +1,6 @@
 ARG LIBEVENT_VERSION="2.1.12" 
 
-FROM madnuttah/unbound:openssl-buildenv-latest AS buildenv
+FROM madnuttah/unbound:openssl-buildenv-3.2.0-2 AS buildenv
 LABEL maintainer="madnuttah"
 
 ARG LIBEVENT_VERSION
