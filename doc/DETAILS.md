@@ -39,7 +39,7 @@
   - [Folder Structure](#Folder-Structure)
   - [Networking](#Networking)
   - [Usage](#Usage)
-  - [CacheDB (REDIS)](#CacheDB-REDIS)
+  - [CacheDB (Redis)](#CacheDB-(Redis))
 - [Troubleshooting](#Troubleshooting)  
 - [Documentation](#Documentation)
    
@@ -84,6 +84,7 @@ To provide always the latest stable versions, the following software components 
 | ---------------------------------------- | ------------------ |
 | chroot                                   | :white_check_mark: |
 | Unprivileged user                        | :white_check_mark: |
+| Libevent                                 | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
 | DNSCrypt                                 | :white_check_mark: |
 | DNSTap                                   | :white_check_mark: |
@@ -95,8 +96,8 @@ To provide always the latest stable versions, the following software components 
 | Auth. zones with local copy of root zone | :white_check_mark: |
 | Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
 | Response Policy Zones                    | :white_check_mark: |
-| REDIS                    | :white_check_mark: |
-| Python.                                  | :x:                |
+| Redis                                    | :white_check_mark: |
+| Python                                   | :x:                |
 | EDNS Client Subnet                       | :x:                |
     
 </details>
@@ -203,7 +204,7 @@ docker run --name madnuttah-unbound -d \
 madnuttah/unbound:latest
 ```
 
-### CacheDB REDIS
+### CacheDB (Redis)
 
 I prefer accessing the CacheDB rather via socket than via TCP, you can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
 
