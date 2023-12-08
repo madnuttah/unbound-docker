@@ -39,7 +39,7 @@
   - [Folder Structure](#Folder-Structure)
   - [Networking](#Networking)
   - [Usage](#Usage)
-  - [CacheDB (Redis)](#CacheDB-(Redis))
+  - [CacheDB (Redis)](#cachedb-redis)
 - [Troubleshooting](#Troubleshooting)  
 - [Documentation](#Documentation)
    
