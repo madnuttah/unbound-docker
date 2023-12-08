@@ -1,11 +1,11 @@
-ARG IMAGE_BUILD_DATE="2023-12-01" \
-  ALPINE_VERSION="3.18.5" \
+ARG IMAGE_BUILD_DATE="2023-12-08" \
+  ALPINE_VERSION="3.19.0" \
   OPENSSL_VERSION="3.2.0" \
   LIBEVENT_VERSION="2.1.12" \
   UNBOUND_VERSION="1.19.0" \
-  IMAGE_REVISION="2"
+  IMAGE_REVISION="3"
    
-FROM madnuttah/unbound:libevent-buildenv-latest AS buildenv
+FROM madnuttah/unbound:libevent-buildenv-2.1.12-29 AS buildenv
 LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION
@@ -133,6 +133,17 @@ RUN set -xe; \
     
 COPY ./unbound/root/usr/local/unbound/ \
   /usr/local/unbound/
+
+FROM scratch as app
+
+COPY --from=buildenv /usr/local/openssl/ \
+  /app/openssl/
+  
+COPY --from=buildenv /usr/local/libevent/ \
+  /app/libevent/
+  
+COPY --from=buildenv /usr/local/unbound/ \
+  /app/unbound/
 	
 FROM alpine:${ALPINE_VERSION}
 
@@ -168,14 +179,8 @@ LABEL maintainer="madnuttah" \
 COPY ./unbound/root/*.sh \
   /usr/local/sbin/
 
-COPY --from=buildenv /usr/local/openssl/ \
-  /usr/local/openssl/
-  
-COPY --from=buildenv /usr/local/libevent/ \
-  /usr/local/libevent/
-  
-COPY --from=buildenv /usr/local/unbound/ \
-  /usr/local/unbound/
+COPY --from=app /app/ \
+  /usr/local/
   
 RUN set -xe; \
   addgroup -S _unbound -g 1000 && \
