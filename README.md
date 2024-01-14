@@ -39,6 +39,15 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 
 **If you would like to have Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats)**
 
+## Getting started
+
+Docker containers are most easily used with docker compose.
+
+ - Some [installation intructions](./doc/DETAILS.md)
+ - You find example docker-compose files [here](./unbound/examples)
+ - There are some scripts in the directory [scripts](./scripts)
+    - `self-build-docker-images.sh` when you want to build the docker images yourself
+
 ## Available Docker Tags
 
 <details> 
@@ -100,6 +109,12 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 ## Changes
     
 You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unbound-docker/releases) section.
+
+## Known Issues
+
+Currently the arm image is broken for `armv6l` architecture (Raspberry Pi 1A / 1A+ / 1B / 1B+ and Zero / Zero W)
+
+You can check your hardware architecture with the command `uname -m`. If you want to use unbound-docker on hardware `armv6l`, you have to build the images yourself on the target hardware. We are sorry for the inconvenience.
 
 ## Feedback
 
