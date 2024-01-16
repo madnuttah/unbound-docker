@@ -40,6 +40,7 @@
   - [Networking](#Networking)
   - [Usage](#Usage)
   - [CacheDB (Redis)](#cachedb-redis)
+- [Known Issues](#Known-Issues)
 - [Troubleshooting](#Troubleshooting)  
 - [Documentation](#Documentation)
    
@@ -222,6 +223,12 @@ Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` an
 Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
 Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/docker-compose_snippet.yaml).
+
+# Known Issues
+
+Currently the arm image is broken for `armv6l` architecture (Raspberry Pi 1A / 1A+ / 1B / 1B+ and Zero / Zero W)
+
+You can check your hardware architecture with the command `uname -m`. If you want to use unbound-docker on hardware `armv6l` [`but you can build the images yourself on the target hardware`](https://github.com/madnuttah/unbound-docker/tree/main/scripts). We are sorry for the inconvenience.
 
 # Troubleshooting
 
