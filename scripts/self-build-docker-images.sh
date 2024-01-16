@@ -27,9 +27,14 @@ if [ -z "$1" ]; then
 fi
 ARCH="$1"
 
-# extract some variable assignments from unbound/Dockerfile
-# First Join backslash-continued lines | grep lines with ARG x=y | remove ARG | finally evaluate in current shell
-eval $(sed -e ':x /\\$/ { N; s/\\\n//g ; bx }' unbound/Dockerfile | grep -E '^ARG.*=' | sed 's/^ARG //')
+# extract some variable assignments from 
+# Grep versions | remove VERSIONS | remove quotes | assign to vars
+# OpenSSL
+OPENSSL_VERSION=$(cat .github/workflows/build-openssl-buildenv.yaml | grep 'VERSION:' | sed 's/VERSION: //' | tr -d '"')
+# Libevent
+LIBEVENT_VERSION=$(cat .github/workflows/build-libevent-buildenv.yaml | grep 'VERSION:' | sed 's/VERSION: //' | tr -d '"')
+# Unbound
+UNBOUND_VERSION=$(cat .github/workflows/build-unbound.yaml | grep 'VERSION:' | sed 's/VERSION: //' | tr -d '"')
 
 # check if all necessary variables are set
 if [ -n "$OPENSSL_VERSION" -a -n "$LIBEVENT_VERSION" -a -n "$UNBOUND_VERSION" ]; then
