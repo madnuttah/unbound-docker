@@ -54,7 +54,8 @@ Docker containers are most easily used with docker compose.
     
   <summary>Tags</summary><br>  
 
-   - [1.19.0-4 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.19.0-5 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.19.0-4](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-3](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
