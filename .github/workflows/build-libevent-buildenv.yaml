@@ -9,8 +9,7 @@ on:
 
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "2.1.12-29"
-  REVISION: "29"
+  VERSION: "2.1.12-30"
   
 jobs:
   build:
@@ -59,6 +58,4 @@ jobs:
           file: ./libevent/Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:libevent-buildenv-${{ env.VERSION }}
-            ${{ env.DOCKERHUB_SLUG }}:libevent-buildenv-latest
-          
+            ${{ env.DOCKERHUB_SLUG }}:libevent-buildenv-${{ env.VERSION }}         
