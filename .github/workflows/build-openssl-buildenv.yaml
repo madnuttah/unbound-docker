@@ -9,8 +9,7 @@ on:
         
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "3.2.0-2"
-  REVISION: "2" 
+  VERSION: "3.2.1-0" 
   
 jobs:
   linux_x86:
@@ -300,12 +299,4 @@ jobs:
             --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64 \
             --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6 \
             --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
-          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}
-          docker manifest create ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-latest \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-386 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-arm64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-amd64 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv6 \
-            --amend ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}-armv7
-          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-latest
-          
+          docker manifest push ${{ env.DOCKERHUB_SLUG }}:openssl-buildenv-${{ env.VERSION }}        
