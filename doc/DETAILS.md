@@ -55,7 +55,6 @@ Source: [unbound.net](https://unbound.net/)
 ## About this Image
 
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
-The unbound process runs in the context of a non-root user, is sealed with chroot and makes use of unprivileged ports (5335 tcp/udp).
 
 Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) to build a "hyperlocal" setup as a recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
 
