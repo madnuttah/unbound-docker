@@ -28,7 +28,6 @@
 [![Current Alpine Linux release](https://img.shields.io/docker/v/_/alpine/latest?label=Current%20Alpine%20Linux%20release&style=flat-square)](https://github.com/alpinelinux/docker-alpine)
 [![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
 [![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
-[![Current Libevent release](https://img.shields.io/github/v/tag/libevent/libevent?label=Current%20Libevent%20release&style=flat-square)](https://github.com/libevent/libevent/tags)
 
 ## Table of Contents
 
@@ -55,8 +54,9 @@ Source: [unbound.net](https://unbound.net/)
 ## About this Image
 
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
+The unbound process runs in the context of a non-root user, is build with a "distroless" scratch image and makes use of unprivileged ports (5335 tcp/udp).
 
-Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) to build a "hyperlocal" setup as a recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
+Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
 
 __There's a really nice explanation at the [Pi-hole documentation page](https://docs.pi-hole.net/guides/dns/unbound/) of what that means without becoming too technical:__
 
@@ -64,12 +64,11 @@ __There's a really nice explanation at the [Pi-hole documentation page](https://
 >Furthermore, from the point of an attacker, the DNS servers of larger providers are very worthwhile targets, as they only need to poison one DNS server, but millions of users might be affected. Instead of your bank's actual IP address, you could be sent to a phishing site hosted on some island. This scenario has already happened and it isn't unlikely to happen again...
 >When you operate your own (tiny) recursive DNS server, then the likeliness of getting affected by such an attack is greatly reduced._
 
-However, even though the image is intended to run a "hyperlocal" setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features instead of using the "hyperlocal" feature.
+However, even though the image is intended to run a recursive setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements, especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features.
        
-To provide always the latest stable versions, the following software components are self compiled in the build process using separated workflows and are not just installed:
+To provide always the latest stable and optimized versions per architecture, the following software components are self compiled in the build process using separated workflows and are not just installed:
     
 - [`Unbound`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
-- [`Libevent`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-libevent-buildenv.yaml)
 - [`OpenSSL`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
     
 **The image is completely built online via [GitHub Actions](https://github.com/features/actions) with [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
@@ -82,7 +81,7 @@ To provide always the latest stable versions, the following software components 
     
 | Feature                                  | Supported          |
 | ---------------------------------------- | ------------------ |
-| chroot                                   | :white_check_mark: |
+| Minimalist scratch image                 | :white_check_mark: |
 | Unprivileged user                        | :white_check_mark: |
 | Libevent                                 | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
@@ -101,8 +100,6 @@ To provide always the latest stable versions, the following software components 
 | EDNS Client Subnet                       | :x:                |
     
 </details>
-
-I hope you enjoy the image as much as I do. 
     
 ## Installation
 
@@ -110,21 +107,21 @@ Multiarch-builds for Linux-based 386, arm, arm64 or amd64 platforms are availabl
 
 ## How to use this Image
 
-Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/root/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking.
+Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking.
 
 To provide a better structuring of the unbound.conf file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
-- [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/certs.d/) for storing your certificate files.
+- [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
-- [`/usr/local/unbound/conf.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/conf.d/) for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
+- [`/usr/local/unbound/conf.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/conf.d/) for your configuration files like interfaces.conf, performance.conf, security.conf, etc.
     
-- [`/usr/local/unbound/log.d/unbound.log`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/log.d/unbound.log) in case you need to access it for troubleshooting and debugging purposes.
+- [`/usr/local/unbound/log.d/unbound.log`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/log.d/unbound.log) in case you need to access it for troubleshooting and debugging purposes.
 
-- [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
+- [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
     
 **The config files in the `conf.d` and `zones.d` folders must be named with the suffix .conf to prevent issues with specific host configurations.**
     
-The splitted configuration files located in [`unbound/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/unbound/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
+The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
 
 Other than that, splitting ain't really necessary as your standard unbound.conf will perfectly do the job.
     
@@ -184,15 +181,15 @@ Other than that, splitting ain't really necessary as your standard unbound.conf 
 | --------- | ------------------------ |
 | `5335`    | Listening Port (TCP/UDP) |
 
-If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml.
+If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml. You may need to enable CAPabilities in your compose file.
 
 ### Usage
 
-The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
 
-I have added a custom bridge network to the [`MACVLAN example`](https://github.com/madnuttah/unbound-docker/blob/main/unbound/examples/docker-compose.yaml%20(mcvlan)) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
+I have added a custom bridge network to the [`MACVLAN example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/docker-compose.yaml%20(mcvlan)) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
 Anyway, you can also spin up the container with the following command:
 
@@ -217,21 +214,23 @@ server:
   module-config: "cachedb validator iterator"
 ```
 
-Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/redis.conf) there.
+Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
 
-Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
+Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
 Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/docker-compose_snippet.yaml).
 
 # Known Issues
 
-Currently the arm image is broken for `armv6l` architecture (Raspberry Pi 1A / 1A+ / 1B / 1B+ and Zero / Zero W)
+Alpine Linux dropped hardware support for 'armv6l` (Raspberry Pi 1A / 1A+ / 1B / 1B+ and Zero / Zero W).
 
-You can check your hardware architecture with the command `uname -m`. If you want to use unbound-docker on hardware `armv6l` [`but you can build the images yourself on the target hardware`](https://github.com/madnuttah/unbound-docker/tree/main/scripts). We are sorry for the inconvenience.
+You can check your hardware architecture with the command `uname -m`. If you want to use unbound-docker on hardware like `armv6l` [`you can build the images yourself on the target hardware`](https://github.com/madnuttah/unbound-docker/tree/main/scripts). We are sorry for the inconvenience.
 
 # Troubleshooting
 
-You can access the _running_ image by executing the following command in your shell: `sudo docker exec -ti madnuttah-unbound /bin/sh`. If you have assigned a different name for the image than `madnuttah-unbound`, this must be adjusted of course.
+Most issues take place because there are missing files like the unbound.log or due to permission issues. The container won't start up in such cases. Make sure `uid/gid 1000 (_unbound:_unbound)` has read/write permissions on it's folders. 
+
+You can access the _running_ image by executing the following command in your shell: `sudo docker exec -ti madnuttah-unbound /bin/ash`. If you have assigned a different name for the image than `madnuttah-unbound`, this must be adjusted of course.
 
 # Documentation
 

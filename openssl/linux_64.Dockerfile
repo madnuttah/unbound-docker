@@ -43,7 +43,7 @@ RUN set -xe; \
       no-ssl3 \
       no-err \
       no-autoerrinit \
-      shared \
+      no-shared \
       enable-tfo \
       enable-quic \
       enable-ktls \
@@ -52,9 +52,9 @@ RUN set -xe; \
       -DOPENSSL_NO_HEARTBEATS \
       -fstack-protector-strong \
       -fstack-clash-protection \
-      --prefix=/usr/local/openssl \
-      --openssldir=/usr/local/openssl \
-      --libdir=/usr/local/openssl/lib && \
+      --prefix=/openssl \
+      --openssldir=/openssl \
+      --libdir=/openssl/lib && \
   make && \
   make install_sw && \
   apk del --no-cache .build-deps && \

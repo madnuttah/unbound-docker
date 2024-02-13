@@ -14,7 +14,7 @@
         chown -R 999:1000 /usr/local/unbound/cachedb.d/
         /bin/sh
     volumes:
-       - /usr/local/unbound/cachedb.d/
+       - cachedb.d:/usr/local/unbound/cachedb.d/
       
   redis:
     container_name: unbound-db
@@ -24,3 +24,6 @@
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     volumes_from:
       - redis-socket:rw
+
+volumes:
+  cachedb.d:

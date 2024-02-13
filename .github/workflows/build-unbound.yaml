@@ -1,4 +1,4 @@
-name: Build Multiarch Unbound Docker Image
+name: Build Release 1.19.1-0
               
 on:
   push:
@@ -9,7 +9,7 @@ on:
          
 env:
   DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "1.19.0-5"
+  VERSION: "1.19.1-0"
   
 jobs:
   build:
