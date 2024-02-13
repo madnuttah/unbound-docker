@@ -7,7 +7,6 @@
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 [![Build Multiarch Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-unbound.yaml?branch=main&label=Unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
 [![Build Multiarch OpenSSL BuildEnv Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-openssl-buildenv.yaml?branch=main&label=OpenSSL%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
-[![Build Multiarch Libevent BuildEnv Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-libevent-buildenv.yaml?branch=main&label=Libevent%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-libevent-buildenv.yaml)
 
 This is an actively maintained and trustworthy, lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server.
 
@@ -17,7 +16,7 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
     
 | Feature                                  | Supported          |
 | ---------------------------------------- | ------------------ |
-| chroot                                   | :white_check_mark: |
+| Minimalist distroless scratch image      | :white_check_mark: |
 | Unprivileged user                        | :white_check_mark: |
 | Libevent                                 | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
@@ -44,7 +43,7 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 Docker containers are most easily used with docker compose.
 
  - Some [`installation intructions and details`](./doc/DETAILS.md)
- - You find example docker-compose files [`here`](./unbound/examples)
+ - You find example docker-compose files [`here`](./unbound/doc/examples)
  - There are some scripts in the directory [`scripts`](./scripts)
     - `self-build-docker-images.sh` when you want or need to build the docker images yourself
 
@@ -53,8 +52,9 @@ Docker containers are most easily used with docker compose.
 <details> 
     
   <summary>Tags</summary><br>  
-
-   - [1.19.0-5 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+  
+   - [1.19.1-0 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)
+   - [1.19.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-4](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-3](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
@@ -145,7 +145,6 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 - Docker: [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)
 - Unbound: [BSD License](https://unbound.nlnetlabs.nl/svn/trunk/LICENSE)
 - OpenSSL: [Apache-style license](https://www.openssl.org/source/license.html)
-- Libevent: [BSD License](https://libevent.org/LICENSE.txt)
 
 ## Legal
 
