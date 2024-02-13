@@ -55,7 +55,7 @@ RUN set -xe; \
     --with-pidfile=/usr/local/unbound/unbound.d/unbound.pid \
     --mandir=/usr/share/man \
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
-    --with-ssl=/usr/local/openssl \
+    --with-ssl=/openssl \
     --with-libevent \
     --with-libnghttp2 \
     --with-libhiredis \
