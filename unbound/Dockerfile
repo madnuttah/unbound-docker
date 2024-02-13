@@ -4,7 +4,7 @@ ARG IMAGE_BUILD_DATE="2024-02-13" \
   UNBOUND_VERSION="1.19.1" \
   IMAGE_REVISION="0"
 
-FROM madnuttah/unbound:openssl-buildenv-3.2.1-0 AS buildenv
+FROM madnuttah/unbound:openssl-buildenv-3.2.1-1 AS buildenv
 
 LABEL maintainer="madnuttah"
 
