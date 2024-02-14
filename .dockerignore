@@ -1,5 +1,5 @@
 .github/
-unbound/examples/
+./unbound/doc/
 .gitignore
 LICENSE
 *.md

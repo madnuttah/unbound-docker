@@ -23,9 +23,6 @@
 [![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker?style=flat-square "Issues")](https://github.com/madnuttah/unbound-docker/issues)
 [![Pull Requests](https://img.shields.io/github/issues-pr/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/pulls)
 
-## Image Dependencies Versions
-
-[![Current Alpine Linux release](https://img.shields.io/docker/v/_/alpine/latest?label=Current%20Alpine%20Linux%20release&style=flat-square)](https://github.com/alpinelinux/docker-alpine)
 [![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
 
 ## Table of Contents
@@ -35,6 +32,7 @@
 - [Installation](#Installation)
 - [How to use this Image](#How-to-use-this-Image)
   - [Folder Structure](#Folder-Structure)
+  - [Recommended Environment Variables](Recommended-Environment-Variables)
   - [Networking](#Networking)
   - [Usage](#Usage)
   - [CacheDB (Redis)](#cachedb-redis)
@@ -122,7 +120,7 @@ To provide a better structuring of the unbound.conf file, directories for **opti
     
 The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
 
-Other than that, splitting ain't really necessary as your standard unbound.conf will perfectly do the job.
+Other than that, splitting ain't really necessary as the included default unbound.conf will perfectly do the job.
     
 ### Folder Structure
 
@@ -131,15 +129,8 @@ Other than that, splitting ain't really necessary as your standard unbound.conf 
   <summary>Filesystem</summary><br>
     
 ```
-/usr/local/
-├── libevent/
-│   └── ...
-├── openssl/
-│   └── ... 
-├── sbin/
-│   ├── healthcheck.sh 
-│   ├── unbound.sh 
-│   └── ...
+...
+usr/local/
 ├── unbound/
 │   ├── certs.d/
 │   │   └── ...
@@ -151,9 +142,10 @@ Other than that, splitting ain't really necessary as your standard unbound.conf 
 │   │   └── root.zone
 │   ├── log.d/
 │   │   └── unbound.log
+│   ├── sbin/
+│   │   ├── healthcheck.sh 
+│   │   └── unbound.sh 
 │   ├── unbound.d/
-│   │   ├── lib/
-│   │   │   └── libunbound.*
 │   │   ├── sbin/
 │   │   │   ├── unbound
 │   │   │   ├── unbound-anchor
@@ -168,11 +160,18 @@ Other than that, splitting ain't really necessary as your standard unbound.conf 
 │   ├── zones.d/
 │   │   └── *.conf
 │   └── unbound.conf 
-├── ...
 ...
 ```
     
 </details>
+
+### Recommended Environment Variables
+
+| Variable | Default | Value | Description |
+| -------- | ------- | ----- | ---------- |
+| `TZ` | `UTC` | `<Timezone>` | Set your [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC relies on precise time
+| `UID` | `1000` | `Number` | Your desired user id for user ´_unbound´ |
+| `GID` | `1000` | `Number` | Your desired group id for group ´_unbound´ |
 
 ### Networking
 
@@ -180,7 +179,7 @@ Other than that, splitting ain't really necessary as your standard unbound.conf 
 | --------- | ------------------------ |
 | `5335`    | Listening Port (TCP/UDP) |
 
-If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml. You may need to enable CAPabilities in your compose file.
+If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml. You may need to enable CAPabilities in your compose file as the `_unbound` user only has limited permissions.
 
 ### Usage
 

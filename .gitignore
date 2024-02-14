@@ -1,4 +1,4 @@
-unbound/examples/
+./unbound/doc
 .dockerignore
 LICENSE
 *.md

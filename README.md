@@ -4,10 +4,10 @@
 
 # Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
+[![Build Multiarch Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-unbound.yaml?branch=main&label=madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
-[![Build Multiarch Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-unbound.yaml?branch=main&label=Unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
 
-This is an actively maintained and trustworthy, lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in an "distroless" scratch image.
+This is an actively maintained and trustworthy, lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a "distroless" scratch image.
 
 <details> 
     
@@ -41,7 +41,7 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 
 Docker containers are most easily used with docker compose.
 
- - Some [`installation intructions and details`](./doc/DETAILS.md)
+ - Some [`installation intructions and details`](./unbound/doc/DETAILS.md)
  - You find example docker-compose files [`here`](./unbound/doc/examples)
  - There are some scripts in the directory [`scripts`](./scripts)
     - `self-build-docker-images.sh` when you want or need to build the docker images yourself

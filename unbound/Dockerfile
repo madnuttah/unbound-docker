@@ -1,20 +1,18 @@
 ARG IMAGE_BUILD_DATE="2024-02-14" \
   ALPINE_VERSION="3.19.1" \
-  OPENSSL_VERSION="3.2.1" \
+  OPENSSL_VERSION="3.1.4-r5" \
   UNBOUND_VERSION="1.19.1" \
   IMAGE_REVISION="1" \
-  ARG UID=1000 \
-  ARG GID=1000  
+  UID="1000" \
+  GID="1000"  
 
 FROM alpine:"${ALPINE_VERSION}" AS buildenv
-
-LABEL maintainer="madnuttah"
 
 ARG UNBOUND_VERSION \
   UID \
   GID
 
-ENV UNBOUND_VERSION=${UNBOUND_VERSION} \
+ENV UNBOUND_VERSION="${UNBOUND_VERSION}" \
   UNBOUND_DOWNLOAD_URL="https://www.nlnetlabs.nl/downloads/unbound/unbound-"${UNBOUND_VERSION}".tar.gz" \
   UNBOUND_PGP="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
   UNBOUND_SHA256="bc1d576f3dd846a0739adc41ffaa702404c6767d2b6082deb9f2f97cbb24a3a9" \
@@ -50,7 +48,7 @@ RUN set -xe; \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
-  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$UNBOUND_PGP" && \
+  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${UNBOUND_PGP}" && \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
   tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
@@ -81,7 +79,6 @@ RUN set -xe; \
     --enable-relro-now && \
   make && \
   make install && \
-  apk del --no-cache .build-deps && \
   mkdir -p \
     "/usr/local/unbound/iana.d/" && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
@@ -136,18 +133,14 @@ RUN set -xe; \
   chmod -R 770 \
     /usr/local/unbound/sbin/*.sh && \
   rm -rf \  
-    /lib/apk \
-    /etc/apk \
-    /usr/share/man \
-    /usr/share/docs \
     /tmp/* \
     /var/tmp/* \
     /var/log/* \
     /usr/local/unbound/unbound.d/share \
-    /usr/local/unbound/etc \
+    /usr/local/unbound/etc \    
+    /usr/local/unbound/unbound.conf \
     /usr/local/unbound/iana.d/root.hints.* \
     /usr/local/unbound/iana.d/root.zone.* \
-    /usr/local/unbound/unbound.d/lib/pkgconfig \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
@@ -155,6 +148,9 @@ RUN set -xe; \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
+    
+COPY ./unbound/root/usr/local/unbound/unbound.conf \
+  /usr/local/unbound/unbound.conf 
 
 FROM scratch as stage   
 
@@ -166,13 +162,12 @@ COPY --from=buildenv /lib/*-musl-* \
 
 COPY --from=buildenv /bin/sh /bin/sed \
   /app/bin/
-    
-COPY --from=buildenv /usr/lib/libgcc_s* /app/lib/
   
 COPY --from=buildenv /usr/bin/nslookup /usr/bin/awk \
   /app/bin/
 
-COPY --from=buildenv /usr/lib/libsodium* \
+COPY --from=buildenv /usr/lib/libgcc_s* \
+  /usr/lib/libsodium* \
   /usr/lib/libcrypto* \
   /usr/lib/libssl* \
   /usr/lib/libexpat* \
@@ -202,25 +197,25 @@ ARG UNBOUND_VERSION \
   IMAGE_REVISION \
   UID 
 
-ENV BUILD_DATE=${IMAGE_BUILD_DATE} \
-  IMAGE_REVISION=${IMAGE_REVISION} \
-  UNBOUND_VERSION=${UNBOUND_VERSION} \
-  ALPINE_VERSION=${ALPINE_VERSION} \
+ENV BUILD_DATE="${IMAGE_BUILD_DATE}" \
+  IMAGE_REVISION="${IMAGE_REVISION}" \
+  UNBOUND_VERSION="${UNBOUND_VERSION}" \
+  OPENSSL_VERSION="${OPENSSL_VERSION}" \
+  ALPINE_VERSION="${ALPINE_VERSION}" \
   UID="${UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
   
 LABEL maintainer="madnuttah" \
   org.opencontainers.image.title="madnuttah/unbound" \
-  org.opencontainers.image.created=$BUILD_DATE \
-  org.opencontainers.image.version=$UNBOUND_VERSION \
-  org.opencontainers.image.revision=$IMAGE_REVISION \
+  org.opencontainers.image.created="${BUILD_DATE}" \
+  org.opencontainers.image.version="${UNBOUND_VERSION}" \
+  org.opencontainers.image.revision="${IMAGE_REVISION}" \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
   org.opencontainers.image.summary="This multiarch Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
   org.opencontainers.image.base.name="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   org.opencontainers.image.url="https://hub.docker.com/r/madnuttah/unbound-docker" \
   org.opencontainers.image.source="https://github.com/madnuttah/unbound-docker" \
   org.opencontainers.image.authors="madnuttah" \
-  org.opencontainers.image.vendor="madnuttah" \
   org.opencontainers.image.licenses="MIT"
 
 COPY --from=stage /app/ /
