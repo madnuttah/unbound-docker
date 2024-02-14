@@ -19,7 +19,7 @@ services:
 #     - ./zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped
     healthcheck:
-      test: /usr/local/sbin/healthcheck.sh
+      test: /usr/local/unbound/sbin/healthcheck.sh
       interval: 60s
       retries: 5
       start_period: 15s
