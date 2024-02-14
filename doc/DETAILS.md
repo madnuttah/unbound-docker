@@ -27,7 +27,6 @@
 
 [![Current Alpine Linux release](https://img.shields.io/docker/v/_/alpine/latest?label=Current%20Alpine%20Linux%20release&style=flat-square)](https://github.com/alpinelinux/docker-alpine)
 [![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
-[![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
 
 ## Table of Contents
 
@@ -54,7 +53,7 @@ Source: [unbound.net](https://unbound.net/)
 ## About this Image
 
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
-The unbound process runs in the context of a non-root user, is build with a "distroless" scratch image and makes use of unprivileged ports (5335 tcp/udp).
+The unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a "distroless" scratch image.
 
 Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
 
