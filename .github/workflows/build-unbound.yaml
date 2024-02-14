@@ -1,4 +1,4 @@
-name: Build Unbound 
+name: Build Unbound
                
 on:
   push:
