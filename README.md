@@ -41,9 +41,9 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 
 Docker containers are most easily used with docker compose.
 
- - Some [`installation intructions and details`](./unbound/doc/DETAILS.md)
- - You find example docker-compose files [`here`](./unbound/doc/examples)
- - There are some scripts in the directory [`scripts`](./scripts)
+ - Some [`installation intructions and details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
+ - You find example docker-compose files [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples)
+ - There are some scripts in the directory [`scripts`](https://github.com/madnuttah/unbound-docker/tree/main/scripts)
     - `self-build-docker-images.sh` when you want or need to build the docker images yourself
 
 ## Available Docker Tags
