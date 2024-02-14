@@ -1,10 +1,10 @@
-ARG IMAGE_BUILD_DATE="2024-02-13" \
+ARG IMAGE_BUILD_DATE="2024-02-14" \
   ALPINE_VERSION="3.19.1" \
   OPENSSL_VERSION="3.2.1" \
   UNBOUND_VERSION="1.19.1" \
   IMAGE_REVISION="0"
 
-FROM madnuttah/unbound:openssl-buildenv-3.2.1-0 AS buildenv
+FROM alpine:"${ALPINE_VERSION}" AS buildenv
 
 LABEL maintainer="madnuttah"
 
@@ -20,7 +20,7 @@ WORKDIR /tmp/src
 
 RUN set -xe; \
   addgroup -S -g 1000 _unbound && \
-  adduser -S -H -h /usr/local/unbound/ -g _unbound -u 1000  -D -G _unbound _unbound && \
+  adduser -S -H -h /usr/local/unbound -g _unbound -u 1000  -D -G _unbound _unbound && \
   apk --update --no-cache add \
   ca-certificates \
   gnupg \
@@ -31,6 +31,7 @@ RUN set -xe; \
     build-base\
     libsodium-dev \
     linux-headers \
+    openssl-dev \
     nghttp2-dev \
     ngtcp2-dev \
     libevent-dev \
@@ -55,7 +56,7 @@ RUN set -xe; \
     --with-pidfile=/usr/local/unbound/unbound.d/unbound.pid \
     --mandir=/usr/share/man \
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
-    --with-ssl=/openssl \
+    --with-ssl \
     --with-libevent \
     --with-libnghttp2 \
     --with-libhiredis \
@@ -98,9 +99,7 @@ RUN set -xe; \
   
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
-  
-WORKDIR /
-  
+   
 RUN set -xe; \
     apk --update --no-cache add \
     ca-certificates \
@@ -109,6 +108,7 @@ RUN set -xe; \
     nghttp2 \
     ngtcp2 \
     libevent \
+    openssl \
     protobuf-c \
     hiredis \
     expat && \
@@ -137,10 +137,6 @@ RUN set -xe; \
     /tmp/* \
     /var/tmp/* \
     /var/log/* \
-    /usr/local/openssl/private \
-    /usr/local/openssl/include \
-    /usr/local/openssl/lib/pkgconfig \
-    /usr/local/openssl/lib/*.a \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
     /usr/local/unbound/iana.d/root.hints.* \
@@ -148,14 +144,12 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/lib/pkgconfig \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
-    find /usr/local/openssl/lib/lib* -type f | xargs strip --strip-all && \
-    find /usr/local/openssl/lib/engines-3/*.so -type f | xargs strip --strip-all && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
-  
+
 FROM scratch as stage   
 
 COPY --from=buildenv /usr/local/unbound/ \
@@ -173,6 +167,8 @@ COPY --from=buildenv /usr/bin/nslookup \
   /app/bin/nslookup
 
 COPY --from=buildenv /usr/lib/libsodium* \
+  /usr/lib/libcrypto* \
+  /usr/lib/libssl* \
   /usr/lib/libexpat* \
   /usr/lib/libprotobuf-c* \
   /usr/lib/libnghttp2* \
@@ -190,14 +186,12 @@ COPY --from=buildenv /etc/passwd /etc/group \
 COPY --from=buildenv /usr/share/zoneinfo/ \
   /app/usr/share/zoneinfo/
 
-COPY --from=buildenv /usr/local/openssl/lib/ \
-  /app/usr/lib/
+WORKDIR /
 
 FROM scratch as unbound
 
 ARG UNBOUND_VERSION \
   ALPINE_VERSION \
-  OPENSSL_VERSION \
   IMAGE_BUILD_DATE \
   IMAGE_REVISION
 
@@ -205,7 +199,6 @@ ENV BUILD_DATE=${IMAGE_BUILD_DATE} \
   IMAGE_REVISION=${IMAGE_REVISION} \
   UNBOUND_VERSION=${UNBOUND_VERSION} \
   ALPINE_VERSION=${ALPINE_VERSION} \
-  OPENSSL_VERSION=${OPENSSL_VERSION} \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
   
 LABEL maintainer="madnuttah" \
@@ -221,8 +214,6 @@ LABEL maintainer="madnuttah" \
   org.opencontainers.image.authors="madnuttah" \
   org.opencontainers.image.vendor="madnuttah" \
   org.opencontainers.image.licenses="MIT"
-
-USER _unbound
 
 COPY --from=stage /app/ /
 
