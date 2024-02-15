@@ -23,7 +23,7 @@
 [![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker?style=flat-square "Issues")](https://github.com/madnuttah/unbound-docker/issues)
 [![Pull Requests](https://img.shields.io/github/issues-pr/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/pulls)
 
-[![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
+[![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20NLnet%20Labs%20Unbound&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
 
 ## Table of Contents
 

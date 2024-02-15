@@ -1,8 +1,7 @@
-ARG IMAGE_BUILD_DATE="2024-02-14" \
+ARG IMAGE_BUILD_DATE="2024-02-15" \
   ALPINE_VERSION="3.19.1" \
-  OPENSSL_VERSION="3.1.4-r5" \
   UNBOUND_VERSION="1.19.1" \
-  IMAGE_REVISION="2" \
+  IMAGE_REVISION="3" \ 
   UID="1000" \
   GID="1000"  
 
@@ -115,7 +114,6 @@ RUN set -xe; \
     protobuf-c \
     hiredis \
     expat && \
-  apk --purge del apk-tools && \
   mkdir -p \   
     "/usr/local/unbound/conf.d/" \
     "/usr/local/unbound/certs.d/" \
@@ -132,15 +130,13 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/sbin/*.sh && \
-  rm -rf \  
-    /tmp/* \
-    /var/tmp/* \
-    /var/log/* \
-    /usr/local/unbound/unbound.d/share \
-    /usr/local/unbound/etc \    
+rm -rf \  
     /usr/local/unbound/unbound.conf \
+    /usr/local/unbound/unbound.d/share \
+    /usr/local/unbound/etc \
     /usr/local/unbound/iana.d/root.hints.* \
     /usr/local/unbound/iana.d/root.zone.* \
+    /usr/local/unbound/unbound.d/lib/pkgconfig \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
@@ -192,7 +188,6 @@ WORKDIR /
 FROM scratch as unbound
 
 ARG UNBOUND_VERSION \
-  ALPINE_VERSION \
   IMAGE_BUILD_DATE \
   IMAGE_REVISION \
   UID 
@@ -200,8 +195,6 @@ ARG UNBOUND_VERSION \
 ENV BUILD_DATE="${IMAGE_BUILD_DATE}" \
   IMAGE_REVISION="${IMAGE_REVISION}" \
   UNBOUND_VERSION="${UNBOUND_VERSION}" \
-  OPENSSL_VERSION="${OPENSSL_VERSION}" \
-  ALPINE_VERSION="${ALPINE_VERSION}" \
   UID="${UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
   
@@ -211,7 +204,7 @@ LABEL maintainer="madnuttah" \
   org.opencontainers.image.version="${UNBOUND_VERSION}" \
   org.opencontainers.image.revision="${IMAGE_REVISION}" \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
-  org.opencontainers.image.summary="This multiarch Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
+  org.opencontainers.image.summary="This Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
   org.opencontainers.image.base.name="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   org.opencontainers.image.url="https://hub.docker.com/r/madnuttah/unbound-docker" \
   org.opencontainers.image.source="https://github.com/madnuttah/unbound-docker" \

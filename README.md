@@ -32,7 +32,9 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 | Redis                                    | :white_check_mark: |
 | Python                                   | :x:                |
 | EDNS Client Subnet                       | :x:                |
-    
+| Optional Healthcheck                     | :white_check_mark: |
+| Optional Statistics                      | :white_check_mark: |
+
 </details>
 
 **If you would like to have Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats)**
@@ -52,7 +54,8 @@ Docker containers are most easily used with docker compose.
     
   <summary>Tags</summary><br>  
   
-   - [1.19.1-2 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)   
+   - [1.19.1-3 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)   
+   - [1.19.1-2](https://hub.docker.com/r/madnuttah/unbound/tags)   
    - [1.19.1-1](https://hub.docker.com/r/madnuttah/unbound/tags)   
    - [1.19.1-0](https://hub.docker.com/r/madnuttah/unbound/tags)
    - [1.19.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
