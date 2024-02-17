@@ -1,7 +1,7 @@
 ### Put this into your unbound docker-compose service definition:
 ### volumes_from:
 ###   - redis-socket:rw
-### and put this at the end of your docker compose *services:* section ###
+### and put the following at the end of your docker compose *services:* section ###
 
   redis-socket:
     image: busybox
@@ -11,7 +11,7 @@
       - /bin/sh
       - -c
       - |
-        chown -R 999:1000 /usr/local/unbound/cachedb.d/
+        chown -R 999:1000 /usr/local/unbound/cachedb.d/ # Change group (:1000) to your used GID
         /bin/sh
     volumes:
        - cachedb.d:/usr/local/unbound/cachedb.d/

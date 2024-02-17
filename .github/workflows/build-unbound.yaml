@@ -1,19 +1,49 @@
-name: Build Unbound Docker Image
-                
+name: Build Distroless Unbound Docker Image
+   
 on:
   push:
     branches: [ main ]
     paths:
       - '!**'
-      - '.github/workflows/build-unbound.yaml'
-         
-env:
-  DOCKERHUB_SLUG: "madnuttah/unbound"
-  VERSION: "1.19.1-3"
+      - '.github/workflows/build_unbound.yaml'
+      
+  workflow_run:
+    workflows: [Check NLnet Labs Unbound Release]
+    types:
+      - completed
   
 jobs:
-  build:
+  buildvars:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    outputs:
+      IMAGE_BUILD_DATE: ${{ steps.IMPORT_BUILDVARS.outputs.IMAGE_BUILD_DATE }}
+      UNBOUND_DOCKER_IMAGE_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+      UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
+      UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
+      
+    steps:
+      - name: Login to Dockerhub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Import build variables from buildvars file
+        id: IMPORT_BUILDVARS
+        run: |
+          cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
+          cat buildvars | grep IMAGE_BUILD_DATE >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT          
+      
+  build: 
+    runs-on: ubuntu-latest    
+    needs: buildvars
     steps:
       - uses: step-security/harden-runner@v2
         with:
@@ -50,15 +80,26 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-     
+              
       - name: Build and push
         uses: docker/build-push-action@v5
+        env:
+          DOCKERHUB_SLUG: "madnuttah/unbound"
+          IMAGE_BUILD_DATE: ${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}  
+          UNBOUND_DOCKER_IMAGE_VERSION: ${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}  
+          UNBOUND_VERSION: ${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
+          UNBOUND_SHA256: ${{ needs.buildvars.outputs.UNBOUND_SHA256 }}  
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            UNBOUND_SHA256=${{ env.UNBOUND_SHA256 }} 
+            IMAGE_BUILD_DATE=${{ env.IMAGE_BUILD_DATE }} 
+            UNBOUND_VERSION=${{ env.UNBOUND_VERSION}} 
+            UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION}}
           file: ./unbound/Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.VERSION }}      
+            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}      
             ${{ env.DOCKERHUB_SLUG }}:latest
-          
+  

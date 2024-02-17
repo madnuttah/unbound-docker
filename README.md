@@ -43,74 +43,14 @@ This is an actively maintained and trustworthy, lightweight Alpine Linux based D
 
 Docker containers are most easily used with docker compose.
 
- - Some [`installation intructions and details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
- - You find example docker-compose files [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples)
- - There are some scripts in the directory [`scripts`](https://github.com/madnuttah/unbound-docker/tree/main/scripts)
-    - `self-build-docker-images.sh` when you want or need to build the docker images yourself
+ - [`Installation intructions and details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
+ - [`Example docker-compose files`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples)
 
 ## Available Docker Tags
 
-<details> 
-    
-  <summary>Tags</summary><br>  
-  
-   - [1.19.1-3 (latest)](https://hub.docker.com/r/madnuttah/unbound/tags)   
-   - [1.19.1-2](https://hub.docker.com/r/madnuttah/unbound/tags)   
-   - [1.19.1-1](https://hub.docker.com/r/madnuttah/unbound/tags)   
-   - [1.19.1-0](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0-4](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0-3](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.19.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.18.0-3](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.18.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.18.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.18.0](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.18.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.17.1-7](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.17.1-6](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.17.1-5](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.17.1-4](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.17.1-3](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.17.1-2](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.17.1-1](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.17.1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.17.1rc2 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.17.1rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0-5](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0-4](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0-3](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0-2](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0-1](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.16.3-1](https://hub.docker.com/r/madnuttah/unbound/tags) 
-   - [1.17.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.16.3](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.16.2-1](https://hub.docker.com/r/madnuttah/unbound/tags)  
-   - [1.16.2](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.1-1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.1rc1-1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.1rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.0](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.16.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)    
-   - [1.15.0-7](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0-6](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0-5](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0-4](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0-3](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0-2](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0-1](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.15.0rc1 (Pre-release)](https://hub.docker.com/r/madnuttah/unbound/tags)
-   - [1.14.0](https://hub.docker.com/r/madnuttah/unbound/tags)
-    
-</details>
+You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number. 
+
+The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.19.0-0`.
     
 ## Changes
     

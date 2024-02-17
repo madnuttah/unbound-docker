@@ -32,7 +32,7 @@
 - [Installation](#Installation)
 - [How to use this Image](#How-to-use-this-Image)
   - [Folder Structure](#Folder-Structure)
-  - [Recommended Environment Variables](Recommended-Environment-Variables)
+  - [Recommended Environment Variables](#Recommended-Environment-Variables)
   - [Networking](#Networking)
   - [Usage](#Usage)
   - [CacheDB (Redis)](#cachedb-redis)
@@ -66,9 +66,10 @@ However, even though the image is intended to run a recursive setup, it does not
 To provide always the latest stable and optimized versions per architecture, the following software components are self compiled in the build process using separated workflows and are not just installed:
     
 - [`Unbound`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
-- [`OpenSSL`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-openssl-buildenv.yaml)
     
 **The image is completely built online via [GitHub Actions](https://github.com/features/actions) with [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+
+**Thanks to CI, the image will be automatically updated without sacrificing security measures like SHA256 verification of the downloaded files. I am still able and commited to manually update the image when security issues of the image's components got released.**
 
 **Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
       
@@ -132,6 +133,8 @@ Other than that, splitting ain't really necessary as the included default unboun
 ...
 usr/local/
 ├── unbound/
+│   ├── cachedb.d/
+│   │   └── redis.sock
 │   ├── certs.d/
 │   │   └── ...
 │   ├── conf.d/
@@ -203,13 +206,13 @@ madnuttah/unbound:latest
 
 I prefer accessing the CacheDB rather via socket than via TCP, you can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
 
-Due to the `chroot` environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket in an own volume.
+Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket in an own volume.
 
 You need to enable the module in your `unbound.conf` first:
 
-```
 server:
   module-config: "cachedb validator iterator"
+```
 ```
 
 Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
