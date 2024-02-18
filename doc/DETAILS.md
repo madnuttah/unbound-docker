@@ -69,7 +69,7 @@ To provide always the latest stable and optimized versions per architecture, the
     
 **The image is completely built online via [GitHub Actions](https://github.com/features/actions) with [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
 
-**Thanks to CI, the image will be automatically updated without sacrificing security measures like SHA256 verification of the downloaded files. I am still able and commited to manually update the image when security issues of the image's components got released.**
+**Thanks to Continuous Delivery, the image will be automatically updated without sacrificing security measures like SHA256 verification of the downloaded files. I am still able and commited to manually update the image when security issues of the image's components got released.**
 
 **Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
       
