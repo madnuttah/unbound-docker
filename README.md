@@ -4,7 +4,7 @@
 
 # Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
-[![CI](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/ci.yaml?branch=main&label=CI&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/ci.yaml)
+[![CI](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd.yaml?branch=main&label=CI&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd.yaml)
 [![Build Multiarch Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-unbound.yaml?branch=main&label=madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 
