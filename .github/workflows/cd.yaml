@@ -1,12 +1,6 @@
 name: Check NLnet Labs Unbound Release
              
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '!**'
-      - '.github/workflows/ci.yaml'
-
   schedule:
     - cron: '0 19 * * *'
         
