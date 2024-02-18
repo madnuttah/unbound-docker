@@ -1,12 +1,6 @@
 name: Build Distroless Unbound Docker Image
    
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - '!**'
-      - '.github/workflows/build_unbound.yaml'
-      
+on:   
   workflow_run:
     workflows: [Check NLnet Labs Unbound Release]
     types:
@@ -95,8 +89,8 @@ jobs:
           build-args: |
             UNBOUND_SHA256=${{ env.UNBOUND_SHA256 }} 
             IMAGE_BUILD_DATE=${{ env.IMAGE_BUILD_DATE }} 
-            UNBOUND_VERSION=${{ env.UNBOUND_VERSION}} 
-            UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION}}
+            UNBOUND_VERSION=${{ env.UNBOUND_VERSION }} 
+            UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
           file: ./unbound/Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           tags: |

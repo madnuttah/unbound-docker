@@ -51,7 +51,7 @@ Source: [unbound.net](https://unbound.net/)
 ## About this Image
 
 This container image is based on Alpine Linux with focus on security, performance and a small image size.
-The unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a "distroless" scratch image.
+The unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure "distroless" scratch image.
 
 Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
 
@@ -173,8 +173,8 @@ usr/local/
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
 | `TZ` | `UTC` | `<Timezone>` | Set your [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC relies on precise time
-| `UID` | `1000` | `Number` | Your desired user id for user ´_unbound´ |
-| `GID` | `1000` | `Number` | Your desired group id for group ´_unbound´ |
+| `UID` | `1000` | `Number` | Your desired user id for user `_unbound` |
+| `GID` | `1000` | `Number` | Your desired group id for group `_unbound` |
 
 ### Networking
 
@@ -182,15 +182,13 @@ usr/local/
 | --------- | ------------------------ |
 | `5335`    | Listening Port (TCP/UDP) |
 
-If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml. You may need to enable CAPabilities in your compose file as the `_unbound` user only has limited permissions.
-
 ### Usage
 
 The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
 
-I have added a custom bridge network to the [`MACVLAN example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/docker-compose.yaml%20(mcvlan)) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
+I have added a custom bridge network to the [`MACVLAN example`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-macvlan) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
 Anyway, you can also spin up the container with the following command:
 
@@ -219,19 +217,26 @@ Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` an
 
 Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/redis/examples/docker-compose_snippet.yaml).
+Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml).
 
 # Known Issues
 
-Alpine Linux dropped hardware support for 'armv6l` (Raspberry Pi 1A / 1A+ / 1B / 1B+ and Zero / Zero W).
+If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml. You may need to enable CAPabilities in your compose file as the `_unbound` user only has limited permissions, see [issue 54](https://github.com/madnuttah/unbound-docker/issues/54)
 
-You can check your hardware architecture with the command `uname -m`. If you want to use unbound-docker on hardware like `armv6l` [`you can build the images yourself on the target hardware`](https://github.com/madnuttah/unbound-docker/tree/main/scripts). We are sorry for the inconvenience.
+```
+cap_add: 
+  - NET_BIND_SERVICE
+```
+
+[Runtime privilege and Linux capabilities](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
 
 # Troubleshooting
 
-Most issues take place because there are missing files like the unbound.log or due to permission issues. The container won't start up in such cases. Make sure `uid/gid 1000 (_unbound:_unbound)` has read/write permissions on it's folders. 
+*If you have trouble starting up the container, start the container with the [minimal config first](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-minimal). Analyze the logs using `docker logs unbound` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.*
 
-You can access the _running_ image by executing the following command in your shell: `sudo docker exec -ti madnuttah-unbound /bin/ash`. If you have assigned a different name for the image than `madnuttah-unbound`, this must be adjusted of course.
+* Most issues take place because there are missing files like the `unbound.log` or due to permission issues. The container won't start up in such cases. Make sure your `uid/gid [default: 1000:1000] (_unbound:_unbound)` has read/write permissions on it's folders.
+
+* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, a `docker-compose down && docker compose up -d` will remove the PID and the warnings in the log.
 
 # Documentation
 
