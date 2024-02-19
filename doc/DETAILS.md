@@ -229,6 +229,10 @@ Feb 18 22:01:02 unbound[1:0] notice: Connection to Redis established
 ...
 ```
 
+If you like to have a Healtheck for this container which I'd recommend, you got my back:
+
+cachedb [healtcheck.sh](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh)
+
 In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file.
 
 <img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">

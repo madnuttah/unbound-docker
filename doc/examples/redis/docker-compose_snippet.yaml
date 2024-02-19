@@ -22,8 +22,15 @@
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - /.../unbound-db/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
     volumes_from:
       - redis-socket:rw
+    healthcheck:
+      test: /usr/local/sbin/healthcheck.sh
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 30s
 
 volumes:
   cachedb.d:
