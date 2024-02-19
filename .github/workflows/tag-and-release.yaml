@@ -1,0 +1,37 @@
+name: CD Tag And Release
+   
+on:       
+  workflow_run:
+    workflows: [CD Build Distroless Unbound Docker Image]
+    types:
+      - completed
+ 
+jobs: 
+  tag_and_release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Push tag and upload release to GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "${{ github.workspace }}"
+          RELEASE_TAG=$(cat ./buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION)
+          IMAGE_BUILD_DATE=$(cat ./buildvars | grep IMAGE_BUILD_DATE)
+          UNBOUND_VERSION=$(cat ./buildvars | grep UNBOUND_VERSION)
+          echo $RELEASE_TAG 
+          echo $IMAGE_BUILD_DATE
+          echo $UNBOUND_VERSION
+          FILENAME="Source code"
+          git config --global user.name "Continuous Delivery"
+          git config --global user.email "96331755+madnuttah@users.noreply.github.com"
+          git tag -a "$RELEASE_TAG" -m "[CD] $RELEASE_TAG"
+          git push origin "$RELEASE_TAG" main
+          gh release create "$RELEASE_TAG" --notes "Updated Unbound to $UNBOUND_VERSION"
+          tar czf "$FILENAME.tar.gz" ./
+          zip -r "$FILENAME.zip" ./ -j
+          gh release upload "$RELEASE_TAG" "$FILENAME.tar.gz" "$FILENAME.zip"
+          exit 0

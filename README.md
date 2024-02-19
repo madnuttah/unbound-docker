@@ -7,9 +7,9 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd.yaml?branch=main&label=CD&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd.yaml)
 [![Build Distroless Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/build-unbound.yaml?branch=main&label=madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/build-unbound.yaml)
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
+f the most advanced, feature rich, secure and trustworthy Unbound Docker images for you
 
-
-This is an actively maintained and trustworthy, lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure "distroless" scratch image created following best practice principles.
+This is ome of the most advanced and feauture rich, actively maintained and trustworthy, lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image created by following the best practice principles.
 
 <details> 
     

@@ -206,18 +206,32 @@ I prefer accessing the CacheDB rather via socket than via TCP, you can learn abo
 
 Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket in an own volume.
 
-You need to enable the module in your `unbound.conf` first:
+You need to enable the module in your `unbound.conf` first and t:
 
+```
 server:
   module-config: "cachedb validator iterator"
-```
 ```
 
 Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
 
 Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml).
+Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is important, `cachedb` has to be loaded before `iterator`.
+
+ou can verify the connection to redis in the log, there should read 
+
+```
+...
+Feb 18 22:01:02 unbound[1:0] notice: init module 1: cachedb
+Feb 18 22:01:02 unbound[1:0] notice: Redis initialization 
+Feb 18 22:01:02 unbound[1:0] notice: Connection to Redis established
+...
+```
+
+In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file.
+
+<img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">
 
 # Known Issues
 
