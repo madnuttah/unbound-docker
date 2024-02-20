@@ -1,4 +1,4 @@
-name: CD Build Distroless Unbound Docker Image
+name: Manually Build Distroless Unbound Docker Image
    
 on:   
   push:
@@ -7,36 +7,8 @@ on:
       - '!**'
       - '.github/workflows/manually-build-unbound.yaml'
  
-jobs:
-  buildvars:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    outputs:
-      IMAGE_BUILD_DATE: ${{ steps.IMPORT_BUILDVARS.outputs.IMAGE_BUILD_DATE }}
-      UNBOUND_DOCKER_IMAGE_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
-      UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
-      UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
-      
-    steps:
-      - name: Login to Dockerhub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-  
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Import build variables from buildvars file
-        id: IMPORT_BUILDVARS
-        run: |
-          cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep IMAGE_BUILD_DATE >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT          
-      
-  build: 
+jobs:    
+  build-unbound: 
     runs-on: ubuntu-latest    
     needs: buildvars
     steps:
