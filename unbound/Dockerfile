@@ -156,11 +156,11 @@ COPY --from=buildenv /usr/local/unbound/ \
 COPY --from=buildenv /lib/*-musl-* \
   /app/lib/
 
-COPY --from=buildenv /bin/sh /bin/sed \
+COPY --from=buildenv /bin/sh /bin/sed /bin/netstat\
   /app/bin/
   
-COPY --from=buildenv /usr/bin/nslookup /usr/bin/awk \
-  /app/bin/
+COPY --from=buildenv /usr/bin/awk \
+  /app/usr/bin/
 
 COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libsodium* \

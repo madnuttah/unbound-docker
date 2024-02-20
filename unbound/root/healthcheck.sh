@@ -1,7 +1,8 @@
 #! /bin/sh
-nslookup internic.net > /dev/null
+netstat -ln | grep -c ":5335" &> /dev/null # Change ":5335" to the port you may use
 STATUS=$?
-if [[ ${STATUS} -ne 0 ]]
+#STATUS=0
+if [[ ${STATUS} -lt 1 ]]
 then
-    exit 1
+    exit 0
 fi
