@@ -8,9 +8,8 @@ on:
       - '.github/workflows/manually-build-unbound.yaml'
  
 jobs:    
-  build-unbound: 
+  build: 
     runs-on: ubuntu-latest    
-    needs: buildvars
     steps:
       - uses: step-security/harden-runner@v2
         with:
