@@ -1,11 +1,12 @@
 name: CD Build Distroless Unbound Docker Image
    
 on:   
-  workflow_run:
-    workflows: [CD Check NLnet Labs Unbound Release]
-    types:
-      - completed
-  
+  push:
+    branches: [ main ]
+    paths:
+      - '!**'
+      - '.github/workflows/manually-build-unbound.yaml'
+ 
 jobs:
   buildvars:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -79,10 +80,10 @@ jobs:
         uses: docker/build-push-action@v5
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
-          IMAGE_BUILD_DATE: ${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}  
-          UNBOUND_DOCKER_IMAGE_VERSION: ${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}  
-          UNBOUND_VERSION: ${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
-          UNBOUND_SHA256: ${{ needs.buildvars.outputs.UNBOUND_SHA256 }}  
+          IMAGE_BUILD_DATE: "Tue Feb 20 10:54:48 UTC 2024"
+          UNBOUND_DOCKER_IMAGE_VERSION: "1.19.1-4"
+          UNBOUND_VERSION: "1.19.1"
+          UNBOUND_SHA256: "bc1d576f3dd846a0739adc41ffaa702404c6767d2b6082deb9f2f97cbb24a3a9"
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
