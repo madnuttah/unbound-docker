@@ -16,7 +16,7 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
     
 | Feature                                  | Supported          |
 | ---------------------------------------- | ------------------ |
-| Minimalist distroless scratch image      | :white_check_mark: |
+| Distroless scratch image                 | :white_check_mark: |
 | Unprivileged user                        | :white_check_mark: |
 | Libevent                                 | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
@@ -31,10 +31,10 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
 | Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
 | Response Policy Zones                    | :white_check_mark: |
 | Redis                                    | :white_check_mark: |
-| Python                                   | :x:                |
-| EDNS Client Subnet                       | :x:                |
 | Optional Healthcheck                     | :white_check_mark: |
 | Optional Statistics                      | :white_check_mark: |
+| Python                                   | :x:                |
+| EDNS Client Subnet                       | :x:                |
 
 </details>
 
