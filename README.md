@@ -18,24 +18,20 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
 | ---------------------------------------- | ------------------ |
 | Distroless scratch image                 | :white_check_mark: |
 | Unprivileged user                        | :white_check_mark: |
+| Unprivileged port                        | :white_check_mark: |
 | Libevent                                 | :white_check_mark: |
 | DNSSEC                                   | :white_check_mark: |
 | DNSCrypt                                 | :white_check_mark: |
 | DNSTap                                   | :white_check_mark: |
 | DNS64                                    | :white_check_mark: |
-| Draft-0x20 (caps-for-id: yes)            | :white_check_mark: |    
 | DNS over HTTPS                           | :white_check_mark: |
 | DNS over TLS                             | :white_check_mark: |
-| QName Minimization                       | :white_check_mark: |
-| Auth. zones with local copy of root zone | :white_check_mark: |
-| Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
-| Response Policy Zones                    | :white_check_mark: |
 | Redis                                    | :white_check_mark: |
 | Optional Healthcheck                     | :white_check_mark: |
 | Optional Statistics                      | :white_check_mark: |
 | Python                                   | :x:                |
 | EDNS Client Subnet                       | :x:                |
-
+    
 </details>
 
 **If you would like to have Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats)**

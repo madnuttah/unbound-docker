@@ -51,9 +51,10 @@ Source: [unbound.net](https://unbound.net/)
 ## About this Image
 
 This feature-rich Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size.
-The Unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure "distroless" scratch image with the absolute minimum of content needed to make the operating system and Unbound run flawlessly.
 
-Unbound is configured as an DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
+The Unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure [distroless](https://hackernoon.com/distroless-containers-hype-or-true-value-2rfl3wat) scratch image with the absolute minimum of content needed to make the operating system and Unbound run flawlessly with a lowest possible attack surface.
+
+Unbound is configured as a DNSSEC validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
 
 __There's a really nice explanation at the [Pi-hole documentation page](https://docs.pi-hole.net/guides/dns/unbound/) of what that means without becoming too technical:__
 
@@ -72,6 +73,8 @@ To provide always the latest stable and optimized versions per architecture, the
 **Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
 
 **When NLnet Labs publishes a new Unbound release, the image will be built, pushed to Docker Hub, tagged and released automatically to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. I am still able and very commited to manually update the image as soon as security fixes of the images components were released.**
+
+**This makes this image the probably most advanced, feature-rich and secure Unbound Docker image available.**
       
 <details> 
     
@@ -87,13 +90,8 @@ To provide always the latest stable and optimized versions per architecture, the
 | DNSCrypt                                 | :white_check_mark: |
 | DNSTap                                   | :white_check_mark: |
 | DNS64                                    | :white_check_mark: |
-| Draft-0x20 (caps-for-id: yes)            | :white_check_mark: |    
 | DNS over HTTPS                           | :white_check_mark: |
 | DNS over TLS                             | :white_check_mark: |
-| QName Minimization                       | :white_check_mark: |
-| Auth. zones with local copy of root zone | :white_check_mark: |
-| Aggressive use of DNSSEC-Validated Cache | :white_check_mark: |
-| Response Policy Zones                    | :white_check_mark: |
 | Redis                                    | :white_check_mark: |
 | Optional Healthcheck                     | :white_check_mark: |
 | Optional Statistics                      | :white_check_mark: |
@@ -110,7 +108,7 @@ Distroless multiarch-builds for Linux-based 386, arm, arm64 or amd64 platforms a
 
 Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking.
 
-*I don't like large, monolithic config files much*. Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the unbound.conf file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
+**I don't like large, monolithic config files much**. Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the unbound.conf file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
 - [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
@@ -124,7 +122,7 @@ Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnutta
     
 The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
 
-Other than that, splitting ain't really necessary as the included default unbound.conf will perfectly do the job.
+Other than that, splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job.
     
 ### Folder Structure
 
@@ -193,9 +191,9 @@ The most elegant way to get started is using [docker-compose](https://docs.docke
 
 I have added a custom bridge network to the [`MACVLAN example`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-macvlan) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
-Anyway, you can also spin up the container with the following command:
+Anyway, you can also spin up the container with the following command, `sudo` may apply:
 
-```console
+```
 docker run --name unbound -d \
 -p 5335:5335/udp \
 -p 5335:5335/tcp \
@@ -205,11 +203,11 @@ madnuttah/unbound:latest
 
 ### CacheDB (Redis)
 
-I prefer accessing the CacheDB rather via socket than via TCP, you can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
+Even it takes a little more effort, I recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via TCP. You can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
 
 Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket in an own volume.
 
-You need to enable the module in your `unbound.conf` first and t:
+Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`.
 
 ```
 server:
@@ -220,9 +218,7 @@ Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` an
 
 Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is important, `cachedb` has to be loaded before `iterator`.
-
-You can verify the connection to redis in the `unbound.log`: 
+You can verify the connection to redis in the `unbound.log` or by typing `sudo docker logs unbound` in the shell: 
 
 ```
 ...
@@ -248,20 +244,20 @@ The OpenSSL build environment needs my attention. Until the issues are fixed, Op
 
 # Troubleshooting
 
-* If you have trouble starting up the container, start the container with the [minimal config first](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-minimal). Analyze the logs using `docker logs unbound` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
+* If you have trouble spinning up the container, start the container with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-minimal) first. Analyze the logs using `docker logs unbound` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
 
-* Most issues take place because there are missing files like the `unbound.log` or due to permission issues. The container won't start up in such cases. Make sure your `uid/gid [default: 1000:1000] (_unbound:_unbound)` has read/write permissions on it's folders.
+* Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions. The container won't start up in such cases. Make sure your `uid/gid`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 
-* If you like to use a different `unbound.conf` than the one [included](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf), make sure to change at least the following settings, otherwise the container will fail to start:
+* If you like to use a different `unbound.conf` than the one [included](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf), make sure to change at least the following settings and fix crucial paths, otherwise the container will fail to start:
 
 ```
 server:
-   username="" # Is set in Dockerfile
-   chroot="" # Distroless, so no chroot
+   username="" # Is set in Dockerfile at buildtime
+   chroot="" # Distroless, so no chroot necessary
    directory: "/usr/local/unbound"
 ```
 
-* If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your unbound.conf and docker-compose.yaml. You may need to enable CAPabilities in your compose file as the `_unbound` user only has limited permissions, see [issue 54](https://github.com/madnuttah/unbound-docker/issues/54)
+* If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml`. You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54)
 
 ```
 cap_add: 
@@ -270,9 +266,9 @@ cap_add:
 
 [Runtime privilege and Linux capabilities](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
 
-* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, a `docker-compose down && docker compose up -d` will remove the PID and the warnings in the log.
+* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, `docker-compose down && docker compose up -d` will remove the PID and the warnings in the log.
 
-* This is no issue but rather something good, it means that Unbound is able to use DNSSECs:
+* This is no issue but rather something good, it means that Unbound is using DNSSEC and is receiving cryptographic keys:
 
 > `... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN`
 

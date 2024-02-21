@@ -71,8 +71,8 @@ services:
       ServerIP: <UNBOUND_IP_ADDRESS> #e.g. 192.168.1.253 or fd11:aa:1234:1234::505
       VIRTUAL_HOST: <unbound.yourdomain.lan>
       #Optional
-      UID: <YourUserID>
-      GID: <YourUserID>
+      UID: <YOURUSERID>
+      GID: <YOURGROUPID>
     volumes:
       - ./unbound.conf:/usr/local/unbound/unbound.conf:rw #Your local path to Unbound
       - ./conf.d/:/usr/local/unbound/conf.d/:rw

@@ -1,5 +1,6 @@
 .github/
 ./unbound/doc/
+buildvars
 .gitignore
 LICENSE
 *.md
