@@ -73,8 +73,6 @@ To provide always the latest stable and optimized versions per architecture, the
 **Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
 
 **When NLnet Labs publishes a new Unbound release, the image will be built, pushed to Docker Hub, tagged and released automatically to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. I am still able and very commited to manually update the image as soon as security fixes of the images components were released.**
-
-**This makes this image the probably most advanced, feature-rich and secure Unbound Docker image available.**
       
 <details> 
     
