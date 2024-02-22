@@ -31,7 +31,7 @@
 - [About this Image](#About-this-Image)
 - [Installation](#Installation)
 - [How to use this Image](#How-to-use-this-Image)
-  - [Folder Structure](#Folder-Structure)
+  - [Directory Structure](#Directory-Structure)
   - [Recommended Environment Variables](#Recommended-Environment-Variables)
   - [Networking](#Networking)
   - [Usage](#Usage)
@@ -122,7 +122,7 @@ The splitted configuration files located in [`doc/examples/usr/local/unbound`](h
 
 Other than that, splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job.
     
-### Folder Structure
+### Directory Structure
 
 <details> 
     
@@ -203,9 +203,9 @@ madnuttah/unbound:latest
 
 Even it takes a little more effort, I recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via TCP. You can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
 
-Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container containing the socket in an own volume.
+Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container providing the socket in an own volume.
 
-Extend your ***existing*** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`.
+Extend your **existing** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`.
 
 ```
 server:
@@ -243,6 +243,8 @@ The OpenSSL build environment needs my attention. Until the issues are fixed, Op
 # Troubleshooting
 
 * If you have trouble spinning up the container, start the container with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-minimal) first. Analyze the logs using `docker logs unbound` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
+
+* To check your config(s) for errors, you can connect to the running container with `docker exec -ti unbound sh` and execute `unbound-checkconf`.
 
 * Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions. The container won't start up in such cases. Make sure your `uid/gid`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 

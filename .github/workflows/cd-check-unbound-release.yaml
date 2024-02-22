@@ -7,9 +7,6 @@ on:
 jobs:
   unbound-update:
     runs-on: ubuntu-latest
-    env: 
-      CD_COMMIT_MESSAGE: Continuous Delivery Build Variables
-      CD_COMMIT_AUTHOR: Continuous Delivery
     steps:
       - name: Get versions
         id: GET_VERSIONS
@@ -40,9 +37,9 @@ jobs:
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
           echo UNBOUND_SHA256=${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_SHA256 }} >> buildvars
           echo IMAGE_BUILD_DATE=${{ steps.IS_UPDATE_AVAILABLE.outputs.IMAGE_BUILD_DATE }} >> buildvars
-          git config --global user.name "${{ env.CD_COMMIT_AUTHOR }}"
+          git config --global user.name "Continuous Delivery"
           git config --global user.email "96331755+madnuttah@users.noreply.github.com"
           git add buildvars
-          git commit buildvars -m "${{ env.CD_COMMIT_MESSAGE }}"
+          git commit buildvars -m "CD Updated buildvars"
           git push origin main
           exit 0
