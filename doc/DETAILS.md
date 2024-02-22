@@ -273,7 +273,7 @@ cap_add:
 
 > `... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN`
 
-You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-madnuttah).
+* **You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-madnuttah).**
 
 # Documentation
 
