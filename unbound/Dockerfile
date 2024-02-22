@@ -131,7 +131,7 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/sbin/*.sh && \
-rm -rf \  
+  rm -rf \  
     /usr/local/unbound/unbound.conf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
