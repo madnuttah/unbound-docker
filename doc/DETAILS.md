@@ -171,6 +171,7 @@ usr/local/
 
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
+| `ServerIP` | `-` | `IPv4/IPv6` | The IP address of your Unbound host |
 | `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC relies on precise time
 | `UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
 | `GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
@@ -254,7 +255,7 @@ The OpenSSL build environment needs my attention. Until the issues are fixed, Op
 server:
    username="" # Is set in Dockerfile at buildtime
    chroot="" # Distroless, so no chroot necessary
-   directory: "/usr/local/unbound"
+   directory: "/usr/local/unbound" # This is the folder where Unbound lives
 ```
 
 * If you want to use this image as a standalone DNS resolver _without_ Pi-hole, the given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml`. You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54)
@@ -271,6 +272,8 @@ cap_add:
 * This is no issue but rather something good, it means that Unbound is using DNSSEC and is receiving cryptographic keys:
 
 > `... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN`
+
+You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-madnuttah).
 
 # Documentation
 

@@ -1,6 +1,6 @@
 ### Put this into your unbound docker-compose service definition:
 ### volumes_from:
-###   - redis-socket:rw
+###   - redis-socket:ro
 ### and put the following at the end of your docker compose *services:* section ###
 
   redis-socket:

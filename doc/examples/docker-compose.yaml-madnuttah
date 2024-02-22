@@ -1,0 +1,160 @@
+# This is the Docker Compose stack I'm currently using. Private details are redacted (x)
+# You won't be able to deploy the stack, it's purpose is solely for comparing your setup with mine
+# The stack consists of the following services: 
+# - Pi-hole
+# - Unbound
+# - Redis
+# - Redis socket host
+
+version: '3'
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: pihole
+    domainname: domain.private
+    mac_address: x:x:x:x:x:x
+    depends_on:
+      unbound:
+        condition: service_healthy
+    cap_add:
+      - NET_BIND_SERVICE
+    networks:
+      docker:
+        ipv4_address: x.x.x.x
+      docker-bridge:
+        ipv4_address: x.x.x.x
+    dns:
+      - x.x.x.x@5335
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    environment:
+      FTLCONF_LOCAL_IPV4: x.x.x.x
+      VIRTUAL_HOST: pihole.domain.private 
+      WEBPASSWORD: x 
+      WEBUIBOXEDLAYOUT: boxed
+      TZ: "Europe/Amsterdam"
+      CORS_HOSTS: domain.private
+      PIHOLE_DNS_1: x.x.x.x#5335
+      IPv6: "false"    
+      DNS_BOGUS_PRIV: "true"
+      DNS_FQDN_REQUIRED: "true"
+      REV_SERVER: "true"
+      REV_SERVER_TARGET: x.x.x.x
+      REV_SERVER_DOMAIN: domain.private
+      REV_SERVER_CIDR: x.x.x.x/x
+      DNSMASQ_LISTENING: all
+      SKIPGRAVITYONBOOT: 1
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/:rw
+      - ./pihole/etc/lighttpd/pihole.pem:/etc/lighttpd/pihole.pem:ro
+      - ./pihole/etc/lighttpd/pihole.key:/etc/lighttpd/pihole.key:ro
+      - ./pihole/etc/lighttpd/root_ca.pem:/etc/lighttpd/root_ca.pem:ro
+      - ./pihole/etc/lighttpd/external.conf:/etc/lighttpd/conf-enabled/external.conf:rw
+      - ./pihole/etc/pihole/:/etc/pihole/:rw
+      - ./pihole/etc/hosts.list:/etc/hosts:rw
+      - ./pihole/etc/resolv.conf:/etc/resolv.conf:rw
+      - ./pihole/etc/hostname:/etc/hostname:rw
+    restart: always
+  
+  unbound:
+    container_name: unbound
+    image: madnuttah/unbound:latest
+    mac_address: x:x:x:x:x:x
+    hostname: unbound
+    domainname: domain.private
+    networks:
+      docker:
+        ipv4_address: x.x.x.x
+    environment:  
+      TZ: "Europe/Amsterdam"
+      ServerIP: x.x.x.x   
+      VIRTUAL_HOST: unbound.domain.private 
+      UID: 1000
+      GID: 1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./unbound/usr/local/sbin/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
+      - ./unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw
+      - ./unbound/conf.d/:/usr/local/unbound/conf.d/:rw
+      - ./unbound/iana.d/:/usr/local/unbound/iana.d/:rw
+      - ./unbound/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
+      - ./unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
+      - ./unbound/zones.d/:/usr/local/unbound/zones.d/:rw
+    volumes_from:
+      - unbound-db-socket:ro
+    restart: always
+    depends_on:
+      unbound-db:
+        condition: service_healthy
+    healthcheck:
+      test: /usr/local/sbin/healthcheck.sh
+      interval: 60s
+      retries: 5
+      start_period: 5s
+      timeout: 30s
+      
+  unbound-db-socket:
+    image: busybox
+    container_name: unbound-db-socket
+    tty: true
+    command:
+      - /bin/sh
+      - -c
+      - |
+        chown -R 999:1000 /usr/local/unbound/cachedb.d/
+        /bin/sh
+    volumes:
+       - cachedb.d:/usr/local/unbound/cachedb.d/
+    networks:
+       - docker-bridge
+      
+  unbound-db:
+    container_name: unbound-db
+    image: redis:alpine
+    mac_address: x:x:x:x:x:x
+    hostname: unbound-db
+    domainname: domain.private
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./unbound-db/data:/data/
+      - ./unbound-db/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./unbound-db/sysctl.conf:/etc/sysctl.conf
+      - ./unbound-db/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
+    volumes_from:
+      - unbound-db-socket:rw
+    healthcheck:
+      test: /usr/local/sbin/healthcheck.sh
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 30s
+    depends_on:
+      - unbound-db-socket
+    networks:
+      - docker-bridge
+ 
+networks: 
+  docker:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: x.x.x.x/x      
+          gateway: x.x.x.x     
+          ip_range: x.x.x.x/x
+          
+  docker-bridge:
+     driver: bridge
+     ipam:
+       config:
+         - subnet: x.x.x.x/x
+   
+volumes:
+  cachedb.d:
