@@ -173,8 +173,8 @@ usr/local/
 | -------- | ------- | ----- | ---------- |
 | `ServerIP` | `-` | `IPv4/IPv6` | The IP address of your Unbound host |
 | `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC relies on precise time
-| `UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
-| `GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
+| `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
+| `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
 
 ### Networking
 
@@ -247,7 +247,7 @@ The OpenSSL build environment needs my attention. Until the issues are fixed, Op
 
 * To check your config(s) for errors, you can connect to the running container with `docker exec -ti unbound sh` and execute `unbound-checkconf`.
 
-* Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions. The container won't start up in such cases. Make sure your `uid/gid`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
+* Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions. The container won't start up in such cases. Make sure your `UNBOUND_UID/UNBOUND_GID`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 
 * If you like to use a different `unbound.conf` than the one [included](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf), make sure to change at least the following settings and fix crucial paths, otherwise the container will fail to start:
 

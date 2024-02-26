@@ -43,8 +43,8 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
 
 Docker containers are most easily used with docker compose.
 
- - [`Installation intructions and details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)
- - [`Example docker-compose files`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples)
+ - **[`Details and instructions`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)**
+ - **[`Example docker-compose files`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples)**
 
 ## Available Docker Tags
 

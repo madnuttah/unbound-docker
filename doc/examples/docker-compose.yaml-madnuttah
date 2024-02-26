@@ -91,7 +91,7 @@ services:
       unbound-db:
         condition: service_healthy
     healthcheck:
-      test: /usr/local/sbin/healthcheck.sh
+      test: /usr/local/unbound/sbin/healthcheck.sh
       interval: 60s
       retries: 5
       start_period: 5s

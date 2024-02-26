@@ -2,29 +2,29 @@ ARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   UNBOUND_SHA256 \
   UNBOUND_DOCKER_IMAGE_VERSION \ 
-  UID="1000" \
-  GID="1000"  
+  UNBOUND_UID="1000" \
+  UNBOUND_GID="1000"  
 
 FROM alpine:latest AS buildenv
 
 ARG UNBOUND_VERSION \
   UNBOUND_SHA256 \
-  UID \
-  GID
+  UNBOUND_UID \
+  UNBOUND_GID
 
 ENV UNBOUND_VERSION="${UNBOUND_VERSION}" \
   UNBOUND_DOWNLOAD_URL="https://www.nlnetlabs.nl/downloads/unbound/unbound-"${UNBOUND_VERSION}".tar.gz" \
   UNBOUND_PGP="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
   UNBOUND_SHA256="${UNBOUND_SHA256}" \
   INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5" \
-  UID="${UID}" \
-  GID="${GID}"
+  UNBOUND_UID="${UNBOUND_UID}" \
+  UNBOUND_GID="${UNBOUND_GID}"
 
 WORKDIR /tmp/src
 
 RUN set -xe; \
-  addgroup -S -g "${GID}" _unbound && \
-  adduser -S -H -h /usr/local/unbound -g _unbound -u "${UID}" -D -G _unbound _unbound && \
+  addgroup -S -g "${UNBOUND_GID}" _unbound && \
+  adduser -S -H -h /usr/local/unbound -g _unbound -u "${UNBOUND_UID}" -D -G _unbound _unbound && \
   apk --update --no-cache add \
   ca-certificates \
   gnupg \
@@ -79,6 +79,7 @@ RUN set -xe; \
     --enable-relro-now && \
   make && \
   make install && \
+  apk del --no-cache .build-deps && \
   mkdir -p \
     "/usr/local/unbound/iana.d/" && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
@@ -107,6 +108,7 @@ RUN set -xe; \
     apk --update --no-cache add \
     ca-certificates \
     tzdata \
+    drill \
     libsodium \
     nghttp2 \
     ngtcp2 \
@@ -159,7 +161,7 @@ COPY --from=buildenv /lib/*-musl-* \
 COPY --from=buildenv /bin/sh /bin/sed /bin/netstat \
   /app/bin/
   
-COPY --from=buildenv /usr/bin/awk \
+COPY --from=buildenv /usr/bin/awk /usr/bin/drill \
   /app/usr/bin/
 
 COPY --from=buildenv /usr/lib/libgcc_s* \
@@ -169,6 +171,7 @@ COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libexpat* \
   /usr/lib/libprotobuf-c* \
   /usr/lib/libnghttp2* \
+  /usr/lib/libldns* \
   /usr/lib/libhiredis* \
   /usr/lib/libevent* \
   /usr/lib/libngtcp2* \
@@ -190,11 +193,11 @@ FROM scratch as unbound
 ARG UNBOUND_VERSION \
   IMAGE_BUILD_DATE \
   UNBOUND_DOCKER_IMAGE_VERSION \
-  UID 
+  UNBOUND_UID 
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
   UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_DOCKER_IMAGE_VERSION}" \
-  UID="${UID}" \
+  UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
   
 LABEL maintainer="madnuttah" \
@@ -202,7 +205,7 @@ LABEL maintainer="madnuttah" \
   org.opencontainers.image.created="${IMAGE_BUILD_DATE}" \
   org.opencontainers.image.version="${UNBOUND_DOCKER_IMAGE_VERSION}" \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
-  org.opencontainers.image.summary="This Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
+  org.opencontainers.image.summary="This distroless Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
   org.opencontainers.image.base.name="https://hub.docker.com/r/madnuttah/unbound-docker" \
   org.opencontainers.image.url="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   org.opencontainers.image.source="https://github.com/madnuttah/unbound-docker" \
@@ -211,6 +214,6 @@ LABEL maintainer="madnuttah" \
 
 COPY --from=stage /app/ /
 
-USER "${UID}"
+USER "${UNBOUND_UID}"
 
 CMD [ "/usr/local/unbound/sbin/unbound.sh" ]
