@@ -73,8 +73,8 @@ services:
       TZ: "Europe/Amsterdam"
       ServerIP: x.x.x.x   
       VIRTUAL_HOST: unbound.domain.private 
-      UID: 1000
-      GID: 1000
+      UNBOUND_UID: 1000
+      UNBOUND_GID: 1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./unbound/usr/local/sbin/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
