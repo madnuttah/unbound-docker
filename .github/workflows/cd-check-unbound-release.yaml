@@ -11,9 +11,14 @@ jobs:
       - name: Get versions
         id: GET_VERSIONS
         run: |
-          echo UNBOUND_VERSION="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT
-          echo UNBOUND_DOCKER_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT     
-          echo UNBOUND_DOCKER_IMAGE_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
+          if [[ "$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .prerelease')" -eq 1 ]]; then
+            echo "Pre-release, skipping"
+            exit 1
+          else
+            echo UNBOUND_VERSION="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT
+            echo UNBOUND_DOCKER_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT     
+            echo UNBOUND_DOCKER_IMAGE_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
+          fi
 
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
