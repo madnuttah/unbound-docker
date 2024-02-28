@@ -4,15 +4,6 @@ on:
   schedule:
     - cron: '0 19 * * mon-fri'
     
- name: CD Check NLnet Labs Unbound Release
-
-on:   
-  push:
-    branches: [ main ]
-    paths:
-      - '!**'
-      - '.github/workflows/cd.yaml'
- 
 jobs:
   unbound-update:
     runs-on: ubuntu-latest
