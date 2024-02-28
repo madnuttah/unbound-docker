@@ -13,22 +13,39 @@ jobs:
     steps: 
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
+      - name: Import GPG key 
+        id: IMPORT_GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+          git_push_gpgsign: true
+          trust_level: 5
+          
       - name: Push tag and upload release to GitHub
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
+          GIT_AUTHOR_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
+          GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
+          GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
           cd "${{ github.workspace }}"
           RELEASE_TAG=$(cat ./buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION)
           IMAGE_BUILD_DATE=$(cat ./buildvars | grep IMAGE_BUILD_DATE)
           UNBOUND_VERSION=$(cat ./buildvars | grep UNBOUND_VERSION)
           FILENAME="Source code"
-          git config --global user.name "Continuous Delivery"
-          git config --global user.email "96331755+madnuttah@users.noreply.github.com"
-          git tag -a "$RELEASE_TAG" -m "[CD] $RELEASE_TAG"
+          git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
           git push origin "$RELEASE_TAG" main
           gh release create "$RELEASE_TAG" --notes "Updated Unbound to $UNBOUND_VERSION"
           tar czf "${FILENAME}.tar.gz" ./
           zip -r "${FILENAME}.zip" ./ -j
           gh release upload "$RELEASE_TAG" "${FILENAME}.tar.gz" "${FILENAME}.zip"
           exit 0
+

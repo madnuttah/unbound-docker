@@ -63,7 +63,7 @@ __There's a really nice explanation at the [Pi-hole documentation page](https://
 >Furthermore, from the point of an attacker, the DNS servers of larger providers are very worthwhile targets, as they only need to poison one DNS server, but millions of users might be affected. Instead of your bank's actual IP address, you could be sent to a phishing site hosted on some island. This scenario has already happened and it isn't unlikely to happen again...
 >When you operate your own (tiny) recursive DNS server, then the likeliness of getting affected by such an attack is greatly reduced._
 
-However, even though the image is intended to run a recursive setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements **[`*`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#troubleshooting)**, especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features.
+However, even though the image is intended to run a recursive setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements[`*`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#troubleshooting), especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features.
        
 To provide always the latest stable and optimized versions per architecture, the following software components are self compiled in the build process using separated workflows and are not just installed:
     
@@ -107,7 +107,7 @@ Distroless multiarch-builds for Linux-based 386, arm, arm64 or amd64 platforms a
 
 Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking.
 
-**I don't like large, monolithic config files much**. Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the `unbound.conf` file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
+**I don't like large, monolithic config files much. I bet you do not either.** Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the `unbound.conf` file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
 - [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
@@ -218,7 +218,7 @@ Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` an
 
 Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-You can verify the connection to redis in the `unbound.log` or by typing `sudo docker logs unbound` in the shell: 
+You can verify the connection to redis in the `unbound.log` or by typing `sudo docker logs unbound` in the shell (you'll notice the difference anyway): 
 
 ```
 ...
@@ -240,7 +240,7 @@ The loading order in your docker compose is also important. **Redis depends on t
 
 **Even I use it for less important services myself, I don't recommend using solutions like [watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your internet doesn't work anymore due to an update of the image not working as expected. Please always test before rolling out an update even I do my best not to break something. Don't blame me, you have been warned.**
 
-**Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DUIN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action.**
+**Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action.**
 
 If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate the image by executing `docker-compose up -d`.
 
