@@ -158,7 +158,7 @@ COPY --from=buildenv /usr/local/unbound/ \
 COPY --from=buildenv /lib/*-musl-* \
   /app/lib/
 
-COPY --from=buildenv /bin/sh /bin/sed /bin/netstat \
+COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
   /app/bin/
   
 COPY --from=buildenv /usr/bin/awk /usr/bin/drill \

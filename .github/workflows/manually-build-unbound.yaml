@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest    
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
-      IMAGE_BUILD_DATE: "Mon Feb 26 18:51:27 UTC 2024"
-      UNBOUND_DOCKER_IMAGE_VERSION: "1.19.1-5"
+      IMAGE_BUILD_DATE: "Wed Feb 28 17:30:26 UTC 2024"
+      UNBOUND_DOCKER_IMAGE_VERSION: "1.19.1-6"
       UNBOUND_VERSION: "1.19.1"
       UNBOUND_SHA256: "bc1d576f3dd846a0739adc41ffaa702404c6767d2b6082deb9f2f97cbb24a3a9"
     steps:
