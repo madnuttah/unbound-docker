@@ -158,7 +158,7 @@ COPY --from=buildenv /usr/local/unbound/ \
 COPY --from=buildenv /lib/*-musl-* \
   /app/lib/
 
-COPY --from=buildenv /bin/sh /bin/sed /bin/netstat \
+COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
   /app/bin/
   
 COPY --from=buildenv /usr/bin/awk /usr/bin/drill \
@@ -171,8 +171,8 @@ COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libexpat* \
   /usr/lib/libprotobuf-c* \
   /usr/lib/libnghttp2* \
-  /usr/lib/libldns* \
   /usr/lib/libhiredis* \
+  /usr/lib/libldns* \
   /usr/lib/libevent* \
   /usr/lib/libngtcp2* \
   /app/usr/lib/
@@ -205,7 +205,7 @@ LABEL maintainer="madnuttah" \
   org.opencontainers.image.created="${IMAGE_BUILD_DATE}" \
   org.opencontainers.image.version="${UNBOUND_DOCKER_IMAGE_VERSION}" \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
-  org.opencontainers.image.summary="This distroless Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
+  org.opencontainers.image.summary="This Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
   org.opencontainers.image.base.name="https://hub.docker.com/r/madnuttah/unbound-docker" \
   org.opencontainers.image.url="https://hub.docker.com/r/madnuttah/unbound-docker:latest" \
   org.opencontainers.image.source="https://github.com/madnuttah/unbound-docker" \
