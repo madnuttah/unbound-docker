@@ -59,6 +59,7 @@ jobs:
           GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
+          git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}        
           UNBOUND_VERSION=${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }} 
           echo UNBOUND_VERSION=$UNBOUND_VERSION > buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
