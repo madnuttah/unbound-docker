@@ -25,7 +25,7 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
           git_tag_gpgsign: true
-          git_push_gpgsign: true
+          git_push_gpgsign: false
           trust_level: 5
           
       - name: Push tag and upload release to GitHub
@@ -36,16 +36,15 @@ jobs:
           GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
-          cd "${{ github.workspace }}"
-          RELEASE_TAG=$(cat ./buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION)
-          IMAGE_BUILD_DATE=$(cat ./buildvars | grep IMAGE_BUILD_DATE)
-          UNBOUND_VERSION=$(cat ./buildvars | grep UNBOUND_VERSION)
-          FILENAME="Source code"
+          git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}  
+          IMAGE_BUILD_DATE="$(cat ./buildvars | grep "^IMAGE_BUILD_DATE=" | cut -d"=" -f2-)"
+          UNBOUND_VERSION="$(cat ./buildvars | grep "^UNBOUND_VERSION=" | cut -d"=" -f2-)"
+          UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
+          RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
-          git push origin "$RELEASE_TAG" main
-          gh release create "$RELEASE_TAG" --notes "Updated Unbound to $UNBOUND_VERSION"
-          tar czf "${FILENAME}.tar.gz" ./
-          zip -r "${FILENAME}.zip" ./ -j
-          gh release upload "$RELEASE_TAG" "${FILENAME}.tar.gz" "${FILENAME}.zip"
+          git push -u origin "$RELEASE_TAG"
+          git fetch --all --tags
+          git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
+          git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
+          gh release create "$RELEASE_TAG" -t "$UNBOUND_DOCKER_VERSION" -n "Updated Unbound to $UNBOUND_VERSION" --latest
           exit 0
-
