@@ -6,10 +6,7 @@ on:
     paths:
       - '!**'
       - '.github/workflows/cd-check-unbound-release-pre-flight-check.yaml'
-      
-#  schedule:
-#    - cron: '0 8 1 3 ? 2024' # only start once at 1.3.2024 8:00 UTC
-    
+          
 jobs:
   unbound-update:
     runs-on: ubuntu-latest
