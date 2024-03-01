@@ -1,5 +1,4 @@
 ./unbound/doc
 .dockerignore
-buildvars
 LICENSE
 *.md
