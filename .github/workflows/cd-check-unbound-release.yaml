@@ -27,8 +27,7 @@ jobs:
             echo "No update found"
             exit 1
           else
-            echo "Update found"          
-            echo IMAGE_BUILD_DATE="$(date -u)" >> $GITHUB_OUTPUT
+            echo "Update found"
             echo UNBOUND_SHA256="$(curl -s https://nlnetlabs.nl/downloads/unbound/unbound-"${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}".tar.gz.sha256)" 2>/dev/null >> $GITHUB_OUTPUT
           fi 
 
@@ -58,11 +57,12 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}  
           UNBOUND_VERSION=${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }} 
-          echo UNBOUND_VERSION=$UNBOUND_VERSION > buildvars
+          UNBOUND_SHA256=${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_SHA256 }} 
+          echo IMAGE_BUILD_DATE="$(date -u)" > buildvars
+          echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
+          echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
-          echo UNBOUND_SHA256=${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_SHA256 }} >> buildvars
-          echo IMAGE_BUILD_DATE=${{ steps.IS_UPDATE_AVAILABLE.outputs.IMAGE_BUILD_DATE }} >> buildvars
           git add buildvars
-          git commit buildvars -m "CD Updated buildvars"
+          git commit buildvars -m "Updated buildvars"
           git push origin main
           exit 0

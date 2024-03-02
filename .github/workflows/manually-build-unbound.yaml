@@ -7,15 +7,30 @@ on:
       - '!**'
       - '.github/workflows/manually-build-unbound.yaml'
  
-jobs:    
+jobs:   
+  buildvars:
+    runs-on: ubuntu-latest
+    outputs:
+      IMAGE_BUILD_DATE: ${{ steps.IMPORT_BUILDVARS.outputs.IMAGE_BUILD_DATE }}
+      UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
+      UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
+      
+    steps: 
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Import build variables from buildvars file
+        id: IMPORT_BUILDVARS
+        run: |
+          echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT     
+          
   build: 
     runs-on: ubuntu-latest    
-    env:
-      DOCKERHUB_SLUG: "madnuttah/unbound"
-      IMAGE_BUILD_DATE: "Wed Feb 28 17:30:26 UTC 2024"
-      UNBOUND_DOCKER_IMAGE_VERSION: "1.19.1-6"
-      UNBOUND_VERSION: "1.19.1"
-      UNBOUND_SHA256: "bc1d576f3dd846a0739adc41ffaa702404c6767d2b6082deb9f2f97cbb24a3a9"
+    needs: buildvars
     steps:
       - uses: step-security/harden-runner@v2
         with:
@@ -38,6 +53,8 @@ jobs:
     
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -55,10 +72,17 @@ jobs:
               
       - name: Build and push
         uses: docker/build-push-action@v5
+        env:
+          DOCKERHUB_SLUG: "madnuttah/unbound"
+          UNBOUND_DOCKER_IMAGE_VERSION: "1.19.1-x"
+          IMAGE_BUILD_DATE: ${{ needs.buildvars.outputs.IMAGE_BUILD_DATE}}
+          UNBOUND_VERSION: ${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
+          UNBOUND_SHA256: ${{ needs.buildvars.outputs.UNBOUND_SHA256 }}  
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
+            DOCKERHUB_SLUG=${{ env.DOCKERHUB_SLUG }} 
             UNBOUND_SHA256=${{ env.UNBOUND_SHA256 }} 
             IMAGE_BUILD_DATE=${{ env.IMAGE_BUILD_DATE }} 
             UNBOUND_VERSION=${{ env.UNBOUND_VERSION }} 

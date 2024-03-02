@@ -77,7 +77,7 @@ services:
       UNBOUND_GID: 1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./unbound/usr/local/sbin/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
+      - ./unbound/usr/local/unbound/sbin/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
       - ./unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw
       - ./unbound/conf.d/:/usr/local/unbound/conf.d/:rw
       - ./unbound/iana.d/:/usr/local/unbound/iana.d/:rw
@@ -93,9 +93,9 @@ services:
     healthcheck:
       test: /usr/local/unbound/sbin/healthcheck.sh
       interval: 60s
-      retries: 5
+      retries: 3
       start_period: 5s
-      timeout: 30s
+      timeout: 15s
       
   unbound-db-socket:
     image: busybox
@@ -131,9 +131,9 @@ services:
     healthcheck:
       test: /usr/local/sbin/healthcheck.sh
       interval: 10s
-      retries: 5
+      retries: 3
       start_period: 5s
-      timeout: 30s
+      timeout: 15s
     depends_on:
       - unbound-db-socket
     networks:

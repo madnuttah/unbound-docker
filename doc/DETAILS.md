@@ -51,7 +51,9 @@ Source: [unbound.net](https://unbound.net/)
 
 ## About this Image
 
-This feature-rich Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size.
+This innovative and feature-rich Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size. 
+
+As it leaves nothing to be desired, it is perfectly suited for professional and personal use alike. 
 
 The Unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure [distroless](https://hackernoon.com/distroless-containers-hype-or-true-value-2rfl3wat) scratch image with the absolute minimum of content needed to make the operating system and Unbound run flawlessly with a lowest possible attack surface.
 
@@ -73,7 +75,7 @@ To provide always the latest stable and optimized versions per architecture, the
 
 **Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
 
-**When NLnet Labs publishes a new Unbound release, the image will be built, pushed to Docker Hub, tagged and released automatically to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. I am still able and very commited to manually update the image as soon as security fixes of the images components were released.**
+**When NLnet Labs publishes a new Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released.**
       
 <details> 
     
@@ -195,10 +197,10 @@ Anyway, you can also spin up the container with the following command, `sudo` ma
 
 ```
 docker run --name unbound -d \
--p 5335:5335/udp \
--p 5335:5335/tcp \
---restart=unless-stopped \
-madnuttah/unbound:latest
+  -p 5335:5335/udp \
+  -p 5335:5335/tcp \
+  --restart=unless-stopped \
+  madnuttah/unbound:latest
 ```
 
 ### CacheDB (Redis)
@@ -214,11 +216,11 @@ server:
   module-config: "cachedb validator iterator"
 ```
 
-Create a new mountpoint like `.../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
+Create a new mountpoint like `../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
 
 Place a new entry for cachedb in your `unbound.conf` with the content of my [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-You can verify the connection to redis in the `unbound.log` or by typing `sudo docker logs unbound` in the shell (you'll notice the difference anyway): 
+You can verify the connection to redis in the `unbound.log` or by typing `sudo docker logs unbound` in the shell: 
 
 ```
 ...
@@ -238,9 +240,11 @@ The loading order in your docker compose is also important. **Redis depends on t
 
 ### Updating the Image
 
-**Even I use it for less important services myself, I don't recommend using solutions like [watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your internet doesn't work anymore due to an update of the image not working as expected. Please always test before rolling out an update even I do my best not to break something. Don't blame me, you have been warned.**
+**Even I use it for less important services myself, I don't recommend using solutions like [watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your network went down due to an update of the image not working as expected. Please always test before rolling out an update even I do my best not to break something.** 
 
-**Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action.**
+**Don't blame me, you have been warned.**
+
+**Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.**
 
 If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate the image by executing `docker-compose up -d`.
 
@@ -265,7 +269,7 @@ server:
 
 * If you have trouble spinning up the container, start the container with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-minimal) first. Analyze the logs using `docker logs unbound` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
 
-* To check your config(s) for errors, you can connect to the running container with `docker exec -ti unbound sh` and execute `unbound-checkconf`.
+* To check your config(s) for errors, you can connect to the running container and execute `unbound-checkconf` with the following command: `docker exec -ti unbound unbound-checkconf`.
 
 * Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions. The container won't start up in such cases. Make sure your `UNBOUND_UID/UNBOUND_GID`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 

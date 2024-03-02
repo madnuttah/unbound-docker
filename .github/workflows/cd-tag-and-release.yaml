@@ -41,10 +41,11 @@ jobs:
           UNBOUND_VERSION="$(cat ./buildvars | grep "^UNBOUND_VERSION=" | cut -d"=" -f2-)"
           UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
           RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
+          RELEASE_NOTE=$(echo -e "\x23\x23 $(date '+%Y-%m-%d') <madnuttah-bot>\n\x23\x23 What's Changed?\n\x2A Updated Unbound to version $UNBOUND_VERSION")
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
           git push -u origin "$RELEASE_TAG"
           git fetch --all --tags
           git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
           git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
-          gh release create "$RELEASE_TAG" -t "$UNBOUND_DOCKER_VERSION" -n "Updated Unbound to $UNBOUND_VERSION" --latest
+          gh release create "$RELEASE_TAG" -t "$UNBOUND_DOCKER_VERSION" -n "$RELEASE_NOTE" --latest
           exit 0
