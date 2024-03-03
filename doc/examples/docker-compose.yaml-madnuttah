@@ -71,8 +71,6 @@ services:
         ipv4_address: x.x.x.x
     environment:  
       TZ: "Europe/Amsterdam"
-      ServerIP: x.x.x.x   
-      VIRTUAL_HOST: unbound.domain.private 
       UNBOUND_UID: 1000
       UNBOUND_GID: 1000
     volumes:
