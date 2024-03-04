@@ -39,6 +39,7 @@
   - [CacheDB (Redis)](#cachedb-redis)
   - [Healthcheck](#healthcheck)
   - [Updating the image](#updating-the-image)
+  - [Unbound Statistics](#unbound-statistics)
 - [Known Issues](#Known-Issues)
 - [Troubleshooting](#Troubleshooting)  
 - [Documentation](#Documentation)
@@ -85,24 +86,24 @@ To provide always the latest stable and optimized versions per architecture, the
     
 | Feature                                  | Supported          |
 | ---------------------------------------- | ------------------ |
-| Distroless scratch image                 | :white_check_mark: |
-| Unprivileged user                        | :white_check_mark: |
-| Unprivileged port                        | :white_check_mark: |
-| Libevent                                 | :white_check_mark: |
-| DNSSEC                                   | :white_check_mark: |
-| DNSCrypt                                 | :white_check_mark: |
-| DNSTap                                   | :white_check_mark: |
-| DNS64                                    | :white_check_mark: |
-| DNS over HTTPS                           | :white_check_mark: |
-| DNS over TLS                             | :white_check_mark: |
-| Redis                                    | :white_check_mark: |
-| Optional Healthcheck                     | :white_check_mark: |
-| Optional Statistics                      | :white_check_mark: |
-| Python                                   | :x:                |
-| EDNS Client Subnet                       | :x:                |
+| Distroless scratch image                 | yes |
+| Unprivileged user                        | yes |
+| Unprivileged port                        | yes |
+| Libevent                                 | yes |
+| DNSSEC                                   | yes |
+| DNSCrypt                                 | yes |
+| DNSTap                                   | yes |
+| DNS64                                    | yes |
+| DNS over HTTPS                           | yes |
+| DNS over TLS                             | yes |
+| Redis                                    | yes |
+| Optional Healthcheck                     | yes |
+| [`Optional Statistics`](https://github.com/madnuttah/unbound-docker-stats) | yes |
+| Python                                   | no |
+| EDNS Client Subnet                       | no |
     
 </details>
-    
+
 ## Installation
 
 Distroless multiarch-builds for Linux-based 386, arm/v6, arm/v7, arm64 or amd64 platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
@@ -244,7 +245,7 @@ Even it takes a little more effort, I recommend accessing the CacheDB rather via
 
 Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container providing the socket in an own volume.
 
-Extend your **existing** `docker-compose.yaml` `servers:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`.
+Extend your **existing** `docker-compose.yaml` `server:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`.
 
 ```
 server:
@@ -313,6 +314,14 @@ If you want to update to the `latest` version available on Docker Hub, just pull
 Pulling the latest image without a compose file can be done by `docker pull madnuttah/unbound:latest`.
 
 `sudo` may apply.
+
+### Unbound Statistics
+
+<p>
+    <img width="292" img src="https://github.com/madnuttah/unbound-docker-stats/blob/main/unbound-stats/screenshots/Screenshot.png" alt="Image">
+</p>
+
+I also created a [`companion project`](https://github.com/madnuttah/unbound-docker-stats) using [Zabbix](https://zabbix.com) for shipping the Unbound stats via a `Zabbix Active Agent` to [Grafana](https://grafana.com) _without_ using additional tools like [Zabbix Sender](https://www.zabbix.com/documentation/current/en/manpages/zabbix_sender) using a _frankensteined_ [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker-stats/main/unbound-stats/healthcheck.sh).
 
 # Known Issues
 

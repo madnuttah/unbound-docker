@@ -16,17 +16,17 @@ DOMAIN="unbound.net"
 # the result into a variable
 CHECK_PORT="$(netstat -ln | grep -c ":$PORT")" &> /dev/null
 
-# Opened port count should be larger than 0, otherwise an error in the
-# unbound.conf or docker-compose is likely
+# If opened port count is equal 0 exit ungracefully
 if [[ "$CHECK_PORT" -eq 0 ]]; then
   echo "⚠️ Port $PORT not open"
   exit 1
 else
   echo "✅ Port $PORT open"
-# Exit gracefully if EXTENDED=0
+# If extended check disabled exit gracefully
   if [[ "$EXTENDED" = "0" ]]; then
     exit 0
   fi
+# Otherwise continue, we don't exit here
 fi
 
 ## Extended healthcheck
@@ -35,8 +35,7 @@ fi
 # into a variable
 IP="$(drill -Q -p $PORT $DOMAIN @127.0.0.1)" &> /dev/null
 
-# Check the errorlevel of the last command, if not equal 0 something with the 
-# network connection doesn't seem right
+# Check the errorlevel of the last command, if not equal 0 exit ungracefully
 if [[ $? -ne 0 ]]; then
   echo "⚠️ Domain '$DOMAIN' not resolved"
   exit 1 

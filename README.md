@@ -6,12 +6,11 @@
 
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
-
-[![Manual Build Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/manually-build-unbound.yaml?branch=main&label=Manual%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/manually-build-unbound.yaml)
+[![Manual Build Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/manually-build-unbound.yaml?branch=main&label=Manually%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/manually-build-unbound.yaml)
 
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 
-This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [@NLnetLabs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image modeled by following the best practice principles.
+This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [NLnet Labs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image modeled by following the best practice principles.
 
 <details> 
     
@@ -19,25 +18,23 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
     
 | Feature                                  | Supported          |
 | ---------------------------------------- | ------------------ |
-| Distroless scratch image                 | :white_check_mark: |
-| Unprivileged user                        | :white_check_mark: |
-| Unprivileged port                        | :white_check_mark: |
-| Libevent                                 | :white_check_mark: |
-| DNSSEC                                   | :white_check_mark: |
-| DNSCrypt                                 | :white_check_mark: |
-| DNSTap                                   | :white_check_mark: |
-| DNS64                                    | :white_check_mark: |
-| DNS over HTTPS                           | :white_check_mark: |
-| DNS over TLS                             | :white_check_mark: |
-| Redis                                    | :white_check_mark: |
-| Optional Healthcheck                     | :white_check_mark: |
-| Optional Statistics                      | :white_check_mark: |
-| Python                                   | :x:                |
-| EDNS Client Subnet                       | :x:                |
+| Distroless scratch image                 | yes |
+| Unprivileged user                        | yes |
+| Unprivileged port                        | yes |
+| Libevent                                 | yes |
+| DNSSEC                                   | yes |
+| DNSCrypt                                 | yes |
+| DNSTap                                   | yes |
+| DNS64                                    | yes |
+| DNS over HTTPS                           | yes |
+| DNS over TLS                             | yes |
+| Redis                                    | yes |
+| Optional Healthcheck                     | yes |
+| [`Optional Statistics`](https://github.com/madnuttah/unbound-docker-stats) | yes |
+| Python                                   | no |
+| EDNS Client Subnet                       | no |
     
 </details>
-
-**If you would like to have Unbound statistics, take a look [`here`](https://github.com/madnuttah/unbound-docker-stats)**
 
 ## Getting started
 
