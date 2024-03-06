@@ -6,11 +6,12 @@
 
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
+[![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-nightly-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20nightly%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-nightly-unbound.yaml)
 [![Manual Build Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/manually-build-unbound.yaml?branch=main&label=Manually%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/manually-build-unbound.yaml)
 
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 
-This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people [NLnet Labs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image modeled by following the best practice principles.
+This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people at [NLnet Labs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image modeled by following the best practice principles.
 
 <details> 
     
@@ -21,6 +22,7 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
 | Distroless scratch image                 | yes |
 | Unprivileged user                        | yes |
 | Unprivileged port                        | yes |
+| Custom UID/GID                           | yes |
 | Libevent                                 | yes |
 | DNSSEC                                   | yes |
 | DNSCrypt                                 | yes |
@@ -30,7 +32,7 @@ This is a lightweight Alpine Linux based Docker image that runs [Unbound](https:
 | DNS over TLS                             | yes |
 | Redis                                    | yes |
 | Optional Healthcheck                     | yes |
-| [`Optional Statistics`](https://github.com/madnuttah/unbound-docker-stats) | yes |
+| Optional Statistics                      | yes |
 | Python                                   | no |
 | EDNS Client Subnet                       | no |
     
@@ -48,10 +50,14 @@ Docker containers are most easily used with docker compose.
 You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number. 
 
 The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.19.0-0`.
-    
+ 
+There are nightly builds of Unbound available each early morning from Monday to Friday at about 2:00 UTC. You can pull the image using it's `nightly` tag. 
+
+**Please note that _nightly builds_ are untested and also unsupported by me**.
+ 
 ## Changes
     
-You can view the changelogs in the [`Releases`](https://github.com/madnuttah/unbound-docker/releases) section.
+You can view the changes in the [`Releases`](https://github.com/madnuttah/unbound-docker/releases) section.
 
 ## Feedback
 

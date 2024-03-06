@@ -54,7 +54,7 @@ Source: [unbound.net](https://unbound.net/)
 
 ## About this Image
 
-This innovative and feature-rich Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size. 
+This innovative Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size. 
 
 While it leaves _almost_ nothing to be desired, it is perfectly suited for professional and personal use alike. 
 
@@ -89,6 +89,7 @@ To provide always the latest stable and optimized versions per architecture, the
 | Distroless scratch image                 | yes |
 | Unprivileged user                        | yes |
 | Unprivileged port                        | yes |
+| Custom UID/GID                           | yes |
 | Libevent                                 | yes |
 | DNSSEC                                   | yes |
 | DNSCrypt                                 | yes |
@@ -98,7 +99,7 @@ To provide always the latest stable and optimized versions per architecture, the
 | DNS over TLS                             | yes |
 | Redis                                    | yes |
 | Optional Healthcheck                     | yes |
-| [`Optional Statistics`](https://github.com/madnuttah/unbound-docker-stats) | yes |
+| Optional Statistics                      | yes |
 | Python                                   | no |
 | EDNS Client Subnet                       | no |
     
@@ -293,12 +294,27 @@ yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
 ✅ Port 5335 open
 ```
 
+Standard healthcheck console output showing an issue:
+
+```
+yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
+⚠️ Port 5335 not open
+```
+
 Extended healthcheck console output:
 
 ```
 yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
 ✅ Port 5335 open
 ✅ Domain 'unbound.net' resolved to '185.49.140.10'
+```
+
+Extended healthcheck console output showing an issue:
+
+```
+yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
+ ✅ Port 5335 open
+ ⚠️ Domain 'unbound.net' not resolved
 ```
 
 Not in the console but rather in Portainer (and here on this page of course) the colored unicode emoji icons will show you the condition of your container at a first glance.
