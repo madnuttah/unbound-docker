@@ -8,11 +8,11 @@ on:
     schedule:
       - cron: '0 19 * * *'
       
-    # push:
-      # branches: [ main ]
-      # paths:
-        # - '!**'
-        # - '.github/workflows/cd-security-scan.yaml'
+    push:
+      branches: [ main ]
+      paths:
+        - '!**'
+        - '.github/workflows/cd-security-scan.yaml'
     
 jobs:
   scan:
@@ -62,11 +62,11 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           format: 'sarif'
-          output: 'scan-results-latest.sarif'
+          output: './scan-results-latest.sarif'
       
       - name: Upload SARIF result
         id: UPLOAD_SARIF
         if: ${{ github.event_name != 'pull_request' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'scan-results-latest.sarif'
+          sarif_file: './scan-results-latest.sarif'
