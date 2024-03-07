@@ -7,6 +7,12 @@ on:
 #      - completed
     schedule:
       - cron: '0 19 * * *'
+      
+    push:
+      branches: [ main ]
+      paths:
+        - '!**'
+        - '.github/workflows/cd-security-scan.yaml'
     
 jobs:
   scan:
