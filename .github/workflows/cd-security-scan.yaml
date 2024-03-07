@@ -23,22 +23,22 @@ jobs:
       DOCKERHUB_SLUG: "madnuttah/unbound"  
       
     steps:          
-      - uses: step-security/harden-runner@v2
-        with:
-          egress-policy: block
-          disable-telemetry: true
-          allowed-endpoints: 
-            github.com:443
-            docker.io:433
-            index.docker.io:433
-            auth.docker.io:443
-            registry-1.docker.io:443
-            production.cloudflare.docker.com:443
-            objects.githubusercontent.com:443
-            pipelines.actions.githubusercontent.com:443 
-            actions-results-receiver-production.githubapp.com:443
-            aquasecurity.github.io:433
-            ghcr.io:433
+      # - uses: step-security/harden-runner@v2
+        # with:
+          # egress-policy: block
+          # disable-telemetry: true
+          # allowed-endpoints: 
+            # github.com:443
+            # docker.io:433
+            # index.docker.io:433
+            # auth.docker.io:443
+            # registry-1.docker.io:443
+            # production.cloudflare.docker.com:443
+            # objects.githubusercontent.com:443
+            # pipelines.actions.githubusercontent.com:443 
+            # actions-results-receiver-production.githubapp.com:443
+            # aquasecurity.github.io:433
+            # ghcr.io:433
             
       - name: Checkout source
         uses: actions/checkout@v4

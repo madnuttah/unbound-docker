@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 18 * * mon-fri'
     
+  push:
+    branches: [ main ]
+    paths:
+      - '!**'
+      - '.github/workflows/cd-check-unbound-release.yaml'
+    
 jobs:
   unbound-update:
     runs-on: ubuntu-latest
