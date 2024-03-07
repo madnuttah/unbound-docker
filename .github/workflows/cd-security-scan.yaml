@@ -6,13 +6,13 @@ on:
 #    types:
 #      - completed
     schedule:
-      - cron: '0 19 * * *'
+      - cron: '0 17 * * *'
       
-    push:
-      branches: [ main ]
-      paths:
-        - '!**'
-        - '.github/workflows/cd-security-scan.yaml'
+#    push:
+#      branches: [ main ]
+#      paths:
+#        - '!**'
+#        - '.github/workflows/cd-security-scan.yaml'
     
 jobs:
   scan:
