@@ -6,17 +6,17 @@ on:
 #    types:
 #      - completed
     schedule:
-      - cron: '0 17 * * *'
+      - cron: '0 19 * * *'
       
-#    push:
-#      branches: [ main ]
-#      paths:
-#        - '!**'
-#        - '.github/workflows/cd-security-scan.yaml'
+    push:
+      branches: [ main ]
+      paths:
+        - '!**'
+        - '.github/workflows/cd-security-scan.yaml'
     
 jobs:
   scan:
-#    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     
     env:
