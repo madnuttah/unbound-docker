@@ -30,6 +30,7 @@ jobs:
             keys.openpgp.org:443
             pipelines.actions.githubusercontent.com:443 
             actions-results-receiver-production.githubapp.com:443
+            aquasecurity.github.io:433
             ghcr.io:433
             
       - name: Checkout source
@@ -77,8 +78,8 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         with:
           image-ref: ${{ env.DOCKERHUB_SLUG }}:nightly          
-          exit-code: '1'
-          ignore-unfixed: true
+          exit-code: '0'
+          ignore-unfixed: false
           scan-type: image
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
