@@ -74,7 +74,7 @@ To provide always the latest stable and optimized versions per architecture, the
     
 - [`Unbound`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
     
-**This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) by utilizing [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not locally on my systems_. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+**This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) ~by utilizing [hardened runners by StepSecurity](https://github.com/step-security/harden-runner)~ and _not locally on my systems_. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
 
 **The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) on schedule (I'll change this to buildtime after some more testing) and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub. The Trivy SARIF results can be viewed in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository, the `nightly` build only shows a table in it's workflows run details.**
 
@@ -343,7 +343,9 @@ I also created a [`companion project`](https://github.com/madnuttah/unbound-dock
 
 # Known Issues
 
-The OpenSSL build environment needs my attention. Until the issues are fixed, OpenSSL will be installed instead of compiled via workflow as it was before version 1.19.1-0. I'm sorry for the inconvenience.
+- The OpenSSL build environment needs my attention. Until the issues are fixed, OpenSSL will be installed instead of compiled via workflow as it was before version 1.19.1-0. I'm sorry for the inconvenience.
+
+- The Hardened Runner is causing issues while building, I ran an audit and try to set the endpoints once again. Until I know all egress connections, they'll just audit.
 
 # Troubleshooting
 
