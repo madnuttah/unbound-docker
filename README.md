@@ -47,13 +47,19 @@ Docker containers are most easily used with docker compose.
 
 ## Available Docker Tags
 
-You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number. 
+You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number:
+
+`docker pull madnuttah/unbound:latest`
+
+`docker pull madnuttah/unbound:1.19.0-0`
 
 The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.19.0-0`.
  
-There are nightly builds of Unbound available each early morning from Monday to Friday at about 2:00 UTC. You can pull the image using it's `nightly` tag. 
+There are nightly builds of the image available each early morning from Monday to Friday at about 2:00 UTC. You can pull the image using it's `nightly` tag: 
 
-**Please note that _nightly builds_ are untested and also unsupported by me**.
+`docker pull madnuttah/unbound:nightly`
+
+**Please note that _nightly builds_ may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by me**.
  
 ## Changes
     
@@ -77,6 +83,7 @@ You can also reach me on Fosstodon:
 - [Redis](https://redis.io/)
 - [Pi-hole](https://pi-hole.net/)
 - [StepSecurity](https://www.stepsecurity.io/)
+- [Aqua Security](https://trivy.dev/)
 - The many Docker Images which got me inspired
 - **Thank you for using my image** ❤️
 

@@ -74,11 +74,13 @@ To provide always the latest stable and optimized versions per architecture, the
     
 - [`Unbound`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
     
-**This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) by utilizing [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not_ locally on my systems. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
-
-**Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
+**This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) by utilizing [hardened runners by StepSecurity](https://github.com/step-security/harden-runner) and _not locally on my systems_. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
 
 **When NLnet Labs publishes a new Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released.**
+
+**The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) on schedule (I'll change this to buildtime after some more testing) and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub.**
+
+**Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
       
 <details> 
     
@@ -212,7 +214,7 @@ export                 set                    wait
 
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
-| `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC relies on precise time
+| `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC, logging and the optional statistics rely on precise time
 | `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
 | `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
 
@@ -370,8 +372,6 @@ cap_add:
 * When the extended healthcheck fails telling connection to 127.0.0.1 refused, verify that you permit connections to localhost. There are multiple places in the `unbound.conf` where this could be disabled, from `access control` to `DoNotQueryLocalhost` and so on. You'll likely need to check the whole file. Isn't that alone one good reason for the concept with the separated config directories? If you can't find the culprit, don't hesitate giving me a shout. 
 
 * If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker-compose down && docker compose up -d` will remove the PID and also the warnings in the log.
-
-* This image is distroless, that means there aren't (m)any of the [`utilities included`](#Available-Commands) you are used to for troubleshooting issues. If you need such tools, a way could be binding volumes providing the tools to your docker container or use the filesystem of your Docker host if it runs Alpine Linux.
 
 * This is no issue but rather something good, it means that Unbound is using DNSSEC:
 
