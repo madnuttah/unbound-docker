@@ -6,9 +6,8 @@ on:
 #    types:
 #      - completed
     schedule:
-      - cron: '0 9 * * *'
+      - cron: '0 19 * * *'
     
-  
 jobs:
   scan:
 #    if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -23,20 +22,17 @@ jobs:
           egress-policy: block
           disable-telemetry: true
           allowed-endpoints: 
-            dl-cdn.alpinelinux.org:443
             github.com:443
-            docker.io
-            index.docker.io
+            docker.io:433
+            index.docker.io:433
             auth.docker.io:443
             registry-1.docker.io:443
             production.cloudflare.docker.com:443
             objects.githubusercontent.com:443
-            www.nlnetlabs.nl:443
-            www.internic.net:443
-            keys.openpgp.org:443
             pipelines.actions.githubusercontent.com:443 
             actions-results-receiver-production.githubapp.com:443
-    
+            ghcr.io:433
+            
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -53,17 +49,18 @@ jobs:
         uses: aquasecurity/trivy-action@master
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:latest    
-          format: 'table'
+          image-ref: ${{ env.DOCKERHUB_SLUG }}:latest          
           exit-code: '1'
           ignore-unfixed: true
           scan-type: image
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          format: 'sarif'
+          output: 'scan-results-latest.sarif'
       
       - name: Upload SARIF result
         id: UPLOAD_SARIF
         if: ${{ github.event_name != 'pull_request' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: sarif.output.json
+          sarif_file: 'scan-results-latest.sarif'

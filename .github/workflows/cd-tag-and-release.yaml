@@ -11,6 +11,16 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps: 
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: block
+          disable-telemetry: true
+          allowed-endpoints: 
+            github.com:443
+            objects.githubusercontent.com:443
+            pipelines.actions.githubusercontent.com:443 
+            actions-results-receiver-production.githubapp.com:443
+            
       - name: Checkout source
         uses: actions/checkout@v4
         with:

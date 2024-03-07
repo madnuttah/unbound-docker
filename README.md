@@ -6,7 +6,8 @@
 
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
-[![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-nightly-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20nightly%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-nightly-unbound.yaml)
+[![CD Build Nightly Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-nightly-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20nightly%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-nightly-unbound.yaml)
+[![CD Security Scan](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-security-scan.yaml?branch=main&label=CD%20security%20scan&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-security-scan.yaml)
 [![Manual Build Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/manually-build-unbound.yaml?branch=main&label=Manually%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/manually-build-unbound.yaml)
 
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
@@ -55,7 +56,7 @@ You can pull the most recent image from Docker Hub using it's `latest` tag or by
 
 The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.19.0-0`.
  
-There are nightly builds of the image available each early morning from Monday to Friday at about 2:00 UTC. You can pull the image using it's `nightly` tag: 
+There are nightly builds of the image available each midnight UTC from Monday to Friday. You can pull the image using it's `nightly` tag: 
 
 `docker pull madnuttah/unbound:nightly`
 

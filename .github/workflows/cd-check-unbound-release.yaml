@@ -2,12 +2,24 @@ name: CD Check NLnet Labs Unbound Release
              
 on:
   schedule:
-    - cron: '0 19 * * mon-fri'
+    - cron: '0 18 * * mon-fri'
     
 jobs:
   unbound-update:
     runs-on: ubuntu-latest
+              
     steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: block
+          disable-telemetry: true
+          allowed-endpoints: 
+            github.com:443
+            objects.githubusercontent.com:443
+            nlnetlabs.nl:443
+            pipelines.actions.githubusercontent.com:443 
+            actions-results-receiver-production.githubapp.com:443
+            
       - name: Get versions
         id: GET_VERSIONS
         run: |
