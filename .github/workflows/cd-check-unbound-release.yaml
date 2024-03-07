@@ -2,13 +2,13 @@ name: CD Check NLnet Labs Unbound Release
              
 on:
   schedule:
-    - cron: '0 18 * * mon-fri'
+    - cron: '0 16 * * mon-fri'
     
-  push:
-    branches: [ main ]
-    paths:
-      - '!**'
-      - '.github/workflows/cd-check-unbound-release.yaml'
+  # push:
+    # branches: [ main ]
+    # paths:
+      # - '!**'
+      # - '.github/workflows/cd-check-unbound-release.yaml'
     
 jobs:
   unbound-update:
@@ -17,19 +17,20 @@ jobs:
     steps:
       - uses: step-security/harden-runner@v2
         with:
-          egress-policy: block
+          egress-policy: audit
           disable-telemetry: true
-          allowed-endpoints: 
-            github.com:443
-            objects.githubusercontent.com:443
-            nlnetlabs.nl:443
-            pipelines.actions.githubusercontent.com:443 
-            actions-results-receiver-production.githubapp.com:443
-            
+          # allowed-endpoints: 
+            # github.com:443
+            # objects.githubusercontent.com:443
+            # nlnetlabs.nl:443
+            # pipelines.actions.githubusercontent.com:443 
+            # actions-results-receiver-production.githubapp.com:443
+
       - name: Get versions
         id: GET_VERSIONS
         run: |
-          if [[ "$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .prerelease')" -eq 1 ]]; then
+          BOOL="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .prerelease')"
+          if $BOOL; then
             echo "Pre-release, skipping"
             exit 1
           else
@@ -41,12 +42,12 @@ jobs:
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
         run: |
-          if [[ "${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}" == "${{ steps.GET_VERSIONS.outputs.UNBOUND_DOCKER_VERSION }}" ]]; then
+          if [[ "${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}" = "${{ steps.GET_VERSIONS.outputs.UNBOUND_DOCKER_VERSION }}" ]]; then
             echo "No update found"
             exit 1
           else
             echo "Update found"
-            echo UNBOUND_SHA256="$(curl -s https://nlnetlabs.nl/downloads/unbound/unbound-"${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}".tar.gz.sha256)" 2>/dev/null >> $GITHUB_OUTPUT
+            echo UNBOUND_SHA256="$(curl -s https://nlnetlabs.nl/downloads/unbound/unbound-"${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}".tar.gz.sha256)" >> $GITHUB_OUTPUT
           fi 
 
       - name: Checkout source

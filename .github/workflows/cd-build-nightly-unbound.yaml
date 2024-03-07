@@ -12,10 +12,10 @@ jobs:
       DOCKERHUB_SLUG: "madnuttah/unbound"   
       
     steps:
-      # - uses: step-security/harden-runner@v2
-        # with:
-          # egress-policy: block
-          # disable-telemetry: true
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+          disable-telemetry: true
           # allowed-endpoints: 
             # dl-cdn.alpinelinux.org:443
             # github.com:443

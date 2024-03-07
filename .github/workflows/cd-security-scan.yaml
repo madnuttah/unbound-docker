@@ -23,10 +23,10 @@ jobs:
       DOCKERHUB_SLUG: "madnuttah/unbound"  
       
     steps:          
-      # - uses: step-security/harden-runner@v2
-        # with:
-          # egress-policy: block
-          # disable-telemetry: true
+       - uses: step-security/harden-runner@v2
+         with:
+           egress-policy: audit
+           disable-telemetry: true
           # allowed-endpoints: 
             # github.com:443
             # docker.io:433
