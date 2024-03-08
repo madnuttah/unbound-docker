@@ -54,9 +54,7 @@ Source: [unbound.net](https://unbound.net/)
 
 ## About this Image
 
-This innovative Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size. 
-
-While it leaves _almost_ nothing to be desired, it is perfectly suited for professional and personal use alike. 
+This advanced Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size. 
 
 The Unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure [distroless](https://hackernoon.com/distroless-containers-hype-or-true-value-2rfl3wat) scratch image with the absolute minimum of content needed to make the operating system and Unbound run flawlessly with a lowest possible attack surface.
 
@@ -74,14 +72,14 @@ To provide always the latest stable and optimized versions per architecture, the
     
 - [`Unbound`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
     
-**This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) ~by utilizing [hardened runners by StepSecurity](https://github.com/step-security/harden-runner)~ and _not locally on my systems_. All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.**
+This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) and _not locally on my systems_.
 
-**The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) on schedule (I'll change this to buildtime after some more testing) and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub. The Trivy SARIF results can be viewed in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository, the `nightly` build only shows a table in it's workflows run details.**
+All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
 
-**When NLnet Labs publishes a new Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released.**
+The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) at buildtime and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub. If vulnerabilities have been detected by Trivy, they'll show up in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository; the `nightly` build just shows a table in it's workflows run details.
 
-**Unbound itself is compiled from source with hardening security features such as [PIE](https://en.wikipedia.org/wiki/Position-independent_code) (Position Independent Executables), which randomizes the application's position in memory which makes attacks more difficult and [RELRO](https://www.redhat.com/en/blog/hardening-elf-binaries-using-relocation-read-only-relro) (Relocation Read-Only) which also can mitigate exploitations by preventing memory corruption.**
-      
+When NLnet Labs publishes a new Unbound release, the image will be built from source, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released.
+
 <details> 
     
   <summary>Features</summary><br>
@@ -344,8 +342,6 @@ I also created a [`companion project`](https://github.com/madnuttah/unbound-dock
 # Known Issues
 
 - The OpenSSL build environment needs my attention. Until the issues are fixed, OpenSSL will be installed instead of compiled via workflow as it was before version 1.19.1-0. I'm sorry for the inconvenience.
-
-- The Hardened Runner is causing issues while building, I ran an audit and try to set the endpoints once again. Until I know all egress connections, they'll just audit.
 
 # Troubleshooting
 

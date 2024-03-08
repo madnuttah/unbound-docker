@@ -14,6 +14,8 @@
 
 This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people at [NLnet Labs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image modeled by following the best practice principles.
 
+While it leaves _almost_ nothing to be desired, it is perfectly suited for professional and personal use alike. 
+
 <details> 
     
   <summary>Features</summary><br>
@@ -83,7 +85,6 @@ You can also reach me on Fosstodon:
 - [Libevent](https://libevent.org/)
 - [Redis](https://redis.io/)
 - [Pi-hole](https://pi-hole.net/)
-- [StepSecurity](https://www.stepsecurity.io/)
 - [Aqua Security](https://trivy.dev/)
 - The many Docker Images which got me inspired
 - **Thank you for using my image** ❤️
