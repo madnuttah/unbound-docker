@@ -2,7 +2,7 @@ name: CD Check NLnet Labs Unbound Release
              
 on:
   schedule:
-    - cron: '0 18 * * mon-fri'
+    - cron: '0 15 * * mon-fri'
        
 jobs:
   unbound-update:
