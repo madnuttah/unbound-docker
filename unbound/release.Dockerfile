@@ -3,9 +3,10 @@ ARG IMAGE_BUILD_DATE \
   UNBOUND_SHA256 \
   UNBOUND_DOCKER_IMAGE_VERSION \ 
   UNBOUND_UID="1000" \
-  UNBOUND_GID="1000"  
+  UNBOUND_GID="1000" \
+  OPENSSL_BUILDENV_VERSION \
 
-FROM alpine:latest AS buildenv
+FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}" AS buildenv
 
 ARG UNBOUND_VERSION \
   UNBOUND_SHA256 \
@@ -35,7 +36,6 @@ RUN set -xe; \
     build-base\
     libsodium-dev \
     linux-headers \
-    openssl-dev \
     nghttp2-dev \
     ngtcp2-dev \
     libevent-dev \
@@ -60,7 +60,7 @@ RUN set -xe; \
     --with-pidfile=/usr/local/unbound/unbound.d/unbound.pid \
     --mandir=/usr/share/man \
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
-    --with-ssl \
+    --with-ssl=/usr/local/openssl \
     --with-libevent \
     --with-libnghttp2 \
     --with-libhiredis \
@@ -113,7 +113,6 @@ RUN set -xe; \
     nghttp2 \
     ngtcp2 \
     libevent \
-    openssl \
     protobuf-c \
     hiredis \
     expat && \
@@ -141,6 +140,8 @@ RUN set -xe; \
     /usr/local/unbound/iana.d/root.zone.* \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
+    find /usr/local/openssl/lib/libssl.so.* -type f | xargs strip --strip-all && \
+    find /usr/local/openssl/lib/libcrypto.so.* -type f | xargs strip --strip-all && \  
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
@@ -163,11 +164,12 @@ COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
   
 COPY --from=buildenv /usr/bin/awk /usr/bin/drill \
   /app/usr/bin/
+  
+COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
+  /app/lib/
 
 COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libsodium* \
-  /usr/lib/libcrypto* \
-  /usr/lib/libssl* \
   /usr/lib/libexpat* \
   /usr/lib/libprotobuf-c* \
   /usr/lib/libnghttp2* \
@@ -192,11 +194,13 @@ FROM scratch as unbound
 
 ARG UNBOUND_VERSION \
   IMAGE_BUILD_DATE \
+  OPENSSL_BUILDENV_VERSION \
   UNBOUND_DOCKER_IMAGE_VERSION \
   UNBOUND_UID 
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
   UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_DOCKER_IMAGE_VERSION}" \
+  OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}"  \
   UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
   

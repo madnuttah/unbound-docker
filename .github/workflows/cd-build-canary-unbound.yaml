@@ -1,8 +1,8 @@
-name: CD Build Nightly Distroless Unbound Docker Image
+name: CD Build Canary Distroless Unbound Docker Image
 
 on:      
   schedule:
-    - cron: '0 0 * * mon-fri'
+    - cron: '0 20 * * mon-fri'
     
 jobs: 
   build: 
@@ -43,20 +43,20 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             IMAGE_BUILD_DATE=${{ steps.SET_BUILD_DATE.outputs.IMAGE_BUILD_DATE }} 
-          file: ./unbound/nightly.Dockerfile   
+          file: ./unbound/canary.Dockerfile   
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           push: ${{ github.event_name != 'pull_request' }}      
           cache-from: type=gha
           cache-to: type=gha,mode=max          
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:nightly
+            ${{ env.DOCKERHUB_SLUG }}:canary
             
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:nightly          
+          image-ref: ${{ env.DOCKERHUB_SLUG }}:canary          
           exit-code: '1'
           ignore-unfixed: false
           scan-type: image

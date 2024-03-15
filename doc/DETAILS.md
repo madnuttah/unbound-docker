@@ -68,42 +68,18 @@ __There's a really nice explanation at the [Pi-hole documentation page](https://
 
 However, even though the image is intended to run a recursive setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements[`*`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#troubleshooting), especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features.
        
-To provide always the latest stable and optimized versions per architecture, the following software components are self compiled in the build process using separated workflows and are not just installed:
+To provide always the latest stable and optimized versions per architecture, the following software components are self compiled in the build processes using workflows and are not just installed:
     
-- [`Unbound`](https://github.com/madnuttah/unbound-docker/actions/workflows/build-unbound.yaml)
+- [`Unbound`](https://github.com/madnuttah/unbound-docker/)
+- [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv/)
     
-This image is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) and _not locally on my systems_.
+This image and its build environment is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) and _not locally on my systems_.
 
 All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
 
-The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) at buildtime and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub. If vulnerabilities have been detected by Trivy, they'll show up in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository; the `nightly` build just shows a table in it's workflows run details.
-
 When NLnet Labs publishes a new Unbound release, the image will be built from source, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released.
 
-<details> 
-    
-  <summary>Features</summary><br>
-    
-| Feature                                  | Supported          |
-| ---------------------------------------- | ------------------ |
-| Distroless scratch image                 | yes |
-| Unprivileged user                        | yes |
-| Unprivileged port                        | yes |
-| Custom UID/GID                           | yes |
-| Libevent                                 | yes |
-| DNSSEC                                   | yes |
-| DNSCrypt                                 | yes |
-| DNSTap                                   | yes |
-| DNS64                                    | yes |
-| DNS over HTTPS                           | yes |
-| DNS over TLS                             | yes |
-| Redis                                    | yes |
-| Optional Healthcheck                     | yes |
-| Optional Statistics                      | yes |
-| Python                                   | no |
-| EDNS Client Subnet                       | no |
-    
-</details>
+The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) at buildtime ~and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub~. If vulnerabilities have been detected by Trivy, they'll show up in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository; the `canary` build just shows a table in it's workflows run details.
 
 ## Installation
 
@@ -341,7 +317,7 @@ I also created a [`companion project`](https://github.com/madnuttah/unbound-dock
 
 # Known Issues
 
-- The OpenSSL build environment needs my attention. Until the issues are fixed, OpenSSL will be installed instead of compiled via workflow as it was before version 1.19.1-0. I'm sorry for the inconvenience.
+- None I'm aware of
 
 # Troubleshooting
 
