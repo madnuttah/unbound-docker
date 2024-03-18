@@ -1,5 +1,9 @@
 ## Statistics
 
+<details>
+
+<summary>Stats</summary><br>
+
 <p align="Left">
     <img width=100 src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png" alt="Docker Logo">
 </p><br>
@@ -14,7 +18,7 @@
 
 <p align="Left">
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
-</p><br>
+</p>
 
 [![Maintenance](https://img.shields.io/maintenance/yes/2024?style=flat-square)](https://github.com/madnuttah/unbound-docker/)
 [![Commit Activity](https://img.shields.io/github/commit-activity/y/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
@@ -23,7 +27,10 @@
 [![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker?style=flat-square "Issues")](https://github.com/madnuttah/unbound-docker/issues)
 [![Pull Requests](https://img.shields.io/github/issues-pr/madnuttah/unbound-docker?style=flat-square)](https://github.com/madnuttah/unbound-docker/pulls)
 
-[![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20NLnet%20Labs%20Unbound&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
+</details>
+
+[![Current Unbound release](https://img.shields.io/github/v/tag/nlnetlabs/unbound?label=Current%20NLnet%20Labs%20Unbound%20release&style=flat-square)](https://github.com/NLnetLabs/unbound/tags)
+[![Current OpenSSL release](https://img.shields.io/github/v/tag/openssl/openssl?label=Current%20OpenSSL%20release&style=flat-square)](https://github.com/openssl/openssl/tags)
 
 ## Table of Contents
 
@@ -54,9 +61,13 @@ Source: [unbound.net](https://unbound.net/)
 
 ## About this Image
 
-This advanced Unbound Docker container image is based on Alpine Linux with focus on security, performance and a small image size. 
+This advanced Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small size.
 
-The Unbound process runs in the context of a non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure [distroless](https://hackernoon.com/distroless-containers-hype-or-true-value-2rfl3wat) scratch image with the absolute minimum of content needed to make the operating system and Unbound run flawlessly with a lowest possible attack surface.
+The Unbound process runs in the context of an unpriviledged non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure [distroless](https://hackernoon.com/distroless-containers-hype-or-true-value-2rfl3wat) scratch image.
+
+**Why distroless?**
+
+> _Imagine a critical system like a DNS server being compromised; with an underlying, possibly inadequately maintained, yet fully functional operating system providing a substantial attack surface supplemented by various nifty tools that could be exploited or even installed by someone with malicious intent._
 
 Unbound is configured as a [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions) validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) for adblocking in mind, but works also as a standalone server. 
 
@@ -68,22 +79,20 @@ __There's a really nice explanation at the [Pi-hole documentation page](https://
 
 However, even though the image is intended to run a recursive setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements[`*`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#troubleshooting), especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features.
        
-To provide always the latest stable and optimized versions per architecture, the following software components are self compiled in the build processes using workflows and are not just installed:
+To provide always the latest stable, hardened and optimized versions per hardware architecture, the following software components are compiled online from source in the build processes of their own dedicated repositories using workflow driven CD pipelines using trusted GitHub Actions and are **not** built _locally on my systems in my lab_:
     
-- [`Unbound`](https://github.com/madnuttah/unbound-docker/)
-- [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv/)
+- [`Unbound`](https://github.com/madnuttah/unbound-docker/tree/main/.github/workflows)
+- [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv/tree/main/.github/workflows)
     
-This image and its build environment is automatically built online using a CD pipeline via [GitHub Actions](https://github.com/features/actions) and _not locally on my systems_.
-
 All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
 
-When NLnet Labs publishes a new Unbound release, the image will be built from source, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub that same evening without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released.
+When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
 
 The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) at buildtime ~and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub~. If vulnerabilities have been detected by Trivy, they'll show up in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository; the `canary` build just shows a table in it's workflows run details.
 
 ## Installation
 
-Distroless multiarch-builds for Linux-based 386, arm/v6, arm/v7, arm64 or amd64 platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
+Distroless production and canary multiarch-builds for Linux-based 386, arm/v6, arm/v7, arm64 or amd64 platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
 
 ## How to use this Image
 
@@ -105,7 +114,7 @@ Luckily Unbound can load configs through a `include:` clause. To provide a bette
     
 The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
 
-Other than that, splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job.
+Other than that, splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job after you adapted the settings to suit your environment.
     
 ### Directory Structure
 
@@ -188,7 +197,7 @@ export                 set                    wait
 
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
-| `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC, logging and the optional statistics rely on precise time
+| `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC, logging and the optional redis and statistics rely on precise time
 | `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
 | `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
 
@@ -218,9 +227,9 @@ docker run --name unbound -d \
 
 ### CacheDB (Redis)
 
-Even it takes a little more effort, I recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via TCP. You can learn about the benefits [here](https://www.techandme.se/performance-tips-for-redis-cache-server/).
+Even it takes a little more effort, I recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via tcp. The speed is superior in comparison to a tcp connection.
 
-Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but had to use a "proxy" container which provides access for both containers, `unbound` as well as `redis`, so there's an additional busybox container providing the socket in an own volume.
+Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but need to use a "proxy" container which provides access to both containers, `unbound` as well as `unbound-db`, so there's an additional busybox container providing the socket in an own volume.
 
 Extend your **existing** `docker-compose.yaml` `server:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`.
 
@@ -245,11 +254,23 @@ Feb 18 22:01:02 unbound[1:0] notice: Connection to Redis established
 
 If you like to have a healtheck for this container which I'd recommend strongly, [`you got my back`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh). Read on, I'll explain how to set this up in the next heading.
 
-In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file.
+In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file by clicking `browse`.
 
 <img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">
 
 The boot order set in your docker compose is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole, it will depend on Unbound.**
+
+For the sake of completeness, you can also flange Unbound to Redis by network. Just follow the given steps, except the part preparing and creating the unbound-db-socket container. Use proper name resolution by whether docker internal resolution, your DNS or use fixed IP addresses and change your `cachedb.conf` or your `unbound.conf` according this:
+
+```
+cachedb:
+  backend: "redis"
+  redis-server-host: unbound-db # The hostname or IP of your Redis server
+  redis-server-port: 6379
+  redis-expire-records: no
+```
+
+Make sure that Unbound is able to accept connections on port `6379` and that you secure your setup using proper credentials and settings in your `redis.conf`.
 
 ### Healthcheck
 
@@ -336,7 +357,7 @@ server:
 
 * Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions on Unbound's volumes. The container won't start up in such cases. Make sure your `UNBOUND_UID/UNBOUND_GID`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 
-* This image can also be used as a standalone DNS resolver _without_ Pi-hole. The given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml` then. You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
+* This image can also be used as a standalone DNS resolver _without_ Pi-hole. The given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see extended healthcheck below). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
 
 ```
 cap_add: 

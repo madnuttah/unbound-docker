@@ -4,15 +4,22 @@
 
 # Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
+<details> 
+    
+  <summary>Build status</summary><br>
+  
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
 [![CD Build Nightly Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-canary-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20canary%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-canary-unbound.yaml)
 [![CD Security Scan](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-security-scan.yaml?branch=main&label=CD%20security%20scan&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-security-scan.yaml)
 [![Manual Build Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/manually-build-unbound.yaml?branch=main&label=Manually%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/manually-build-unbound.yaml)
 
-[![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
+</details>
 
-This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people at [NLnet Labs](https://github.com/NLnetLabs) running as **your own** recursive DNS server in a secure distroless scratch image modeled by following the best practice principles.
+[![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
+[![OpenSSL buildenv](https://img.shields.io/github/v/release/madnuttah/openssl-buildenv?include_prereleases&label=madnuttah/openssl-buildenv%20release&style=flat-square)](https://github.com/madnuttah/openssl-buildenv/releases)
+
+This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people at [NLnet Labs](https://nlnetlabs.nl) running as **your own recursive DNS server** in a secure single-layer distroless scratch image modeled by following the best practice principles.
 
 While it leaves _almost_ nothing to be desired, it is perfectly suited for professional and personal use alike. 
 
@@ -20,28 +27,29 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
     
   <summary>Features</summary><br>
     
-| Feature                                  | Supported          |
-| ---------------------------------------- | ------------------ |
-| Distroless scratch image                 | yes |
+| Feature                                  | Supported |
+| ---------------------------------------- | --------- |
+| Single-layer distroless scratch image running Alpine Linux | yes |
 | Unprivileged user                        | yes |
-| Unprivileged port                        | yes |
-| Custom UID/GID                           | yes |
-| Selfbuilt & optimized OpenSSL            | yes |
+| Unprivileged port (privileged possible)  | yes |
+| Custom UID/GID enviroment variables      | yes |
+| Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
 | Libevent                                 | yes |
+| Recursive DNS as default                 | yes |
 | DNSSEC                                   | yes |
 | DNSCrypt                                 | yes |
 | DNSTap                                   | yes |
 | DNS64                                    | yes |
 | DNS over HTTPS                           | yes |
 | DNS over TLS                             | yes |
-| Redis                                    | yes |
-| Optional Healthcheck                     | yes |
-| Optional Statistics                      | yes |
+| Redis via UNIX Socket                    | yes |
+| Optional privacy respecting & meaningful healthcheck | yes |
+| Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
 | Python                                   | no |
 | EDNS Client Subnet                       | no |
+| Made with love & passion ❤️‍🔥             | **yes** |
     
 </details>
-
 
 ## Getting started
 
@@ -54,13 +62,11 @@ Docker containers are most easily used with docker compose.
 
 You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number:
 
-`docker pull madnuttah/unbound:latest`
-
-`docker pull madnuttah/unbound:1.1.0-0`
+`docker pull madnuttah/unbound:latest` or `docker pull madnuttah/unbound:1.1.0-0`
 
 The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.1.0-0`.
  
-There are canary builds of the image available each night 22:00 UTC from Monday to Friday. You can pull the image using it's `canary` tag: 
+There are canary builds of the image available. You can pull the image using it's `canary` tag: 
 
 `docker pull madnuttah/unbound:canary`
 
