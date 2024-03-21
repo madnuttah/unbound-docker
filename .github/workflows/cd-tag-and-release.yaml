@@ -2,7 +2,7 @@ name: CD Tag And Release
    
 on:       
   workflow_run:
-    workflows: [CD Security Scan]
+    workflows: [CD Build Distroless Unbound Docker Image]
     types:
       - completed
  
