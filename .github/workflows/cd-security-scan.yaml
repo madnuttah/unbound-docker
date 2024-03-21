@@ -1,10 +1,9 @@
 name: CD Security Scan
     
-on:         
-  workflow_run:
-    workflows: [CD Build Distroless Unbound Docker Image]
-    types:
-      - completed
+             
+on:
+  schedule:
+    - cron: '0 */8 * * *'
     
 jobs:
   scan:

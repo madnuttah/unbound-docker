@@ -32,7 +32,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | Single-layer distroless scratch image running Alpine Linux | yes |
 | Unprivileged user                        | yes |
 | Unprivileged port (privileged possible)  | yes |
-| Custom UID/GID enviroment variables      | yes |
+| Custom UID/GID environment variables      | yes |
 | Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
 | Libevent                                 | yes |
 | Recursive DNS as default                 | yes |
@@ -42,12 +42,11 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | DNS64                                    | yes |
 | DNS over HTTPS                           | yes |
 | DNS over TLS                             | yes |
-| Redis via UNIX Socket                    | yes |
+| Redis via UNIX Socket or network         | yes |
 | Optional privacy respecting & meaningful healthcheck | yes |
 | Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
 | Python                                   | no |
 | EDNS Client Subnet                       | no |
-| Made with love & passion ❤️‍🔥             | **yes** |
     
 </details>
 
@@ -95,7 +94,6 @@ You can also reach me on Fosstodon:
 - [Pi-hole](https://pi-hole.net/)
 - [Aqua Security](https://trivy.dev/)
 - The many Docker Images which got me inspired
-- **Thank you for using my image** ❤️
 
 ## Licenses
 
@@ -113,3 +111,9 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 ## Legal
 
 Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+
+## Supporting my work
+
+If you would like to support what I do and this image made in the spirit of altruism and idealism to protect your privacy - become a Stargazer ⭐ on Docker Hub and GitHub. Thank you for your support!
+
+Some things in life are free. ❤️

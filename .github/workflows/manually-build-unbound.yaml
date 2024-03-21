@@ -1,11 +1,7 @@
 name: Manually Build Distroless Unbound Docker Image
-   
-on:   
-  push:
-    branches: [ main ]
-    paths:
-      - '!**'
-      - '.github/workflows/manually-build-unbound.yaml'
+
+on:
+  workflow_dispatch:
       
 jobs:   
   buildvars:
@@ -74,24 +70,4 @@ jobs:
           provenance: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}      
-            ${{ env.DOCKERHUB_SLUG }}:latest
-            
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:latest          
-          exit-code: '1'
-          ignore-unfixed: true
-          scan-type: image
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-          format: 'sarif'
-          output: 'scan-results-latest.sarif'
-      
-      - name: Upload SARIF result
-        id: UPLOAD_SARIF
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'scan-results-latest.sarif'            
+            ${{ env.DOCKERHUB_SLUG }}:latest 

@@ -209,11 +209,11 @@ export                 set                    wait
 
 ### Usage
 
-The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) or [Bridge](https://docs.docker.com/network/bridge/) network which **must** be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) and a shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
 
-I have added a custom bridge network to the [`MACVLAN example`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-macvlan) so your host is able communicate with the container and vice versa. If you don't like to have an additional bridge network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
+You'll need an additional custom bridge network so your host is able communicate with the container and vice versa (updating the Docker host, etc.). If you don't like to have an additional shim network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
 Anyway, you can also spin up the container with the following command, `sudo` may apply:
 
@@ -260,7 +260,7 @@ In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume wi
 
 The boot order set in your docker compose is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole, it will depend on Unbound.**
 
-For the sake of completeness, you can also flange Unbound to Redis by network. Just follow the given steps, except the part preparing and creating the unbound-db-socket container. Use proper name resolution by whether docker internal resolution, your DNS or use fixed IP addresses and change your `cachedb.conf` or your `unbound.conf` according this:
+For the sake of completeness, you can also flange Unbound to Redis by network. Just follow the given steps, except the part preparing and creating the unbound-db-socket container. Use proper name resolution by whether docker internal resolution, your DNS or use fixed IP addresses and change your `cachedb.conf` or your `unbound.conf` according to this:
 
 ```
 cachedb:
@@ -338,7 +338,8 @@ I also created a [`companion project`](https://github.com/madnuttah/unbound-dock
 
 # Known Issues
 
-- None I'm aware of
+- There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up
+when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See issue #62.
 
 # Troubleshooting
 
@@ -364,7 +365,12 @@ cap_add:
   - NET_BIND_SERVICE
 ```
 
-* When the extended healthcheck fails telling connection to 127.0.0.1 refused, verify that you permit connections to localhost. There are multiple places in the `unbound.conf` where this could be disabled, from `access control` to `DoNotQueryLocalhost` and so on. You'll likely need to check the whole file. Isn't that alone one good reason for the concept with the separated config directories? If you can't find the culprit, don't hesitate giving me a shout. 
+* When you see log entries like those below or similar issues in the healthcheck, verify that you permit connections to localhost. There are multiple places in the `unbound.conf` where this could be disabled, from `access control` to `Do-Not-Query-Localhost` and so on. You'll likely need to check the whole file. Isn't that alone one good reason for the concept with the separated config directories? If you can't find the culprit, don't hesitate giving me a shout. 
+
+```
+unbound[1:0] fatal error: could not open ports
+unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53 
+```
 
 * If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker-compose down && docker compose up -d` will remove the PID and also the warnings in the log.
 
