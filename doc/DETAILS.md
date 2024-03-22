@@ -88,7 +88,7 @@ All components as well as the Internic files (root.hints and root.zone) are veri
 
 When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
 
-The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) at buildtime ~and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub~. If vulnerabilities have been detected by Trivy, they'll show up in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository; the `canary` build just shows a table in it's workflows run details.
+The image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) at buildtime and with [Docker Scout](https://docs.docker.com/scout/) when pushed to Docker Hub. If vulnerabilities have been detected by Trivy, they'll show up in the [Security](https://github.com/madnuttah/unbound-docker/security) tab of the repository; the Docker Scout results can be checked on Docker Hub. The `canary` build just shows a table in it's workflows run details. 
 
 ## Installation
 

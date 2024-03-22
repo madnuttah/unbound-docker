@@ -186,14 +186,13 @@ ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
   UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
   
-LABEL maintainer="madnuttah" \
-  org.opencontainers.image.title="madnuttah/unbound" \
+LABEL org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.created="${IMAGE_BUILD_DATE}" \
   org.opencontainers.image.version="canary" \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
   org.opencontainers.image.summary="This Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
-  org.opencontainers.image.base.name="https://hub.docker.com/r/madnuttah/unbound-docker" \
-  org.opencontainers.image.url="https://hub.docker.com/r/madnuttah/unbound-docker:nightly" \
+  org.opencontainers.image.base.name="madnuttah/unbound" \
+  org.opencontainers.image.url="https://hub.docker.com/r/madnuttah/unbound" \
   org.opencontainers.image.source="https://github.com/madnuttah/unbound-docker" \
   org.opencontainers.image.authors="madnuttah" \
   org.opencontainers.image.licenses="MIT"
