@@ -1,7 +1,3 @@
-<p align="center">
-    <img src="https://repository-images.githubusercontent.com/440215882/b79c7ae3-c3d4-4a6a-a1d7-d27fa626754b" alt="Logo">
-</p>
-
 # Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
 <details> 
@@ -29,7 +25,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
     
 | Feature                                  | Supported |
 | ---------------------------------------- | --------- |
-| Single-layer distroless scratch image running Alpine Linux | yes |
+| CD built single-layer distroless scratch image running Alpine Linux | yes |
 | Unprivileged user                        | yes |
 | Unprivileged port (privileged possible)  | yes |
 | Custom UID/GID environment variables      | yes |
@@ -47,6 +43,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
 | Python                                   | no |
 | EDNS Client Subnet                       | no |
+| Image security scans /w Trivy & Docker Scout | yes |
     
 </details>
 
@@ -89,7 +86,6 @@ You can also reach me on Fosstodon:
 - [Docker](https://www.docker.com/)
 - [Unbound](https://unbound.net/)
 - [OpenSSL](https://www.openssl.org/)
-- [Libevent](https://libevent.org/)
 - [Redis](https://redis.io/)
 - [Pi-hole](https://pi-hole.net/)
 - [Aqua Security](https://trivy.dev/)
