@@ -110,6 +110,8 @@ Please note that this is a work of a private contributor and I'm neither affilia
 
 ## Supporting my work
 
-If you would like to support what I do and this image made in the spirit of altruism and idealism to protect your privacy - become a Stargazer ⭐ on Docker Hub and GitHub. Thank you for your support!
+In case you would like to donate money, please rather spend it on the upstream projects this image relies on.
 
-Some things in life are free. ❤️
+If you endorse what I do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support!
+
+**Some things in life are free**. ❤️

@@ -41,7 +41,7 @@ jobs:
           UNBOUND_VERSION="$(cat ./buildvars | grep "^UNBOUND_VERSION=" | cut -d"=" -f2-)"
           UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
           RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
-          RELEASE_NOTE=$(echo -e "\x23\x23 $(date '+%Y-%m-%d') <madnuttah-bot>\n\x23\x23 What's Changed?\n\x2A Updated Unbound to version $UNBOUND_VERSION")
+          RELEASE_NOTE=$(echo -e "\x23\x23 $(date '+%Y-%m-%d') <madnuttah-bot>\n\x23\x23 What's Changed?\n\x2A Updated Unbound to version $UNBOUND_VERSION\n\n\x2A\x2ANLnet Labs Unbound changelog\x2A\x2A: https://github.com/NLnetLabs/unbound/releases/tag/release-$UNBOUND_VERSION")
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
           git push -u origin "$RELEASE_TAG"
           git fetch --all --tags
