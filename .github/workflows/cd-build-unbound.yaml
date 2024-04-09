@@ -2,7 +2,7 @@ name: CD Build Distroless Unbound Docker Image
    
 on:   
   workflow_run:
-    workflows: [CD Check NLnet Labs Unbound Release, CD Build Multiarch OpenSSL BuildEnv Docker Image]
+    workflows: [CD Check NLnet Labs Unbound Release]
     types:
       - completed 
  
