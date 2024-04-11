@@ -20,7 +20,6 @@ jobs:
             echo UNBOUND_VERSION="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT
             echo UNBOUND_DOCKER_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT     
             echo UNBOUND_DOCKER_IMAGE_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
-            echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
           fi
 
       - name: Is update available
@@ -65,7 +64,6 @@ jobs:
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
-          echo OPENSSL_BUILDENV_VERSION=${{ steps.GET_VERSIONS.outputs.OPENSSL_BUILDENV_VERSION }} >> buildvars
           git add buildvars
           git commit buildvars -m "Updated buildvars"
           git push origin main

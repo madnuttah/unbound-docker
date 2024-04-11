@@ -112,6 +112,6 @@ Please note that this is a work of a private contributor and I'm neither affilia
 
 In case you would like to donate money, please rather spend it on the upstream projects this image relies on.
 
-If you endorse what I do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support!
+If you like what I do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support!
 
 **Some things in life are free**. ❤️

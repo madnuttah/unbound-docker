@@ -88,7 +88,7 @@ All components as well as the Internic files (root.hints and root.zone) are veri
 
 When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
 
-The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a recurring 12 hour schedule. If vulnerabilities have been detected, they'll show up in the `scan` of [CD Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml). You need to be logged into GitHub to see the log files. The `canary` build shows the results in the workflow's run details.
+The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a recurring 12 hour schedule. If vulnerabilities have been detected, they'll show up in the `scan` of [CD Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml). The `canary` build shows the results in the workflow's run details. You need to be logged into GitHub to see the log files.
 
 ## Installation
 
@@ -209,13 +209,13 @@ export                 set                    wait
 
 ### Usage
 
-The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN/Bridge](https://docs.docker.com/network/macvlan/) and a shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN](https://docs.docker.com/network/macvlan/)/shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
 *I prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
 
-You'll need an additional custom bridge network so your host is able communicate with the container and vice versa (updating the Docker host, etc.). If you don't like to have an additional shim network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
+You'll probably want an additional custom bridge network so your host is able communicate with the container and vice versa (for updating the Docker host, etc.). If you don't like to have an additional shim network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
-Anyway, you can also spin up the container with the following command, `sudo` may apply:
+Anyway, you can also spin up the container with the following command:
 
 ```
 docker run --name unbound -d \
@@ -242,7 +242,7 @@ Create a new mountpoint like `../unbound-db/`, make it available via `fstab` and
 
 Create a new entry for cachedb in your `unbound.conf` with the content of this [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-You can verify the connection to redis in the `unbound.log` or by typing `sudo docker logs unbound` in the shell: 
+You can verify the connection to redis in the `unbound.log` or by typing `docker logs unbound` in the shell: 
 
 ```
 ...
@@ -318,15 +318,13 @@ Not in the console but rather in Portainer (and here on this page of course) the
 
 ### Updating the Image
 
-**Even I use it for less important services myself, I don't recommend using solutions like [watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your network went down due to an update of the image not working as expected. Please always test before rolling out an update even I do my best not to break something.** 
+**Even I use it for less important services myself, I don't recommend using solutions like [Watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your network went down due to an update of the image not working as expected. Please always test before rolling out an update even I do my best not to break something.** 
 
 **Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.**
 
 If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate the image by executing `docker-compose up -d`.
 
 Pulling the latest image without a compose file can be done by `docker pull madnuttah/unbound:latest`.
-
-`sudo` may apply.
 
 ### Unbound Statistics
 
@@ -339,11 +337,11 @@ I also created a [`companion project`](https://github.com/madnuttah/unbound-dock
 # Known Issues
 
 - There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up
-when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See issue #62.
+when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See [issue #62](https://github.com/madnuttah/unbound-docker/issues/62).
 
 # Troubleshooting
 
-* You'd like to use a different `unbound.conf` than the one [`included`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf)? No problem at all, just make sure to change at least the following settings and fix crucial paths, otherwise the container will fail to start:
+* You'd like to use a different `unbound.conf` than the one [`included`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf)? No problem, just make sure to change at least the following settings and fix crucial paths, otherwise the container will fail to start:
 
 ```
 server:
@@ -374,7 +372,7 @@ unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53
 
 * If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker-compose down && docker compose up -d` will remove the PID and also the warnings in the log.
 
-* This is no issue but rather something good, it means that Unbound is using DNSSEC:
+* This is no issue and shows that Unbound is doing trust anchor signaling to the root name servers. See [this URL](https://tools.ietf.org/html/rfc8145) for more details.
 
 > `... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN`
 
