@@ -65,7 +65,7 @@ jobs:
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
-          echo OPENSSL_BUILDENV_VERSION=${{ steps.GET_VERSIONS.outputs.OPENSSL_BUILDENV_VERSION }} 
+          echo OPENSSL_BUILDENV_VERSION=${{ steps.GET_VERSIONS.outputs.OPENSSL_BUILDENV_VERSION }} >> buildvars
           git add buildvars
           git commit buildvars -m "Updated buildvars"
           git push origin main
