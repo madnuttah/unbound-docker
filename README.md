@@ -49,10 +49,9 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 
 ## Getting started
 
-Docker containers are most easily used with docker compose.
+Docker containers are most easily used with docker compose. 
 
- - **[`Details and instructions`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md)**
- - **[`Example docker-compose files`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples)**
+**I encourage you to read the [`Details and instructions`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `docker-compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).**
 
 ## Available Docker Tags
 
