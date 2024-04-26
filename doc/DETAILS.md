@@ -270,11 +270,11 @@ cachedb:
   redis-expire-records: no
 ```
 
-Make sure that Unbound is able to accept connections on port `6379` and that you secure your setup using proper credentials and settings in your `redis.conf`.
+Don't forget to secure your setup using proper credentials and settings in your configs when everything runs.
 
 ### Healthcheck
 
-The general use of the healthcheck is optional but highly recommended and can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`I use myself`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-madnuttah). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
+The general use of the healthcheck is optional but highly recommended and can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`I use myself`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
 
 The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. I got asked why I don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
 
@@ -350,7 +350,7 @@ server:
    directory: "/usr/local/unbound" # This is the folder where Unbound lives in
 ```
 
-* If you have trouble spinning up the container, start it with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-minimal) first. Analyze the logs using `docker logs unbound` or your `unbound.log` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
+* If you have trouble spinning up the container, start it with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-minimal.yaml) first. Analyze the logs using `docker logs unbound` or your `unbound.log` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
 
 * To check your config(s) for errors, you can connect to the running container and execute `unbound-checkconf` with the following command: `docker exec -ti unbound unbound-checkconf`.
 
@@ -376,7 +376,7 @@ unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53
 
 > `... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN`
 
-**You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose.yaml-madnuttah).**
+**You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml).**
 
 # Documentation
 

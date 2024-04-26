@@ -14,7 +14,6 @@ services:
 #   volumes:
 #     - ./unbound.conf:/usr/local/unbound/unbound.conf:rw
 #     - ./conf.d/:/usr/local/unbound/conf.d/:rw
-#     - ./iana.d/:/usr/local/unbound/iana.d/:rw
 #     - ./log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
 #     - ./zones.d/:/usr/local/unbound/zones.d/:rw
     restart: unless-stopped

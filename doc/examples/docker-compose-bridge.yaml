@@ -1,6 +1,5 @@
 # Sample docker-compose.yaml deploying Pi-hole and Unbound
-# with a macvlan Network and an additional bridge network to enable host
-# container communication.
+# with a Bridged Network.
 # This example needs to be modified to reflect your network environment,
 # especially the values in angle brackets (<>) must be adapted to your needs.
 # This file is the one I'm using and was slightly modified with added IPv6
@@ -14,7 +13,6 @@ services:
     image: pihole/pihole:latest
     hostname: pi-hole
     domainname: <yourdomain.lan>
-    mac_address: 00-A1-31-73-65-D7
     depends_on:
       - unbound
     cap_add:
@@ -22,13 +20,10 @@ services:
       - NET_BIND_SERVICE
     networks:
       dns-network:
-        ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 192.168.1.254
-        #ipv6_address: <PI_HOLE_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::506
-      dns-bridge:
-        ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 192.168.0.254
+        ipv4_address: <PI_HOLE_IPv4_ADDRESS> #e.g. 172.20.0.254
         #ipv6_address: <PI_HOLE_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::506
     dns:
-      - <UNBOUND_IP_ADDRESS> #e.g. 192.168.1.253 or fd11:aa:1234:1234::505
+      - <UNBOUND_IP_ADDRESS> #e.g. 172.20.0.253 or fd11:aa:1234:1234::505
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -36,7 +31,7 @@ services:
       - 80:80/tcp
       - 443:443/tcp
     environment:
-      ServerIP: <PI_HOLE_IP_ADDRESS> #e.g 192.168.1.254 or fd11:aa:1234:1234::506
+      ServerIP: <PI_HOLE_IP_ADDRESS> #e.g 172.20.0.254 or fd11:aa:1234:1234::506
       VIRTUAL_HOST: <pi-hole.yourdomain.lan>
       WEBPASSWORD: <PASSWORD>
       TZ: <YOURTIMEZONE> #e.g. "America/New_York"
@@ -48,7 +43,7 @@ services:
       REV_SERVER: <"true"> #Use Conditional Forwarding
       REV_SERVER_TARGET: <GATEWAY_IP_ADDRESS> #e.g. 192.168.1.1 or fd11:aa:1234:1234::11
       REV_SERVER_DOMAIN: <yourdomain.lan>
-      REV_SERVER_CIDR: <SUBNET/CIDR> #e.g. 192.168.1.0/24 or fd11:bb:1234:1234::11
+      REV_SERVER_CIDR: <SUBNET/CIDR> #e.g. 192.168.1.0/24 or fd11:aa:1234:1234::/64
     volumes:
       - <LOCAL_PIHOLE_VOLUME_PATH>:/etc/:rw #Your local path to Pi-hole
     restart: unless-stopped
@@ -56,7 +51,6 @@ services:
   unbound:
     container_name: unbound
     image: madnuttah/unbound:latest
-    mac_address: 00-A1-31-73-65-D6
     hostname: unbound
     domainname: <yourdomain.lan>
     ports:
@@ -64,11 +58,11 @@ services:
       - 5335:5335/udp
     networks:
       dns-network:
-        ipv4_address: <UNBOUND_IPv4_ADDRESS> #e.g. 192.168.1.253
+        ipv4_address: <UNBOUND_IPv4_ADDRESS> #e.g. 172.20.0.253
         #ipv6_address: <UNBOUND_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::505
     environment:
       TZ: <YOURTIMEZONE> #e.g. "America/New_York"
-      ServerIP: <UNBOUND_IP_ADDRESS> #e.g. 192.168.1.253 or fd11:aa:1234:1234::505
+      ServerIP: <UNBOUND_IP_ADDRESS> #e.g. 172.20.0.253 or fd11:aa:1234:1234::505
       VIRTUAL_HOST: <unbound.yourdomain.lan>
       #Optional
       UNBOUND_UID: <YOUR_USER_ID>
@@ -76,9 +70,9 @@ services:
     volumes:
       - ./unbound.conf:/usr/local/unbound/unbound.conf:rw #Your local path to Unbound
       - ./conf.d/:/usr/local/unbound/conf.d/:rw
-      - ./iana.d/:/usr/local/unbound/iana.d/:rw
       - ./log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - ./zones.d/:/usr/local/unbound/zones.d/:rw
+    restart: unless-stopped
     healthcheck:
       test: /usr/local/unbound/sbin/healthcheck.sh
       interval: 60s
@@ -89,21 +83,12 @@ services:
 networks:
   dns-network:
     #enable_ipv6: <false> #Enable if using IPv6
-    driver: <macvlan>
+    driver: bridge
     driver_opts:
       parent: <eth0> #Your parent network interface
     ipam:
       config:
-        - subnet: <IPv4_SUBNET> #e.g. 192.168.1.0/24
-          gateway: <GATEWAY_IPv4_ADDRESS> #e.g. 192.168.1.1
-          ip_range: <IPv4_NETWORK_RANGE> #e.g. 192.168.1.253/30
-        #- subnet: <IPv6_SUBNET> #e.g. fd11:aa:1234:1234::/127
+        - subnet: <IPv4_SUBNET> #e.g. 172.20.0.0/24
+          gateway: <GATEWAY_IPv4_ADDRESS> #e.g. 172.20.0.1
+        #- subnet: <IPv6_SUBNET> #e.g. fd11:aa:1234:1234::/126
         # gateway: <GATEWAY_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::11
-
-  dns-bridge:
-    #enable_ipv6: <false> #Enable if using IPv6
-    driver: bridge
-    ipam:
-      config:
-        - subnet: <IPv4_SUBNET> #e.g. 192.168.0.0/16
-        #- subnet: <IPv6_SUBNET> #e.g. fd11:bb:1234:1234::/126

@@ -78,7 +78,6 @@ services:
       - ./unbound/usr/local/unbound/sbin/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
       - ./unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw
       - ./unbound/conf.d/:/usr/local/unbound/conf.d/:rw
-      - ./unbound/iana.d/:/usr/local/unbound/iana.d/:rw
       - ./unbound/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - ./unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
       - ./unbound/zones.d/:/usr/local/unbound/zones.d/:rw
