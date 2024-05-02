@@ -17,6 +17,51 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Is update available
+        id: IS_UPDATE_AVAILABLE
+        run: |
+          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git | head -1 | cut -f 1)"
+          UNBOUND_SHA="$(cat unbound_git_sha)"
+          if [[ "$UNBOUND_SHA" = "$UNBOUND_GIT_SHA" ]]; then
+          echo "No update found"
+            exit 1
+          else
+            echo "Update found"
+            echo UNBOUND_GIT_SHA="$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT         
+          fi           
+   
+     - name: Import GPG key 
+        id: IMPORT_GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_push_gpgsign: false
+          trust_level: 5
+
+      - name: Push unbound_git_sha to repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
+          GIT_AUTHOR_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
+          GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
+          GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}  
+          echo ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }} > unbound_git_sha
+          git add unbound_git_sha
+          git commit unbound_git_sha -m "Updated unbound_git_sha"
+          git push origin main
+          exit 0
+              
+      - name: Set buildvars
+        id: SET_BUILDVARS
+        run: |
+          echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
+          echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
+          
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
@@ -29,13 +74,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-              
-      - name: Set buildvars
-        id: SET_BUILDVARS
-        run: |
-          echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
-          echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
+          password: ${{ secrets.DOCKERHUB_TOKEN }}          
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -48,9 +87,7 @@ jobs:
           file: ./unbound/canary.Dockerfile   
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
-          push: ${{ github.event_name != 'pull_request' }}      
-          cache-from: type=gha
-          cache-to: type=gha,mode=max          
+          push: ${{ github.event_name != 'pull_request' }}        
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary
             
