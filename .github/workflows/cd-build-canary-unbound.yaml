@@ -54,7 +54,6 @@ jobs:
           git add unbound_git_sha
           git commit unbound_git_sha -m "Updated unbound_git_sha"
           git push origin main
-          exit 0
               
       - name: Set buildvars
         id: SET_BUILDVARS
