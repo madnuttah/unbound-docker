@@ -30,7 +30,7 @@ jobs:
             echo UNBOUND_GIT_SHA="$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT         
           fi           
    
-     - name: Import GPG key 
+      - name: Import GPG key 
         id: IMPORT_GPG
         uses: crazy-max/ghaction-import-gpg@v6
         with:
