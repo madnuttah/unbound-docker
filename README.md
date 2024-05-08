@@ -15,7 +15,7 @@
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 [![OpenSSL buildenv](https://img.shields.io/github/v/release/madnuttah/openssl-buildenv?include_prereleases&label=madnuttah/openssl-buildenv%20release&style=flat-square)](https://github.com/madnuttah/openssl-buildenv/releases)
 
-This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver brought to you by the nice people at [NLnet Labs](https://nlnetlabs.nl) running as **your own recursive DNS server** in a secure single-layer distroless scratch image modeled by following the best practice principles.
+This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver developed by the nice people at [NLnet Labs](https://nlnetlabs.nl) running as **your own recursive DNS server** in a secure single-layer distroless scratch image modeled by following the best practice principles.
 
 While it leaves _almost_ nothing to be desired, it is perfectly suited for professional and personal use alike. 
 
@@ -51,7 +51,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 
 Docker containers are most easily used with docker compose. 
 
-**I encourage you to read the [`Details and instructions`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `docker-compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).**
+**I encourage you to read the [`Details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `docker-compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).**
 
 ## Available Docker Tags
 
@@ -111,6 +111,4 @@ Please note that this is a work of a private contributor and I'm neither affilia
 
 In case you would like to donate money, please rather spend it on the upstream projects this image relies on.
 
-If you like what I do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support!
-
-**Some things in life are free**. ❤️
+If you like what I do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support! ❤️

@@ -88,7 +88,7 @@ All components as well as the Internic files (root.hints and root.zone) are veri
 
 When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
 
-The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a recurring 12 hour schedule. If vulnerabilities have been detected, they'll show up in the `scan` of [CD Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml). The `canary` build shows the results in the workflow's run details. You need to be logged into GitHub to see the log files.
+The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a recurring 12 hour schedule. If vulnerabilities have been detected, they'll show up in the `scan` of [CD Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml). The `canary` build shows the results in the workflow's run details. You need to be logged into GitHub to view the logs.
 
 ## Installation
 
@@ -96,7 +96,7 @@ Distroless production and canary multiarch-builds for Linux-based 386, arm/v6, a
 
 ## How to use this Image
 
-Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploys [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking.
+Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard or any other ad blocking solution.
 
 **I don't like large, monolithic config files much.** 
 
@@ -322,7 +322,7 @@ Not in the console but rather in Portainer (and here on this page of course) the
 
 **Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.**
 
-If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate the image by executing `docker-compose up -d`.
+If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate your container by executing `docker-compose up -d`.
 
 Pulling the latest image without a compose file can be done by `docker pull madnuttah/unbound:latest`.
 
@@ -374,7 +374,9 @@ unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53
 
 * This is no issue and shows that Unbound is doing trust anchor signaling to the root name servers. See [this URL](https://tools.ietf.org/html/rfc8145) for more details.
 
-> `... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN`
+```
+... unbound[0:1] info: generate keytag query _ta-4f66. NULL IN
+```
 
 **You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml).**
 

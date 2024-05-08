@@ -31,6 +31,7 @@ jobs:
           else
             echo "Update found"
             echo UNBOUND_SHA256="$(curl -s https://nlnetlabs.nl/downloads/unbound/unbound-"${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}".tar.gz.sha256)" >> $GITHUB_OUTPUT
+            echo UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git | head -1 | cut -f 1)" >> $GITHUB_OUTPUT
           fi 
 
       - name: Checkout source
@@ -49,7 +50,7 @@ jobs:
           git_push_gpgsign: false
           trust_level: 5
 
-      - name: Push buildvars to repository
+      - name: Push files to repository
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
@@ -64,7 +65,8 @@ jobs:
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
-          git add buildvars
-          git commit buildvars -m "Updated buildvars"
+          echo ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }} > unbound_git_sha
+          git add buildvars unbound_git_sha
+          git commit buildvars unbound_git_sha -m "Updated buildvars and unbound_git_sha"
           git push origin main
           exit 0
