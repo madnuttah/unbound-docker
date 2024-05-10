@@ -59,6 +59,7 @@ jobs:
         id: SET_BUILDVARS
         run: |
           echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
+          echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
           echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
           
       - name: Set up QEMU
@@ -82,6 +83,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             IMAGE_BUILD_DATE=${{ steps.SET_BUILDVARS.outputs.IMAGE_BUILD_DATE }} 
+            UNBOUND_VERSION=${{ steps.SET_BUILDVARS.outputs.UNBOUND_VERSION }} 
             OPENSSL_BUILDENV_VERSION=${{ steps.SET_BUILDVARS.outputs.OPENSSL_BUILDENV_VERSION }}
           file: ./unbound/canary.Dockerfile   
           sbom: ${{ github.event_name != 'pull_request' }}
@@ -101,4 +103,16 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           format: 'table'
+          
+      - name: Docker Scout CVEs
+        uses: docker/scout-action@v1
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          command: cves
+          image: ${{ env.DOCKERHUB_SLUG }}:canary 
+          only-fixed: true
+          only-severities: critical,high
+          write-comment: true
+          github-token: ${{ secrets.GITHUB_TOKEN }} 
+          exit-code: false
           
