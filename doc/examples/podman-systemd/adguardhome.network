@@ -1,0 +1,7 @@
+[Network]
+NetworkName=adguardhome
+Driver=macvlan
+IPRange=10.0.0.5/32
+Subnet=10.0.0.0/24
+Gateway=10.0.0.1
+Options=parent=eno1
