@@ -53,6 +53,8 @@ Docker containers are most easily used with docker compose.
 
 **I encourage you to read the [`Details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `docker-compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).**
 
+If you prefer to use Podman and systemd to manage your containers, example Quadlets can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/podman-systemd)
+
 ## Available Docker Tags
 
 You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number:

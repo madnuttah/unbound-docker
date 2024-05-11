@@ -1,0 +1,21 @@
+[Unit]
+Description=AdGuard Home
+After=network-pre.target
+
+[Container]
+Image=docker.io/adguard/adguardhome:latest
+Label=io.containers.autoupdate=registry
+#Uncomment the following line if enabling DHCP services
+#AddCapability=NET_RAW
+Network=adguardhome.network
+Network=br-dns.network
+Volume=adguardhome-conf.volume:/opt/adguardhome/conf
+Volume=adguardhome-work.volume:/opt/adguardhome/work
+#Volume=/etc/containers/systemd/adguardhome/conf:/opt/adguardhome/conf:Z
+#Volume=/etc/containers/systemd/adguardhome/work:/opt/adguardhome/work:Z
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

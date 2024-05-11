@@ -1,0 +1,15 @@
+[Unit]
+Description=Unbound Recursive Caching Resolver
+After=network-pre.target
+
+[Container]
+Image=docker.io/madnuttah/unbound:latest
+Label=io.containers.autoupdate=registry
+Network=br-dns
+HostName=unbound
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
