@@ -12,4 +12,4 @@ HostName=unbound
 Restart=always
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target default.target

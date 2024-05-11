@@ -18,4 +18,4 @@ Volume=adguardhome-work.volume:/opt/adguardhome/work
 Restart=always
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target default.target
