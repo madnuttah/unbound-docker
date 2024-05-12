@@ -69,7 +69,7 @@ The Unbound process runs in the context of an unpriviledged non-root user, makes
 
 > _Imagine a critical system like a DNS server being compromised; with an underlying, possibly inadequately maintained, yet fully functional operating system providing a substantial attack surface supplemented by various nifty tools that could be exploited or even installed by someone with malicious intent._
 
-Unbound is configured as a [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions) validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) or [AdGuard](https://adguard.com/en/welcome.html) for adblocking in mind, but works also as a standalone server. 
+Unbound is configured as a [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions) validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) or [AdGuard Home](https://adguard.com/en/welcome.html) for adblocking in mind, but works also as a standalone server. 
 
 __There's a really nice explanation at the [Pi-hole documentation page](https://docs.pi-hole.net/guides/dns/unbound/) of what that means without becoming too technical:__
 
@@ -79,14 +79,14 @@ __There's a really nice explanation at the [Pi-hole documentation page](https://
 
 However, even though the image is intended to run a recursive setup, it does not necessarily mean that it has to be used that way. You are absolutely free to edit the [unbound.conf](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) file according to your own needs and requirements[`*`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#troubleshooting), especially if you'd rather like to use an upstream DNS server which provides [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) features.
        
-To provide always the latest stable, hardened and optimized versions per hardware architecture, the following software components are compiled online from source in the build processes of their own dedicated repositories using workflow driven CD pipelines using trusted GitHub Actions and are **not** built _locally on my systems in my lab_:
+To provide always the latest stable, hardened and optimized versions per hardware architecture, the following software components are compiled online from source in the build processes of their own dedicated repositories using workflow driven CD pipelines using trusted GitHub Actions and are **not** built _locally on our systems in our lab_:
     
 - [`Unbound`](https://github.com/madnuttah/unbound-docker/tree/main/.github/workflows)
 - [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv/tree/main/.github/workflows)
     
 All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
 
-When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by my bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As I take your network security serious, I am still able and very commited to manually update the image as soon as security fixes of the images components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
+When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by the bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As we take your network security serious, we are still able and commited to manually update the image as soon as security fixes of the images components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
 
 The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a recurring 12 hour schedule. If vulnerabilities have been detected, they'll show up in the `scan` of [CD Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml). The `canary` build shows the results in the workflow's run details. You need to be logged into GitHub to view the logs.
 
@@ -96,9 +96,9 @@ Distroless production and canary multiarch-builds for Linux-based 386, arm/v6, a
 
 ## How to use this Image
 
-Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and my example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard or any other ad blocking solution.
+Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and our example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard or any other ad blocking solution.
 
-**I don't like large, monolithic config files much.** 
+**We don't like large, monolithic config files much.** 
 
 Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the `unbound.conf` file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
     
@@ -209,9 +209,9 @@ export                 set                    wait
 
 ### Usage
 
-The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). I have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN](https://docs.docker.com/network/macvlan/)/shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
+The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). We have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which I'm using in slightly modified form that makes use of a combined [MACVLAN](https://docs.docker.com/network/macvlan/)/shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment and to suit your needs. **Especially all entries in angle brackets (<>) needs your very attention!** 
 
-*I prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
+*We prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.* 
 
 You'll probably want an additional custom bridge network so your host is able communicate with the container and vice versa (for updating the Docker host, etc.). If you don't like to have an additional shim network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/).
 
@@ -227,7 +227,7 @@ docker run --name unbound -d \
 
 ### CacheDB (Redis)
 
-Even it takes a little more effort, I recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via tcp. The speed is superior in comparison to a tcp connection.
+Even it takes a little more effort, we recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via tcp. The speed is superior in comparison to a tcp connection.
 
 Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but need to use a "proxy" container which provides access to both containers, `unbound` as well as `unbound-db`, so there's an additional busybox container providing the socket in an own volume.
 
@@ -252,7 +252,7 @@ Feb 18 22:01:02 unbound[1:0] notice: Connection to Redis established
 ...
 ```
 
-If you like to have a healtheck for this container which I'd recommend strongly, [`you got my back`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh). Read on, I'll explain how to set this up in the next heading.
+If you like to have a healtheck for this container which I'd recommend strongly, [`you got our back`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh). Read on, I'll explain how to set this up in the next heading.
 
 In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file by clicking `browse`.
 
@@ -274,13 +274,13 @@ Don't forget to secure your setup using proper credentials and settings in your 
 
 ### Healthcheck
 
-The general use of the healthcheck is optional but highly recommended and can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`I use myself`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
+The general use of the healthcheck is optional but highly recommended and can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`We use myself`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
 
-The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. I got asked why I don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
+The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. We got asked why we don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
 
 To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please download the [`Unbound healthcheck`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/healthcheck.sh) script and put it in your persistent Unbound volume, make it available in your compose file's volume definition, fix permissions and make the file executable. Set the variable `EXTENDED=0` to `EXTENDED=1` and save the file, you will need to restart the Unbound container afterwards.
 
-_Why the hassle?_ The extended healthcheck is deactivated by default -you'll already guess it- in favor of your privacy and security. I am sure that this compromise making an external request optional will suit everyone.
+_Why the hassle?_ The extended healthcheck is deactivated by default -you'll already guess it- in favor of your privacy and security. We are sure that this compromise making an external request optional will suit everyone.
 
 To verify that the healthcheck is working and the container is doing what it is supposed to do, consult your Portainer instance or execute `docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh` in the shell of your Docker host.
 
@@ -318,7 +318,7 @@ Not in the console but rather in Portainer (and here on this page of course) the
 
 ### Updating the Image
 
-**Even I use it for less important services myself, I don't recommend using solutions like [Watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your network went down due to an update of the image not working as expected. Please always test before rolling out an update even I do my best not to break something.** 
+**Even we use it for less important services myself, we don't recommend using solutions like [Watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your network went down due to an update of the image not working as expected. Please always test before rolling out an update even we do our best not to break something.** 
 
 **Absolutely no question, keeping all the things up-to-date is top priority nowadays, so a notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.**
 
@@ -332,7 +332,7 @@ Pulling the latest image without a compose file can be done by `docker pull madn
     <img width="292" img src="https://github.com/madnuttah/unbound-docker-stats/blob/main/unbound-stats/screenshots/Screenshot.png" alt="Image">
 </p>
 
-I also created a [`companion project`](https://github.com/madnuttah/unbound-docker-stats) using [Zabbix](https://zabbix.com) for shipping the Unbound stats via a `Zabbix Active Agent` to [Grafana](https://grafana.com) _without_ using additional tools like [Zabbix Sender](https://www.zabbix.com/documentation/current/en/manpages/zabbix_sender) using a _frankensteined_ [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker-stats/main/unbound-stats/healthcheck.sh).
+We also created a [`companion project`](https://github.com/madnuttah/unbound-docker-stats) using [Zabbix](https://zabbix.com) for shipping the Unbound stats via a `Zabbix Active Agent` to [Grafana](https://grafana.com) _without_ using additional tools like [Zabbix Sender](https://www.zabbix.com/documentation/current/en/manpages/zabbix_sender) using a _frankensteined_ [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker-stats/main/unbound-stats/healthcheck.sh).
 
 # Known Issues
 

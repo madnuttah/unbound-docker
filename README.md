@@ -1,4 +1,4 @@
-# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
+# `Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image`
 
 <details> 
     
@@ -25,10 +25,10 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
     
 | Feature                                  | Supported |
 | ---------------------------------------- | --------- |
-| CD built single-layer distroless scratch image running Alpine Linux | yes |
 | Unprivileged user                        | yes |
 | Unprivileged port (privileged possible)  | yes |
 | Custom UID/GID environment variables      | yes |
+| CD built single-layer distroless scratch image running Alpine Linux | yes |
 | Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
 | Libevent                                 | yes |
 | Recursive DNS as default                 | yes |
@@ -43,7 +43,6 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
 | Python                                   | no |
 | EDNS Client Subnet                       | no |
-| Image security scans /w Trivy & Docker Scout | yes |
     
 </details>
 
@@ -51,9 +50,10 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 
 Docker containers are most easily used with docker compose. 
 
-**I encourage you to read the [`Details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `docker-compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).**
-
-If you prefer to use Podman and systemd to manage your containers, example Quadlets can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/podman-systemd)
+> [!IMPORTANT] 
+> We encourage you to read the [`Details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `Docker-Compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).
+>
+> If you prefer to use Podman and systemd to manage your containers, example `Quadlets` can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/podman-systemd).
 
 ## Available Docker Tags
 
@@ -67,7 +67,8 @@ There are canary builds of the image available. You can pull the image using it'
 
 `docker pull madnuttah/unbound:canary`
 
-**Please note that _canary builds_ may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by me**.
+> [!NOTE] 
+> Canary builds may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by me.
  
 ## Changes
     
@@ -75,9 +76,9 @@ You can view the changes in the [`Releases`](https://github.com/madnuttah/unboun
 
 ## Feedback
 
-I am here to help! Don't hesitate to contact me through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. 
+We are here to help! Don't hesitate to contact us through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. 
 
-You can also reach me on Fosstodon: 
+You can also reach us on Fosstodon: 
 
 [![Follow me on Mastodon](https://img.shields.io/mastodon/follow/107779375129112763?domain=https%3A%2F%2Ffosstodon.org%2F&style=social)](https://fosstodon.org/@madnuttah)
 
@@ -90,7 +91,7 @@ You can also reach me on Fosstodon:
 - [Redis](https://redis.io/)
 - [Pi-hole](https://pi-hole.net/)
 - [Aqua Security](https://trivy.dev/)
-- The many Docker Images which got me inspired
+- The many Docker Images which got us inspired
 
 ## Licenses
 
@@ -109,8 +110,8 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 
 Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
 
-## Supporting my work
+## Supporting our mission
 
 In case you would like to donate money, please rather spend it on the upstream projects this image relies on.
 
-If you like what I do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support! ❤️
+If you like what we do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support! ❤️
