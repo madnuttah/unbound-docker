@@ -23,26 +23,26 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
     
   <summary>Features</summary><br>
     
-| Feature                                  | Supported |
-| ---------------------------------------- | --------- |
-| Unprivileged user                        | yes |
-| Unprivileged port (privileged possible)  | yes |
-| Custom UID/GID environment variables      | yes |
-| CD built single-layer distroless scratch image running Alpine Linux | yes |
-| Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
-| Libevent                                 | yes |
-| Recursive DNS as default                 | yes |
-| DNSSEC                                   | yes |
-| DNSCrypt                                 | yes |
-| DNSTap                                   | yes |
-| DNS64                                    | yes |
-| DNS over HTTPS                           | yes |
-| DNS over TLS                             | yes |
-| Redis via UNIX Socket or network         | yes |
-| Optional privacy respecting & meaningful healthcheck | yes |
-| Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
-| Python                                   | no |
-| EDNS Client Subnet                       | no |
+| Feature                                  
+| ---------------------------------------- |
+| - [x] Unprivileged user                        |
+| Unprivileged port (privileged possible)  | [x] |
+| Custom UID/GID environment variables      | [x] |
+| CD built single-layer distroless scratch image running Alpine Linux | [x] |
+| Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | [x] |
+| Libevent                                 | [x] |
+| Recursive DNS as default                 | [x] |
+| DNSSEC                                   | [x] |
+| DNSCrypt                                 | [x] |
+| DNSTap                                   | [x] |
+| DNS64                                    | [x] |
+| DNS over HTTPS                           | [x] |
+| DNS over TLS                             | [x] |
+| Redis via UNIX Socket or network         | [x] |
+| Optional privacy respecting & meaningful healthcheck | [x] |
+| Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | [x] |
+| Python                                   | [ ] |
+| EDNS Client Subnet                       | [ ] |
     
 </details>
 
@@ -68,7 +68,7 @@ There are canary builds of the image available. You can pull the image using it'
 `docker pull madnuttah/unbound:canary`
 
 > [!NOTE] 
-> Canary builds may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by me.
+> Canary builds may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by us.
  
 ## Changes
     
@@ -108,7 +108,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 
 ## Legal
 
-Please note that this is a work of a private contributor and I'm neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+Please note that this is a work of a private contributor and we're neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
 
 ## Supporting our mission
 
