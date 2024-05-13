@@ -23,26 +23,26 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
     
   <summary>Features</summary><br>
     
-| Feature                                  
-| ---------------------------------------- |
-| - [x] Unprivileged user                        |
-| Unprivileged port (privileged possible)  | [x] |
-| Custom UID/GID environment variables      | [x] |
-| CD built single-layer distroless scratch image running Alpine Linux | [x] |
-| Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | [x] |
-| Libevent                                 | [x] |
-| Recursive DNS as default                 | [x] |
-| DNSSEC                                   | [x] |
-| DNSCrypt                                 | [x] |
-| DNSTap                                   | [x] |
-| DNS64                                    | [x] |
-| DNS over HTTPS                           | [x] |
-| DNS over TLS                             | [x] |
-| Redis via UNIX Socket or network         | [x] |
-| Optional privacy respecting & meaningful healthcheck | [x] |
-| Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | [x] |
-| Python                                   | [ ] |
-| EDNS Client Subnet                       | [ ] |
+| Feature                                  | Supported |
+| ---------------------------------------- | --------- |
+| Unprivileged user                        | yes |
+| Unprivileged port (privileged possible)  | yes |
+| Custom UID/GID environment variables      | yes |
+| CD built single-layer distroless scratch image running Alpine Linux | yes |
+| Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
+| Libevent                                 | yes |
+| Recursive DNS as default                 | yes |
+| DNSSEC                                   | yes |
+| DNSCrypt                                 | yes |
+| DNSTap                                   | yes |
+| DNS64                                    | yes |
+| DNS over HTTPS                           | yes |
+| DNS over TLS                             | yes |
+| Redis via UNIX Socket or network         | yes |
+| Optional privacy respecting & meaningful healthcheck | yes |
+| Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
+| Python                                   | no |
+| EDNS Client Subnet                       | no |
     
 </details>
 
