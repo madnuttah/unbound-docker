@@ -303,7 +303,7 @@ cachedb:
 > [!IMPORTANT]
 > The general use of the healthcheck is optional but highly recommended.
 
-The healthcheck can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`We use ourselves`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
+The healthcheck can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`we use ourselves`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
 
 The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. We got asked why we don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
 
@@ -372,7 +372,7 @@ We also created a [`companion project`](https://github.com/madnuttah/unbound-doc
 # Troubleshooting
 
 > [!TIP]
-> You can run the [`available commands`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Available-Commands) directly from the shell of your Docker host like `docker exec -ti unbound ***COMMAND***`. To check your Unbound config(s) for errors for example, execute `docker exec -ti unbound ***unbound-checkconf***`.
+> You can run the [`available commands`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Available-Commands) directly from the shell of your Docker host like `docker exec -ti unbound COMMAND`. To check your Unbound config(s) for errors for example, execute `docker exec -ti unbound unbound-checkconf`.
 
 * You'd like to use a different `unbound.conf` than the one [`included`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf)? No problem, just make sure to change at least the following settings and fix crucial paths, otherwise the container will fail to start:
 
