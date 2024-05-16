@@ -108,7 +108,7 @@ See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENS
 
 ## Legal
 
-Please note that this is a work of a private contributor and we're neither affiliated with NLnet Labs or Pi-hole nor is NLnet Labs or Pi-hole involved in the development of the image. The marks and properties 'Unbound' and 'Pi-hole' are properties of NLnet Labs and Pi-hole respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
+Please note that this is a work of private contributors and we're neither affiliated with NLnet Labs, Pi-hole or AdGuard nor is NLnet Labs, Pi-hole or AdGuard involved in the development of the image. The marks and properties 'Unbound', 'Pi-hole' and 'AdGuard Home' are properties of NLnet Labs, Pi-hole and AdGuard respectively. All rights in the source codes, including logos relating to said marks and properties belong to their respective owners.
 
 ## Supporting our mission
 

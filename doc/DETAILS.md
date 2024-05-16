@@ -50,6 +50,7 @@
 - [Known Issues](#Known-Issues)
 - [Troubleshooting](#Troubleshooting)  
 - [Documentation](#Documentation)
+- [Contributing](#Contributing)
    
 ## What is Unbound
 
@@ -65,7 +66,7 @@ This advanced Unbound Docker image is based on Alpine Linux with focus on securi
 
 The Unbound process runs in the context of an unpriviledged non-root user, makes use of unprivileged ports (5335 tcp/udp) and the image is built using a secure [distroless](https://hackernoon.com/distroless-containers-hype-or-true-value-2rfl3wat) scratch image.
 
-Unbound is configured as a [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions) validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) or [AdGuard Home Home](https://adguard.com/en/welcome.html) for adblocking in mind, but works also as a standalone server. 
+Unbound is configured as a [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions) validating DNS resolver, which directly queries DNS root servers utilizing zone transfers holding a local copy of the root zone (see [IETF RFC 8806](https://www.rfc-editor.org/rfc/rfc8806.txt)) as your own recursive upstream DNS server in combination with [Pi-hole](https://pi-hole.net/) or [AdGuard Home](https://adguard.com/en/welcome.html) for adblocking in mind, but works also as a standalone server. 
 
 __There's a really nice explanation at the [Pi-hole documentation page](https://docs.pi-hole.net/guides/dns/unbound/) of what that means without becoming too technical:__
 
@@ -84,7 +85,7 @@ All components as well as the Internic files (root.hints and root.zone) are veri
 
 When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by the bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As we take your network security serious, we are still able to manually update the image as soon as security fixes of the images' components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
 
-The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in the `scan` of [CD Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml). The `canary` build shows the results in the workflow's run details and are being scanned an buildtime. You need to be logged into GitHub to view the logs.
+The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned an buildtime. You need to be logged into GitHub to view the logs.
 
 ## Installation
 
@@ -92,11 +93,11 @@ Distroless production and canary multiarch-builds for Linux-based 386, arm/v6, a
 
 ## How to use this Image
 
-Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and our example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard Home or any other ad blocking solution.
+Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and our example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard Home or any similar ad blocking solution.
 
 **We don't like large, monolithic config files much.** 
 
-Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the `unbound.conf` file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the unbound.log file have been created and can be mounted as volumes: 
+Luckily Unbound can load configs through a `include:` clause. To provide a better structuring of the `unbound.conf` file, directories for **optionally** storing zone and other configuration files as well as for your certificates and the `unbound.log` file have been created and can be mounted as volumes: 
     
 - [`/usr/local/unbound/certs.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/certs.d/) for storing your certificate files.
 
@@ -107,12 +108,14 @@ Luckily Unbound can load configs through a `include:` clause. To provide a bette
 - [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
 
 > [!WARNING]    
-> The config files in the `conf.d` and `zones.d` folders must be named with the suffix .conf to prevent issues with specific host configurations.
+> The config files in the `conf.d` and `zones.d` folders must be named with the suffix .conf to prevent issues with specific host configurations. 
+>
+> ***Don't forget to secure your setup when everything runs.***
     
 The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
 
 > [!NOTE]
-> Splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job after you adapted the settings to suit your environment. You don't need to bind mount the config folders then, just ignore them.
+> Splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job after you adapted the settings to suit your environment. You don't need to bind mount the config folders, just ignore them.
     
 ### Directory Structure
 
@@ -207,13 +210,37 @@ export                 set                    wait
 
 ### Usage
 
-The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). We have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which we're using in slightly modified form that makes use of a shim [MACVLAN](https://docs.docker.com/network/macvlan/)/[Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment and to your needs. 
+The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). We have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which we're using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/)/shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment. 
 
 > [!IMPORTANT]
 > All entries in angle brackets (<...>) need your very attention!
 
 > [!NOTE]
 > You'll probably want an additional custom bridge network so your host is able communicate with the container and vice versa (for updating the Docker host, etc.). If you don't like to have an additional shim network, take a look at [this workaround](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/). We prefer using a combined MACVLAN/Bridge network configuration, but other network configurations will run as well.
+
+If you don't want to run Unbound in recursive mode but rather having it forwarding your queries to an upstream server, make sure your `../iana.d/root.hints` file is [up-to-date](https://www.internic.net/domain/named.root) and change the following lines in your `unbound.conf`:
+
+```
+server:
+...
+  for-upstream: no
+...
+forward-zone:
+  name: "."
+  # Forward queries to i.e. quad9
+  forward-addr: 9.9.9.9
+  forward-addr: 149.112.112.112
+...
+```
+
+This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see [`healthcheck`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Healthcheck)). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
+
+```
+cap_add: 
+  - NET_BIND_SERVICE
+```
+
+If you use a Synology Diskstation with `Container Manager`, take also a look [`here`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Known-Issues).
 
 Anyway, you can also spin up the container with the following command:
 
@@ -259,7 +286,7 @@ In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume wi
 
 <img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">
 
-The boot order set in your docker compose is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole, it will depend on Unbound.**
+The boot order set in your docker compose is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole or AdGuard Home, it will depend on Unbound.**
 
 For the sake of completeness, you can also flange Unbound to Redis by network. Just follow the given steps, except the part preparing and creating the unbound-db-socket container. Use proper name resolution by whether docker internal resolution, your DNS or use fixed IP addresses and change your `cachedb.conf` or your `unbound.conf` according to this:
 
@@ -270,9 +297,6 @@ cachedb:
   redis-server-port: 6379
   redis-expire-records: yes
 ```
-
-> [!CAUTION]
-> Don't forget to secure your setup using proper credentials and settings in your configs when everything runs.
 
 ### Healthcheck
 
@@ -286,7 +310,7 @@ The default healthcheck _only_ checks for opened Unbound ports using netstat and
 To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please download the [`Unbound healthcheck`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/healthcheck.sh) script and put it in your persistent Unbound volume, make it available in your compose file's volume definition, fix permissions and make the file executable. Set the variable `EXTENDED=0` to `EXTENDED=1` and save the file, you will need to restart the Unbound container afterwards. To change the domain or host to query in the healthcheck, modify the `DOMAIN=` variable, if you need a different port than `5335`, edit the `PORT=` variable accordingly.
 
 > [!NOTE]
-> The extended healthcheck is deactivated by default -you'll already guess it- in favor of your privacy and security. We are sure that this compromise making an external request optional will suit everyone.
+> The _extended_ healthcheck is deactivated by default in favor of your privacy and security.
 
 To verify that the healthcheck is working and the container is doing what it is supposed to do, consult your Portainer instance or execute `docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh` in the shell of your Docker host.
 
@@ -325,9 +349,8 @@ Not in the console but rather in Portainer (and here on this page of course) the
 ### Updating the Image
 
 > [!WARNING]
-> Even we use it by ourselves to keep less important containers updated, we don't recommend using solutions like [Watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically. Imagine your network went down due to an update of the image not working as expected. Please always test before rolling out an update even we do our best not to break something.
-
-> [!TIP]
+> Even we use it by ourselves to keep less important containers updated, we don't recommend using solutions like [Watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically.
+>
 > A notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.
 
 If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate your container by executing `docker-compose up -d`.
@@ -344,10 +367,12 @@ We also created a [`companion project`](https://github.com/madnuttah/unbound-doc
 
 # Known Issues
 
-- There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up
-when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See [issue #62](https://github.com/madnuttah/unbound-docker/issues/62).
+- There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See [`issue #62`](https://github.com/madnuttah/unbound-docker/issues/62).
 
 # Troubleshooting
+
+> [!TIP]
+> You can run the [`available commands`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Available-Commands) directly from the shell of your Docker host like `docker exec -ti unbound ***COMMAND***`. To check your Unbound config(s) for errors for example, execute `docker exec -ti unbound ***unbound-checkconf***`.
 
 * You'd like to use a different `unbound.conf` than the one [`included`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf)? No problem, just make sure to change at least the following settings and fix crucial paths, otherwise the container will fail to start:
 
@@ -364,13 +389,6 @@ server:
 
 * Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions on Unbound's volumes. The container won't start up in such cases. Make sure your `UNBOUND_UID/UNBOUND_GID`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 
-* This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see extended healthcheck below). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
-
-```
-cap_add: 
-  - NET_BIND_SERVICE
-```
-
 * When you see log entries like those below or similar issues in the healthcheck, verify that you permit connections to localhost. There are multiple places in the `unbound.conf` where this could be disabled, from `access control` to `Do-Not-Query-Localhost` and so on. You'll likely need to check the whole file. Isn't that alone one good reason for the concept with the separated config directories? If you can't find the culprit, don't hesitate giving us a shout. 
 
 ```
@@ -386,9 +404,12 @@ unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53
 unbound[0:1] info: generate keytag query _ta-4f66. NULL IN
 ```
 
-> [!TIP]
-> You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml).
+**You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml).**
 
 # Documentation
 
 In-depth documentation for NLnet Labs Unbound is available on the [Unbound documentation website](https://unbound.docs.nlnetlabs.nl/en/latest/) and [here](https://www.nlnetlabs.nl/documentation/unbound/unbound.conf/) goes a direct link to the documentation of the default unbound.conf file. 
+
+# Contributing
+
+You have found a bug, something to make better or have an idea for a shiny new feature? That's amazing! Feel free to submit a pull request, we'd love to see what you have done.
