@@ -113,4 +113,4 @@ Please note that this is a work of private contributors and we're neither affili
 
 In case you would like to donate money, please rather spend it on the upstream projects this image relies on.
 
-If you like what we do and if you find this image protecting your privacy and giving back your DNS liberty useful - consider becoming a stargazer ⭐ on Docker Hub and GitHub. Thank you for your support! ❤️
+If you like what we do and if you find this image protecting your privacy and giving back your DNS liberty useful - spread the word, fork our repo, open an issue, make a pull request and don't forget to leave a ⭐ on Docker Hub and GitHub. Many thanks for your support! ❤️
