@@ -64,9 +64,6 @@ services:
       TZ: <YOURTIMEZONE> #e.g. "America/New_York"
       ServerIP: <UNBOUND_IP_ADDRESS> #e.g. 172.20.0.253 or fd11:aa:1234:1234::505
       VIRTUAL_HOST: <unbound.yourdomain.lan>
-      #Optional
-      UNBOUND_UID: <YOUR_USER_ID>
-      UNBOUND_GID: <YOUR_GROUP_ID>
     volumes:
       - ./unbound.conf:/usr/local/unbound/unbound.conf:rw #Your local path to Unbound
       - ./conf.d/:/usr/local/unbound/conf.d/:rw

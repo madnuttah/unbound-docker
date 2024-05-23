@@ -25,8 +25,6 @@ services:
         ipv4_address: x.x.x.x
       docker-bridge:
         ipv4_address: x.x.x.x
-    dns:
-      - x.x.x.x@5335
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -71,8 +69,6 @@ services:
         ipv4_address: x.x.x.x
     environment:  
       TZ: "Europe/Amsterdam"
-      UNBOUND_UID: 1000
-      UNBOUND_GID: 1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./unbound/usr/local/unbound/sbin/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
