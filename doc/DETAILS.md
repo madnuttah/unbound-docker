@@ -83,7 +83,10 @@ To provide always the latest stable, hardened and optimized versions per hardwar
     
 All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
 
-When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by the bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As we take your network security serious, we are still able to manually update the image as soon as security fixes of the images' components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released.
+When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by the bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As we take your network security serious, we are still able to manually update the image as soon as security fixes of the images' components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released. 
+
+> [!NOTE]
+> We're not manually building release candidates of Unbound anymore, instead there are automated canary builds which will be created from the most recent NLnet Labs Unbound GitHub commit at 20:00 UTC from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound.
 
 The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned an buildtime. You need to be logged into GitHub to view the logs.
 
@@ -199,8 +202,8 @@ export                 set                    wait
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
 | `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC, logging and the optional redis and statistics rely on precise time
-| `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
-| `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
+<!--| `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
+| `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |-->
 
 ### Networking
 
@@ -367,6 +370,8 @@ We also created a [`companion project`](https://github.com/madnuttah/unbound-doc
 
 # Known Issues
 
+- If you want to run the container with user `_unbound` using a different `UNBOUND_UID` or `UNBOUND_GID`, you'd need to build the image by downloading or forking the repo by yourself or you could try this workaround from [`issue #66`](https://github.com/madnuttah/unbound-docker/issues/66#issuecomment-2119811822). We are sorry for the inconvenience.
+
 - There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See [`issue #62`](https://github.com/madnuttah/unbound-docker/issues/62).
 
 # Troubleshooting
@@ -384,8 +389,6 @@ server:
 ```
 
 * If you have trouble spinning up the container, start it with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-minimal.yaml) first. Analyze the logs using `docker logs unbound` or your `unbound.log` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
-
-* To check your config(s) for errors, you can connect to the running container and execute `unbound-checkconf` with the following command: `docker exec -ti unbound unbound-checkconf`.
 
 * Most issues take place because there are missing files like the `unbound.log` or due to incorrect permissions on Unbound's volumes. The container won't start up in such cases. Make sure your `UNBOUND_UID/UNBOUND_GID`, default: `1000:1000`, (`_unbound:_unbound`) has read/write permissions on it's folders.
 
@@ -412,4 +415,4 @@ In-depth documentation for NLnet Labs Unbound is available on the [Unbound docum
 
 # Contributing
 
-You have found a bug, something to make better or have an idea for a shiny new feature? That's amazing! Feel free to submit a pull request, we'd love to see what you have done.
+You have found a bug, found something to make better or have an idea for a shiny new feature? That's amazing! Feel free to submit a pull request, we ❤️ contributions by the open source community.

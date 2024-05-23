@@ -2,7 +2,7 @@ name: CD Build Canary Distroless Unbound Docker Image
 
 on:      
   schedule:
-    - cron: '0 20 * * mon-fri'
+    - cron: '0 19 * * mon-fri'
     
 jobs: 
   build: 
