@@ -56,6 +56,7 @@ RUN set -xe; \
     --enable-dnstap \
     --enable-dnscrypt \
     --enable-cachedb \
+    --enable-subnet \
     --with-pthreads \
     --without-pythonmodule \
     --without-pyunbound \
