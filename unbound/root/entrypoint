@@ -1,0 +1,11 @@
+#!/bin/sh
+
+UNBOUND_UID=${UNBOUND_UID}
+UNBOUND_GID=${UNBOUND_GID}
+
+groupmod -o -g "$UNBOUND_GID" _unbound
+usermod -o -u "$UNBOUND_UID" _unbound
+
+chown -R "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/
+
+su-exec "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/sbin/unbound.sh
