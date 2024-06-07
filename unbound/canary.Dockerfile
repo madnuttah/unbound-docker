@@ -96,6 +96,8 @@ RUN set -xe; \
     apk --update --no-cache add \
     ca-certificates \
     tzdata \
+    shadow \
+    su-exec \
     drill \
     libsodium \
     nghttp2 \
