@@ -27,7 +27,8 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | ---------------------------------------- | --------- |
 | Unprivileged user                        | yes |
 | Unprivileged port (privileged possible)  | yes |
-| Custom UID/GID environment variables     | yes |
+| Custom UID/GID build & environment variables     | yes |
+| Optional full rootless mode              | yes |
 | CD built single-layer distroless scratch image running Alpine Linux | yes |
 | Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
 | Libevent                                 | yes |
