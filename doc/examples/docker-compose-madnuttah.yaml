@@ -6,8 +6,6 @@
 # - Redis
 # - Redis socket host
 
-version: '3'
-
 services:
   pihole:
     container_name: pihole
@@ -67,7 +65,9 @@ services:
     networks:
       docker:
         ipv4_address: x.x.x.x
-    environment:  
+    environment:
+      UNBOUND_UID: 1000
+      UNBOUND_GID: 1000
       TZ: "Europe/Amsterdam"
     volumes:
       - /etc/localtime:/etc/localtime:ro

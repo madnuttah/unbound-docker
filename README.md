@@ -27,6 +27,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | ---------------------------------------- | --------- |
 | Unprivileged user                        | yes |
 | Unprivileged port (privileged possible)  | yes |
+| Custom UID/GID environment variables     | yes |
 | CD built single-layer distroless scratch image running Alpine Linux | yes |
 | Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
 | Libevent                                 | yes |
@@ -39,9 +40,9 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | DNS over TLS                             | yes |
 | Redis via UNIX Socket or network         | yes |
 | Optional privacy respecting & meaningful healthcheck | yes |
-| Optional Unbound statistics for Grafana via Zabbix utilizing on-board means | yes |
+| Optional Unbound statistics for Grafana via Zabbix without 3rd party tools | yes |
+| EDNS Client Subnet                       | yes |
 | Python                                   | no |
-| EDNS Client Subnet                       | no |
     
 </details>
 

@@ -172,27 +172,30 @@ usr/local/
   <summary>Command list</summary><br>
 
 ```
-.                      false                  sh
-:                      fg                     shift
-[                      getopts                source
-[[                     grep                   sys/
+.                      fg                     shift
+:                      getopts                source
+[                      grep                   su-exec
+[[                     groupmod               sys/
 alias                  hash                   test
 awk                    help                   times
 bg                     history                trap
-bin/                   jobs                   true
-break                  kill                   type
-cd                     let                    ulimit
-chdir                  lib/                   umask
-command                local                  unalias
-continue               netstat                unbound
-dev/                   printf                 unbound-anchor
-drill                  proc/                  unbound-checkconf
-echo                   pwd                    unbound-control
-etc/                   read                   unbound-control-setup
-eval                   readonly               unbound-host
-exec                   return                 unset
-exit                   sed                    usr/
-export                 set                    wait
+bin/                   id                     true
+break                  jobs                   type
+cd                     kill                   ulimit
+chdir                  let                    umask
+chgrp                  lib/                   unalias
+chown                  local                  unbound
+command                netstat                unbound-anchor
+continue               printf                 unbound-checkconf
+dev/                   proc/                  unbound-control
+drill                  pwd                    unbound-control-setup
+echo                   read                   unbound-host
+etc/                   readonly               unset
+eval                   return                 usermod
+exec                   sbin/                  usr/
+exit                   sed                    wait
+export                 set
+false                  sh
 ```
 
 </details>
@@ -202,8 +205,8 @@ export                 set                    wait
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
 | `TZ` | `UTC` | `<Timezone>` | Set your local [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) as DNSSEC, logging and the optional redis and statistics rely on precise time
-<!--| `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
-| `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |-->
+| `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
+| `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
 
 ### Networking
 
@@ -371,8 +374,6 @@ Pulling the latest image without a compose file can be done by `docker pull madn
 We also created a [`companion project`](https://github.com/madnuttah/unbound-docker-stats) using [Zabbix](https://zabbix.com) for shipping the Unbound stats via a `Zabbix Active Agent` to [Grafana](https://grafana.com) _without_ using additional tools like [Zabbix Sender](https://www.zabbix.com/documentation/current/en/manpages/zabbix_sender) using a _frankensteined_ [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker-stats/main/unbound-stats/healthcheck.sh).
 
 # Known Issues
-
-- If you want to run the container with user `_unbound` using a different `UNBOUND_UID` or `UNBOUND_GID`, you'd need to build the image by downloading or forking the repo by yourself or you could try this workaround from [`issue #66`](https://github.com/madnuttah/unbound-docker/issues/66#issuecomment-2119811822). We are sorry for the inconvenience.
 
 - There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See [`issue #62`](https://github.com/madnuttah/unbound-docker/issues/62).
 

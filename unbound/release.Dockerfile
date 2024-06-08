@@ -103,12 +103,16 @@ RUN set -xe; \
   
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
-   
+
+COPY ./unbound/root/entrypoint /
+
 RUN set -xe; \
     apk --update --no-cache add \
     ca-certificates \
     tzdata \
     drill \
+    shadow \
+    su-exec \
     libsodium \
     nghttp2 \
     ngtcp2 \
@@ -159,16 +163,27 @@ COPY --from=buildenv /usr/local/unbound/ \
 COPY --from=buildenv /lib/*-musl-* \
   /app/lib/
 
+COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
+  /app/bin/
+  
+COPY --from=buildenv /sbin/su-exec \
+  /app/sbin/
+  
+COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
+  /app/usr/sbin/
+  
 COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
   /app/bin/
   
-COPY --from=buildenv /usr/bin/awk /usr/bin/drill \
+COPY --from=buildenv /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/
   
 COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
   /app/lib/
-
+  
 COPY --from=buildenv /usr/lib/libgcc_s* \
+  /usr/lib/libbsd* \ 
+  /usr/lib/libmd* \
   /usr/lib/libsodium* \
   /usr/lib/libexpat* \
   /usr/lib/libprotobuf-c* \
@@ -187,6 +202,9 @@ COPY --from=buildenv /etc/passwd /etc/group \
   
 COPY --from=buildenv /usr/share/zoneinfo/ \
   /app/usr/share/zoneinfo/
+  
+COPY --from=buildenv --chmod=0755 /entrypoint \
+  /app/
 
 WORKDIR /
 
@@ -217,6 +235,4 @@ LABEL org.opencontainers.image.title="madnuttah/unbound" \
 
 COPY --from=stage /app/ /
 
-USER "${UNBOUND_UID}"
-
-CMD [ "/usr/local/unbound/sbin/unbound.sh" ]
+ENTRYPOINT [ "/entrypoint" ]

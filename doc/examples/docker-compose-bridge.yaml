@@ -5,8 +5,6 @@
 # This file is the one I'm using and was slightly modified with added IPv6
 # support (which I'm not using currently).
 
-version: '3'
-
 services:
   pihole:
     container_name: pi-hole
@@ -62,6 +60,8 @@ services:
         #ipv6_address: <UNBOUND_IPv6_ADDRESS> #e.g. fd11:aa:1234:1234::505
     environment:
       TZ: <YOURTIMEZONE> #e.g. "America/New_York"
+      UNBOUND_UID: 1000 #optional
+      UNBOUND_GID: 1000 #optional
       ServerIP: <UNBOUND_IP_ADDRESS> #e.g. 172.20.0.253 or fd11:aa:1234:1234::505
       VIRTUAL_HOST: <unbound.yourdomain.lan>
     volumes:

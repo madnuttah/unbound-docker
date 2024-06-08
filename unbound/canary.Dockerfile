@@ -161,7 +161,7 @@ COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
 COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
   /app/bin/
   
-COPY --from=buildenv /usr/bin/awk /usr/bin/drill \
+COPY --from=buildenv /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/
   
 COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \

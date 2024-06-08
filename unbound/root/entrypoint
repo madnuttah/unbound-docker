@@ -1,11 +1,48 @@
 #!/bin/sh
 
+BLD='\033[1;97m'
+CLR='\033[1;92m'
+NRM='\033[0m'
+
+SET_PERMS=0
+
 UNBOUND_UID=${UNBOUND_UID:-"1000"}
 UNBOUND_GID=${UNBOUND_GID:-"1000"}
 
-groupmod -o -g "$UNBOUND_GID" _unbound
-usermod -o -u "$UNBOUND_UID" _unbound
+if [ "$(id -u _unbound)" -ne "$UNBOUND_UID" ]; then
+  usermod -o -u "$UNBOUND_UID" _unbound
+  SET_PERMS=1
+fi
 
-chown -R "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/
+if [ "$(id -g _unbound)" -ne "$UNBOUND_GID" ]; then
+  groupmod -o -g "$UNBOUND_GID" _unbound
+  SET_PERMS=1
+fi
 
-su-exec "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/sbin/unbound.sh
+if [ "$SET_PERMS" -eq 1 ]; then 
+  chown -R "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/ >/dev/null 2>&1
+fi
+
+#echo "╭─────────────────────╮"
+# echo -e "│  ${BLD}madnuttah/unbound${NRM}  │"
+# echo "───────────────────────"
+# echo -e "│ UNBOUND_UID:   ${CLR}$(id -u _unbound)${NRM} │"
+# echo -e "│ UNBOUND_GID:   ${CLR}$(id -g _unbound)${NRM} │"
+# echo "╰─────────────────────╯"
+
+#echo -e "${BLD}madnuttah/unbound${NRM}\n"
+                                            
+echo -e "╔═════════════════════════════════════════════════════╗
+║                                                     ║
+║               MΛDИVTTΛH Unbound Docker              ║
+║                                                     ║
+║     https://github.com/madnuttah/unbound-docker     ║
+║     https://hub.docker.com/r/madnuttah/unbound      ║
+║                                                     ║
+╚═════════════════════════════════════════════════════╝
+
+UNBOUND_UID: ${CLR}$(id -u _unbound)${NRM}
+UNBOUND_GID: ${CLR}$(id -g _unbound)${NRM}
+"
+
+exec su-exec "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/sbin/unbound.sh
