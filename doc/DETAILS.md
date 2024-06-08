@@ -41,6 +41,7 @@
   - [Directory Structure](#Directory-Structure)
   - [Available Commands](#Available-Commands)
   - [Recommended Environment Variables](#Recommended-Environment-Variables)
+  - [Optional Environment Variables](#Optional-Environment-Variables)
   - [Networking](#Networking)
   - [Usage](#Usage)
   - [CacheDB (Redis)](#cachedb-redis)
@@ -208,11 +209,20 @@ false                  sh
 | `UNBOUND_UID` | `1000` | `INT` | Your desired user id for user `_unbound` |
 | `UNBOUND_GID` | `1000` | `INT` | Your desired group id for group `_unbound` |
 
+### Optional Environment Variables
+
+| Variable | Default | Value | Description |
+| -------- | ------- | ----- | ---------- |
+| `DISABLE_SET_PERMS` | `false` | `BOOL` | Set this to `true` for complete rootless mode and define user `_unbound` |
+
+> [!CAUTION]   
+> Setting `DISABLE_SET_PERMS` to `true` *without* defining `user: _unbound` or `--user _unbound` will run the container under root!
+
 ### Networking
 
 | Port      | Description              |
 | --------- | ------------------------ |
-| `5335`    | Listening Port (TCP/UDP) |
+| `5335`    | Listening Port (tcp/udp) |
 
 ### Usage
 
@@ -410,7 +420,7 @@ unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53
 unbound[0:1] info: generate keytag query _ta-4f66. NULL IN
 ```
 
-**You'll find a redacted version of the Docker compose stack I'm currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml).**
+**You'll find a redacted version of the Docker compose stack we`re currently using for comparison purposes [here](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml).**
 
 # Documentation
 
