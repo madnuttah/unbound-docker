@@ -22,15 +22,6 @@ fi
 if [ "$SET_PERMS" -eq 1 ]; then 
   chown -R "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/ >/dev/null 2>&1
 fi
-
-#echo "╭─────────────────────╮"
-# echo -e "│  ${BLD}madnuttah/unbound${NRM}  │"
-# echo "───────────────────────"
-# echo -e "│ UNBOUND_UID:   ${CLR}$(id -u _unbound)${NRM} │"
-# echo -e "│ UNBOUND_GID:   ${CLR}$(id -g _unbound)${NRM} │"
-# echo "╰─────────────────────╯"
-
-#echo -e "${BLD}madnuttah/unbound${NRM}\n"
                                             
 echo -e "╔═════════════════════════════════════════════════════╗
 ║                                                     ║
