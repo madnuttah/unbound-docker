@@ -66,9 +66,12 @@ services:
       docker:
         ipv4_address: x.x.x.x
     environment:
+      TZ: "Europe/Berlin"
       UNBOUND_UID: 1000
       UNBOUND_GID: 1000
-      TZ: "Europe/Amsterdam"
+      HEALTHCHECK_PORT: 5335
+      EXTENDED_HEALTHCHECK: true
+      EXTENDED_HEALTHCHECK_DOMAIN: "nlnetlabs.nl"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./unbound/usr/local/unbound/sbin/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro

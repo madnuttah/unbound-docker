@@ -68,8 +68,9 @@ services:
       TZ: <YOURTIMEZONE> #e.g. "America/New_York"
       UNBOUND_UID: 1000 #optional
       UNBOUND_GID: 1000 #optional
-      ServerIP: <UNBOUND_IP_ADDRESS> #e.g. 192.168.1.253 or fd11:aa:1234:1234::505
-      VIRTUAL_HOST: <unbound.yourdomain.lan>
+      HEALTHCHECK_PORT: 5335 #optional
+      EXTENDED_HEALTHCHECK: false #optional
+      EXTENDED_HEALTHCHECK_DOMAIN: <Domain/host to query> #optional
     volumes:
       - ./unbound.conf:/usr/local/unbound/unbound.conf:rw #Your local path to Unbound
       - ./conf.d/:/usr/local/unbound/conf.d/:rw

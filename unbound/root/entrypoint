@@ -1,45 +1,24 @@
 #!/bin/sh
 
-BLD='\033[1;97m'
-CLR='\033[1;92m'
-STD='\033[0m'
+DISABLE_SET_PERMS=${DISABLE_SET_PERMS:-false}
+UNBOUND_UID=${UNBOUND_UID:-1000}
+UNBOUND_GID=${UNBOUND_GID:-1000}
 
-DISABLE_SET_PERMS=${DISABLE_SET_PERMS:-"false"}
-UNBOUND_UID=${UNBOUND_UID:-"1000"}
-UNBOUND_GID=${UNBOUND_GID:-"1000"}
-
-function info {
-echo -e "╔═════════════════════════════════════════════════════╗
-║                                                     ║
-║               ${BLD}MΛDИVTTΛH Unbound Docker${STD}              ║
-║                                                     ║
-║     https://github.com/madnuttah/unbound-docker     ║
-║     https://hub.docker.com/r/madnuttah/unbound      ║
-║                                                     ║
-╚═════════════════════════════════════════════════════╝
-
-UNBOUND_UID: ${CLR}$(id -u _unbound)${STD}
-UNBOUND_GID: ${CLR}$(id -g _unbound)${STD}
-"
-}
-
-BOOL=$DISABLE_SET_PERMS
-if $BOOL; then
-  info
+bool=$DISABLE_SET_PERMS
+if $bool; then
   exec /usr/local/unbound/sbin/unbound.sh
 else
-  SET_PERMS=0
-  if [ "$(id -u _unbound)" -ne "$UNBOUND_UID" ]; then
-    usermod -o -u "$UNBOUND_UID" _unbound
-    SET_PERMS=1
+  set_perms=0
+  if [ $(id -u _unbound) -ne $UNBOUND_UID ]; then
+    usermod -o -u $UNBOUND_UID _unbound
+    set_perms=1
   fi
-  if [ "$(id -g _unbound)" -ne "$UNBOUND_GID" ]; then
-    groupmod -o -g "$UNBOUND_GID" _unbound
-    SET_PERMS=1
+  if [ $(id -g _unbound) -ne $UNBOUND_GID ]; then
+    groupmod -o -g $UNBOUND_GID _unbound
+    set_perms=1
   fi
-  if [ "$SET_PERMS" -eq 1 ]; then
-    chown -R "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/ >/dev/null 2>&1
+  if [ $set_perms -eq 1 ]; then
+    chown -R $UNBOUND_UID:$UNBOUND_GID /usr/local/unbound/ >/dev/null 2>&1
   fi
-  info
-  exec su-exec "$UNBOUND_UID":"$UNBOUND_GID" /usr/local/unbound/sbin/unbound.sh
+  exec su-exec $UNBOUND_UID:$UNBOUND_GID /usr/local/unbound/sbin/unbound.sh
 fi

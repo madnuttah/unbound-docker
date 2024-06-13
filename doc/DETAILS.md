@@ -89,7 +89,7 @@ When NLnet Labs publishes a new stable Unbound release, the image will be built,
 > [!NOTE]
 > We're not manually building release candidates of Unbound anymore, instead there are automated canary builds which will be created from the most recent NLnet Labs Unbound GitHub commit at 20:00 UTC from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound.
 
-The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned an buildtime. You need to be logged into GitHub to view the logs.
+The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned at buildtime. You need to be logged into GitHub to view the logs.
 
 ## Installation
 
@@ -116,7 +116,7 @@ Luckily Unbound can load configs through a `include:` clause. To provide a bette
 >
 > ***Don't forget to secure your setup when everything runs.***
     
-The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them. It might be necessary to fix permissions and ownership of the files put in the persistent volumes if unbound refuses to start. 
+The splitted configuration files located in [`doc/examples/usr/local/unbound`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound) are only meant to give you an impression on how to separating and structuring the configs. Please mind that those files are **examples** which also needs to be edited to make them work for your environment if you intend to use them.
 
 > [!NOTE]
 > Splitting ain't really necessary as the included default [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf) will perfectly do the job after you adapted the settings to suit your environment. You don't need to bind mount the config folders, just ignore them.
@@ -128,39 +128,40 @@ The splitted configuration files located in [`doc/examples/usr/local/unbound`](h
   <summary>Filesystem</summary><br>
     
 ```
-...
-usr/local/
-├── unbound/
-│   ├── cachedb.d/
-│   │   └── redis.sock
-│   ├── certs.d/
-│   │   └── ...
-│   ├── conf.d/
-│   │   └── *.conf
-│   ├── iana.d/
-│   │   ├── root.hints
-│   │   ├── root.key
-│   │   └── root.zone
-│   ├── log.d/
-│   │   └── unbound.log
-│   ├── sbin/
-│   │   ├── healthcheck.sh 
-│   │   └── unbound.sh 
-│   ├── unbound.d/
-│   │   ├── sbin/
-│   │   │   ├── unbound
-│   │   │   ├── unbound-anchor
-│   │   │   ├── unbound-checkconf
-│   │   │   ├── unbound-control
-│   │   │   ├── unbound-control-setup
-│   │   │   └── unbound-host
-│   │   ├── null
-│   │   ├── random
-│   │   ├── urandom
-│   │   └── unbound.pid
-│   ├── zones.d/
-│   │   └── *.conf
-│   └── unbound.conf 
+/
+├── entrypoint
+├── usr
+│   ├── local
+│   │   └── unbound
+│   │       ├── certs.d
+│   │       │   └── ...
+│   │       ├── conf.d
+│   │       │   └── *.conf
+│   │       ├── iana.d
+│   │       │   ├── root.hints
+│   │       │   ├── root.key
+│   │       │   └── root.zone
+│   │       ├── log.d
+│   │       │   └── unbound.log
+│   │       ├── sbin
+│   │       │   ├── healthcheck.sh
+│   │       │   └── unbound.sh
+│   │       ├── unbound.conf
+│   │       ├── unbound.d
+│   │       │   ├── null -> /dev/null
+│   │       │   ├── random -> /dev/random
+│   │       │   ├── sbin
+│   │       │   │   ├── unbound
+│   │       │   │   ├── unbound-anchor
+│   │       │   │   ├── unbound-checkconf
+│   │       │   │   ├── unbound-control
+│   │       │   │   ├── unbound-control-setup
+│   │       │   │   └── unbound-host
+│   │       │   ├── unbound.pid
+│   │       │   └── urandom -> /dev/urandom
+│   │       └── zones.d
+│   │           └── *.conf
+│   └── ...  
 ...
 ```
     
@@ -170,7 +171,7 @@ usr/local/
 
 <details> 
     
-  <summary>Command list</summary><br>
+  <summary>Commands list</summary><br>
 
 ```
 .                      fg                     shift
@@ -213,10 +214,15 @@ false                  sh
 
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
-| `DISABLE_SET_PERMS` | `false` | `BOOL` | Set this to `true` for complete rootless mode and define user `_unbound` |
+| `HEALTHCHECK_PORT` | `5335` | `INT` | The port Unbound uses (only used by the extended healthcheck) |
+| `EXTENDED_HEALTHCHECK` | `false` | `BOOL` | Set this to `true` if you want to use the extended healthcheck |
+| `EXTENDED_HEALTHCHECK_DOMAIN` | `nlnetlabs.nl` | `string` | The domain/host to run the extended healthcheck against |
+| `DISABLE_SET_PERMS` | `false` | `BOOL` | Set this to `true` and define user `_unbound` for full rootless mode like as it was before v1.20.0-2. The `UNBOUND_UID` and `UNBOUND_GID` will both be overridden with `1000` in that case |
 
 > [!CAUTION]   
-> Setting `DISABLE_SET_PERMS` to `true` *without* defining `user: _unbound` or `--user _unbound` will run the container under root!
+> Setting `DISABLE_SET_PERMS` to `true` ***without*** defining `user: _unbound` or `--user _unbound` will run the container under the root account. The init screen in the log will show you the user who is running Unbound.
+>
+> ***If you ain't sure what this variable does, you'll most likely don't need it.***
 
 ### Networking
 
@@ -249,7 +255,7 @@ forward-zone:
 ...
 ```
 
-This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (TCP/UDP) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see [`healthcheck`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Healthcheck)). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
+This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (tcp/udp) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see [`healthcheck`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Healthcheck)). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
 
 ```
 cap_add: 
@@ -288,7 +294,7 @@ Create a new entry for cachedb in your `unbound.conf` with the content of this [
 
 If using structured directories uncomment the line `include: "/usr/local/unbound/conf.d/*.conf"` of this [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf).
 
-You can verify the connection to redis in the `unbound.log` or by typing `docker logs unbound` in the shell: 
+You can verify the connection to redis in the `unbound.log` or by typing `docker logs unbound` in the shell (for alternative methods like monitoring using the `redis-cli` consult the corresponding documentation): 
 
 ```
 ...
@@ -325,7 +331,7 @@ The healthcheck can be enabled and configured quite self-explanatory in your com
 
 The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. We got asked why we don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
 
-To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please download the [`Unbound healthcheck`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/healthcheck.sh) script and put it in your persistent Unbound volume, make it available in your compose file's volume definition, fix permissions and make the file executable. Set the variable `EXTENDED=0` to `EXTENDED=1` and save the file, you will need to restart the Unbound container afterwards. To change the domain or host to query in the healthcheck, modify the `DOMAIN=` variable, if you need a different port than `5335`, edit the `PORT=` variable accordingly.
+To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please set the [optional environment variables](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Optional-Environment-Variables) in your compose file or run command.
 
 > [!NOTE]
 > The _extended_ healthcheck is deactivated by default in favor of your privacy and security.
@@ -334,21 +340,21 @@ To verify that the healthcheck is working and the container is doing what it is 
 
 Standard healthcheck console output:
 
-```
+```bash
 yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
 ✅ Port 5335 open
 ```
 
 Standard healthcheck console output showing an issue:
 
-```
+```bash
 yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
 ⚠️ Port 5335 not open
 ```
 
 Extended healthcheck console output:
 
-```
+```bash
 yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
 ✅ Port 5335 open
 ✅ Domain 'unbound.net' resolved to '185.49.140.10'
@@ -356,7 +362,7 @@ yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
 
 Extended healthcheck console output showing an issue:
 
-```
+```bash
 yourdockerhost:~# docker exec -ti unbound /usr/local/unbound/sbin/healthcheck.sh
  ✅ Port 5335 open
  ⚠️ Domain 'unbound.net' not resolved
@@ -385,7 +391,7 @@ We also created a [`companion project`](https://github.com/madnuttah/unbound-doc
 
 # Known Issues
 
-- There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up when trying to use a privileged port like `53 tcp/udp` you might need to set `user: root` in the compose file's Unbound service section. See [`issue #62`](https://github.com/madnuttah/unbound-docker/issues/62).
+- There's a difference between 'vanilla' Docker and the variant Synology uses. If the container won't spin up when trying to use a privileged port like `53 tcp/udp` you might need to run the container in `root mode` by setting the `DISABLE_SET_PERMS` environment variable to `true` without a `user` definition or define `user: root` in the compose file's Unbound service section or your shell command.
 
 # Troubleshooting
 
@@ -396,9 +402,9 @@ We also created a [`companion project`](https://github.com/madnuttah/unbound-doc
 
 ```
 server:
-   username="" # Is set in Dockerfile at buildtime
+   username="" # Not set in config but compose or command if needed
    chroot="" # Distroless, so no chroot necessary
-   directory: "/usr/local/unbound" # This is the folder where Unbound lives in
+   directory="/usr/local/unbound" # This is the folder where Unbound lives in
 ```
 
 * If you have trouble spinning up the container, start it with the [minimal config](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-minimal.yaml) first. Analyze the logs using `docker logs unbound` or your `unbound.log` and fix warnings and errors there. When it runs, attach volumes one by one. Success means to adapt the default `unbound.conf` to your needs then.
@@ -428,4 +434,4 @@ In-depth documentation for NLnet Labs Unbound is available on the [Unbound docum
 
 # Contributing
 
-You have found a bug, found something to make better or have an idea for a shiny new feature? That's amazing! Feel free to submit a pull request, we ❤️ contributions by the open source community.
+You have found a bug, got something to make better, have an idea for a shiny new feature or just a question? That's amazing! Feel free to submit an issue or a pull request, we ❤️ contributions by the open source community.
