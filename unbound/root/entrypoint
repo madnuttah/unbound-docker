@@ -4,9 +4,11 @@ DISABLE_SET_PERMS=${DISABLE_SET_PERMS:-false}
 UNBOUND_UID=${UNBOUND_UID:-1000}
 UNBOUND_GID=${UNBOUND_GID:-1000}
 
-bool=$DISABLE_SET_PERMS
-if $bool; then
-  exec /usr/local/unbound/sbin/unbound.sh
+unbound_root=/usr/local/unbound
+
+disable_set_perms=$DISABLE_SET_PERMS
+if $disable_set_perms; then
+  command="exec"
 else
   set_perms=0
   if [ $(id -u _unbound) -ne $UNBOUND_UID ]; then
@@ -18,7 +20,9 @@ else
     set_perms=1
   fi
   if [ $set_perms -eq 1 ]; then
-    chown -R $UNBOUND_UID:$UNBOUND_GID /usr/local/unbound/ >/dev/null 2>&1
+    chown -R $UNBOUND_UID:$UNBOUND_GID $unbound_root >/dev/null 2>&1
   fi
-  exec su-exec $UNBOUND_UID:$UNBOUND_GID /usr/local/unbound/sbin/unbound.sh
+  command="exec su-exec $UNBOUND_UID:$UNBOUND_GID"
 fi
+
+$command $unbound_root/sbin/unbound.sh $disable_set_perms

@@ -161,7 +161,9 @@ The splitted configuration files located in [`doc/examples/usr/local/unbound`](h
 │   │       │   └── urandom -> /dev/urandom
 │   │       └── zones.d
 │   │           └── *.conf
-│   └── ...  
+│   ├── ...  
+│   │
+│   ... 
 ...
 ```
     
@@ -257,7 +259,7 @@ forward-zone:
 
 This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (tcp/udp) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see [`healthcheck`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Healthcheck)). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
 
-```
+```yaml
 cap_add: 
   - NET_BIND_SERVICE
 ```
@@ -418,7 +420,7 @@ unbound[1:0] fatal error: could not open ports
 unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53 
 ```
 
-* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker-compose down && docker compose up -d` will remove the PID and also the warnings in the log.
+* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker compose down && docker compose up -d` will remove the PID and also the warnings in the log. As we're not shipping the image with an init system like `tini` or `dumb-init`, you might want to set `init: true` in your unbound service section or run command. See [Specify an init process](https://docs.docker.com/reference/cli/docker/container/run/#init) for further information.
 
 * This is no issue and shows that Unbound is doing trust anchor signaling to the root name servers. See [this URL](https://tools.ietf.org/html/rfc8145) for more details.
 
