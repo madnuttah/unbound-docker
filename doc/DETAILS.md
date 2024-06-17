@@ -219,6 +219,7 @@ false                  sh
 | `HEALTHCHECK_PORT` | `5335` | `INT` | The port Unbound uses (only used by the extended healthcheck) |
 | `EXTENDED_HEALTHCHECK` | `false` | `BOOL` | Set this to `true` if you want to use the extended healthcheck |
 | `EXTENDED_HEALTHCHECK_DOMAIN` | `nlnetlabs.nl` | `string` | The domain/host to run the extended healthcheck against |
+| `ENABLE_STATS` | `false` | `BOOL` | Set this to `true` if you want to enable Unbound [`statistics`](https://github.com/madnuttah/unbound-docker-stats). Please follow the instructions there |
 | `DISABLE_SET_PERMS` | `false` | `BOOL` | Set this to `true` and define user `_unbound` for full rootless mode like as it was before v1.20.0-2. The `UNBOUND_UID` and `UNBOUND_GID` will both be overridden with `1000` in that case |
 
 > [!CAUTION]   
@@ -329,11 +330,26 @@ cachedb:
 > [!IMPORTANT]
 > The general use of the healthcheck is optional but highly recommended.
 
-The healthcheck can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files to get you started; each compose file has got the healthcheck included, the most complete example is the one [`we use ourselves`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). The same procedure applies for the [`CacheDB (Redis)`](#cachedb-redis) server healthcheck except it has no 'extended' feature in it's own [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh).
+The healthcheck can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files or the snippet below to get you started; each compose file has got the healthcheck included, the most complete example is the one [`we use ourselves`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). 
+
+```yaml
+  ...
+  unbound:
+  ...
+    healthcheck:
+      test: /usr/local/unbound/sbin/healthcheck.sh
+      interval: 60s
+      retries: 3
+      start_period: 5s
+      timeout: 15s
+  ...
+```
+
+To enable the healthcheck for your [`CacheDB (Redis)`](#cachedb-redis) server, please define it in your compose file according to [this](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml) and download it's [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh) and put it in it's persistent volume, make it available in the compose file's volume definition and make the file executable. The You will need to restart the Redis container afterwards.
 
 The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. We got asked why we don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
 
-To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please set the [optional environment variables](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Optional-Environment-Variables) in your compose file or run command.
+To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please set the healtheck's [optional environment variables](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md#Optional-Environment-Variables) in your compose file or run command.
 
 > [!NOTE]
 > The _extended_ healthcheck is deactivated by default in favor of your privacy and security.
@@ -420,7 +436,7 @@ unbound[1:0] fatal error: could not open ports
 unbound[1:0] error: can't bind socket: Permission denied for 127.0.0.1 port 53 
 ```
 
-* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker compose down && docker compose up -d` will remove the PID and also the warnings in the log. As we're not shipping the image with an init system like `tini` or `dumb-init`, you might want to set `init: true` in your unbound service section or run command. See [Specify an init process](https://docs.docker.com/reference/cli/docker/container/run/#init) for further information.
+* If you see the warning `unbound[1:0] warning: unbound is already running as pid 1`, executing `docker compose down && docker compose up -d` will remove the PID and also the warnings in the log.
 
 * This is no issue and shows that Unbound is doing trust anchor signaling to the root name servers. See [this URL](https://tools.ietf.org/html/rfc8145) for more details.
 

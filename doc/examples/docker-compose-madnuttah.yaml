@@ -65,7 +65,6 @@ services:
     networks:
       docker:
         ipv4_address: x.x.x.x
-    init: true
     environment:
       TZ: "Europe/Berlin"
       UNBOUND_UID: 1000

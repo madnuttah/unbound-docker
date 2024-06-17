@@ -96,6 +96,7 @@ RUN set -xe; \
     apk --update --no-cache add \
     ca-certificates \
     tzdata \
+    tini \
     shadow \
     su-exec \
     drill \
@@ -152,7 +153,7 @@ COPY --from=buildenv /lib/*-musl-* \
 COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
   /app/bin/
   
-COPY --from=buildenv /sbin/su-exec \
+COPY --from=buildenv /sbin/su-exec /sbin/tini \
   /app/sbin/
   
 COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
@@ -220,4 +221,4 @@ LABEL org.opencontainers.image.title="madnuttah/unbound" \
 
 COPY --from=stage /app/ /
 
-ENTRYPOINT [ "/entrypoint" ]
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint" ]
