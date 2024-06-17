@@ -65,6 +65,7 @@ services:
       HEALTHCHECK_PORT: 5335 #optional
       EXTENDED_HEALTHCHECK: false #optional
       EXTENDED_HEALTHCHECK_DOMAIN: <Domain/host to query> #optional
+      ENABLE_STATS: false #optional
     volumes:
       - ./unbound.conf:/usr/local/unbound/unbound.conf:rw #Your local path to Unbound
       - ./conf.d/:/usr/local/unbound/conf.d/:rw
