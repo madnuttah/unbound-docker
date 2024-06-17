@@ -72,6 +72,7 @@ services:
       HEALTHCHECK_PORT: 5335
       EXTENDED_HEALTHCHECK: true
       EXTENDED_HEALTHCHECK_DOMAIN: "nlnetlabs.nl"
+      ENABLE_STATS: false #optional
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./unbound/usr/local/unbound/sbin/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
