@@ -40,9 +40,9 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | DNS over HTTPS                           | yes |
 | DNS over TLS                             | yes |
 | Redis via UNIX Socket or network         | yes |
+| EDNS Client Subnet                       | yes |
 | Optional privacy respecting & meaningful healthcheck | yes |
 | Optional Unbound statistics for Grafana via Zabbix without 3rd party tools | yes |
-| EDNS Client Subnet                       | yes |
 | Python                                   | no |
     
 </details>
@@ -52,7 +52,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 Docker containers are most easily used with docker compose. 
 
 > [!IMPORTANT] 
-> We encourage you to read the [`Details`](https://github.com/madnuttah/unbound-docker/blob/main/doc/DETAILS.md) page to learn how to get this up and running, some example `Docker-Compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).
+> We encourage you to read the [`Documentation`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md) page to learn how to get this up and running, some example Docker `Compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).
 >
 > If you prefer to use Podman and systemd to manage your containers, example `Quadlets` can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/podman-systemd).
 

@@ -69,6 +69,7 @@ RUN set -xe; \
     --enable-dnstap \
     --enable-dnscrypt \
     --enable-cachedb \
+    --enable-subnet \
     --with-pthreads \
     --without-pythonmodule \
     --without-pyunbound \
@@ -219,7 +220,7 @@ ARG UNBOUND_VERSION \
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
   UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_DOCKER_IMAGE_VERSION}" \
-  OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}"  \
+  OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
   

@@ -72,7 +72,7 @@ services:
       HEALTHCHECK_PORT: 5335
       EXTENDED_HEALTHCHECK: true
       EXTENDED_HEALTHCHECK_DOMAIN: "nlnetlabs.nl"
-      ENABLE_STATS: false #optional
+      ENABLE_STATS: true
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./unbound/usr/local/unbound/sbin/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
@@ -97,6 +97,7 @@ services:
   unbound-db-socket:
     image: busybox
     container_name: unbound-db-socket
+    init: true
     tty: true
     command:
       - /bin/sh
