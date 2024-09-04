@@ -97,7 +97,7 @@ Distroless production and canary multiarch-builds for Linux-based 386, arm/v6, a
 
 ## How to use this Image
 
-Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and our example [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker-compose files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard Home or any similar ad blocking solution.
+Please adapt the [`/usr/local/unbound/unbound.conf`](https://github.com/madnuttah/unbound-docker/blob/main/doc/examples/usr/local/unbound/unbound.conf) file and our example docker [`compose`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) files to your needs. The docker `compose` files also deploy [Pi-hole](https://pi-hole.net/) for blocking ads and to prevent tracking but isn't limited to Pi-hole. The image can also be used as an upstream for AdGuard Home or any similar ad blocking solution.
 
 **We don't like large, monolithic config files much.** 
 
@@ -110,6 +110,8 @@ Luckily Unbound can load configs through a `include:` clause. To provide a bette
 - [`/usr/local/unbound/log.d/unbound.log`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/log.d/unbound.log) in case you need to access it for troubleshooting and debugging purposes.
 
 - [`/usr/local/unbound/zones.d/`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/usr/local/unbound/zones.d/) for your zone configuration files like auth-zone.conf, stub-zone.conf, forward-zone.conf, etc.
+
+Also make sure to uncomment the line `include: "/usr/local/unbound/conf.d/*.conf"` of the [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf).
 
 > [!WARNING]    
 > The config files in the `conf.d` and `zones.d` folders must be named with the suffix .conf to prevent issues with specific host configurations. 
@@ -220,10 +222,10 @@ false                  set                    wait
 | `EXTENDED_HEALTHCHECK` | `false` | `BOOL` | Set this to `true` if you want to use the extended healthcheck |
 | `EXTENDED_HEALTHCHECK_DOMAIN` | `nlnetlabs.nl` | `string` | The domain/host to run the extended healthcheck against |
 | `ENABLE_STATS` | `false` | `BOOL` | Set this to `true` if you want to enable Unbound [`statistics`](https://github.com/madnuttah/unbound-docker-stats). Please follow the instructions there |
-| `DISABLE_SET_PERMS` | `false` | `BOOL` | Set this to `true` and define user `_unbound` for full rootless mode like as it was before v1.20.0-2. The `UNBOUND_UID` and `UNBOUND_GID` will both be overridden with `1000` in that case |
+| `DISABLE_SET_PERMS` | `false` | `BOOL` | Set this to `true` and define user `_unbound` for full rootless mode. The `UNBOUND_UID` and `UNBOUND_GID` will both be overridden with `1000` in that case |
 
 > [!CAUTION]   
-> Setting `DISABLE_SET_PERMS` to `true` ***without*** defining `user: _unbound` or `--user _unbound` will run the container under the root account. The init screen in the log will show you the user who is running Unbound.
+> Setting `DISABLE_SET_PERMS` to `true` ***without*** defining `user: _unbound` or `--user _unbound` will run the container under the root account (which, of course, might be desired). The init screen in the log will show you the user who is running Unbound.
 >
 > ***If you ain't sure what this variable does, you'll most likely don't need it.***
 
@@ -235,7 +237,7 @@ false                  set                    wait
 
 ### Usage
 
-The most elegant way to get started is using [docker-compose](https://docs.docker.com/compose/). We have provided combined Pi-hole/Unbound [`docker-compose.yaml`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which we're using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/)/shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment. 
+The most elegant way to get started is using [docker compose](https://docs.docker.com/compose/). We have provided combined Pi-hole/Unbound docker [`compose`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/) samples which we're using in slightly modified form that makes use of a [MACVLAN](https://docs.docker.com/network/macvlan/)/shim [Bridge](https://docs.docker.com/network/bridge/) network which must be adapted to your network environment. 
 
 > [!IMPORTANT]
 > All entries in angle brackets (<...>) need your very attention!
@@ -258,7 +260,7 @@ forward-zone:
 ...
 ```
 
-This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (tcp/udp) in your `unbound.conf` and `docker-compose.yaml` then. Additionally verify that connections to localhost are allowed (see [`healthcheck`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md#Healthcheck)). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
+This image can also be used as a standalone DNS resolver _without_ Pi-hole or AdGuard Home. The given ports must be changed to `53` (tcp/udp) in your `unbound.conf` and docker `compose` then. Additionally verify that connections to localhost are allowed (see [`healthcheck`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md#Healthcheck)). You need to enable a capability in your compose file as the `_unbound` user only has limited permissions, see [`issue 54`](https://github.com/madnuttah/unbound-docker/issues/54). You can find more information about runtime privileges and Linux capabilities [here](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities).
 
 ```yaml
 cap_add: 
@@ -280,11 +282,11 @@ docker run --name unbound -d \
 ### CacheDB (Redis)
 
 > [!TIP]
-> Even it takes a little more effort, we recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via tcp. The speed is superior in comparison to a tcp connection.
+> Even it takes a little more effort, we recommend accessing the CacheDB rather via [Unix Socket](https://www.howtogeek.com/devops/what-are-unix-sockets-and-how-do-they-work/) than via tcp. The speed is superior in comparison to a network connection.
 
 Due to the restricted environment of the image, it's not possible to just map and access the redis server's socket but need to use a "proxy" container which provides access to both containers, `unbound` as well as `unbound-db`, so there's an additional busybox container providing the socket in an own volume.
 
-Extend your **existing** `docker-compose.yaml` `server:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator`and after `validator`.
+Extend your **existing** docker `compose` file's `server:` section with the content of [`this snippet`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml). The loading order of the modules is also important, `cachedb` has to be loaded before `iterator` and after `validator`.
 
 ```
 server:
@@ -294,8 +296,6 @@ server:
 Create a new mountpoint like `../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
 
 Create a new entry for cachedb in your `unbound.conf` with the content of this [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
-
-If using structured directories uncomment the line `include: "/usr/local/unbound/conf.d/*.conf"` of this [`unbound.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/unbound/root/usr/local/unbound/unbound.conf).
 
 You can verify the connection to redis in the `unbound.log` or by typing `docker logs unbound` in the shell (for alternative methods like monitoring using the `redis-cli` consult the corresponding documentation): 
 
@@ -313,7 +313,7 @@ In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume wi
 
 <img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">
 
-The boot order set in your docker compose is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole or AdGuard Home, it will depend on Unbound.**
+The boot order set in your docker `compose` is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole or AdGuard Home, it will depend on Unbound.**
 
 For the sake of completeness, you can also flange Unbound to Redis by network. Just follow the given steps, except the part preparing and creating the unbound-db-socket container. Use proper name resolution by whether docker internal resolution, your DNS or use fixed IP addresses and change your `cachedb.conf` or your `unbound.conf` according to this:
 
@@ -330,7 +330,7 @@ cachedb:
 > [!IMPORTANT]
 > The general use of the healthcheck is optional but highly recommended.
 
-The healthcheck can be enabled and configured quite self-explanatory in your compose file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files or the snippet below to get you started; each compose file has got the healthcheck included, the most complete example is the one [`we use ourselves`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). 
+The healthcheck can be enabled and configured quite self-explanatory in your docker `compose` file. Check out the [`example`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples) compose files or the snippet below to get you started; each compose file has got the healthcheck included, the most complete example is the one [`we use ourselves`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/docker-compose-madnuttah.yaml). 
 
 ```yaml
   ...
@@ -345,11 +345,11 @@ The healthcheck can be enabled and configured quite self-explanatory in your com
   ...
 ```
 
-To enable the healthcheck for your [`CacheDB (Redis)`](#cachedb-redis) server, please define it in your compose file according to [this](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml) and download it's [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh) and put it in it's persistent volume, make it available in the compose file's volume definition and make the file executable. You will need to restart the Redis container afterwards.
+To enable the healthcheck for your [`CacheDB (Redis)`](#cachedb-redis) server, please define it in your docker `compose` file according to [this](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/docker-compose_snippet.yaml) and download it's [`healthcheck script`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/healthcheck.sh) and put it in it's persistent volume, make it available in the compose file's volume definition and make the file executable. You will need to restart the Redis container afterwards.
 
 The default healthcheck _only_ checks for opened Unbound ports using netstat and grep. We got asked why we don't include netcat (nc) into the image to _actually_ connect to opened ports, [this](https://www.sciencedirect.com/science/article/abs/pii/B9781597492577000054) is the reason.
 
-To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please set the healtheck's [optional environment variables](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md#Optional-Environment-Variables) in your compose file or run command.
+To enable the _extended_ healthcheck, which uses NLnet Labs' [LDNS](https://www.nlnetlabs.nl/documentation/ldns/index.html) drill tool to query domains or hosts, please set the healtheck's [optional environment variables](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md#Optional-Environment-Variables) in your docker `compose` file or run command.
 
 > [!NOTE]
 > The _extended_ healthcheck is deactivated by default in favor of your privacy and security.
@@ -393,9 +393,9 @@ Not in the console but rather in Portainer (and here on this page of course) the
 > [!WARNING]
 > Even we use it by ourselves to keep less important containers updated, we don't recommend using solutions like [Watchtower](https://github.com/containrrr/watchtower) to update critical services like your production DNS infrastructure automatically.
 >
-> A notification service like [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.
+> A notification service like the one in Watchtower or [DIUN](https://github.com/crazy-max/diun) can inform you when an update has been released so you can take appropriate action if needed.
 
-If you want to update to the `latest` version available on Docker Hub, just pull the image using `docker-compose pull` and recreate your container by executing `docker-compose up -d`.
+If you want to manually update to the `latest` version available on Docker Hub, just pull the image using `docker compose pull` and recreate your container by executing `docker compose up -d`.
 
 Pulling the latest image without a compose file can be done by `docker pull madnuttah/unbound:latest`.
 

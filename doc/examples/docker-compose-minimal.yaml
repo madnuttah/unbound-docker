@@ -2,8 +2,6 @@
 #
 # just start unbound for a quick check
 
-version: '3'
-
 services:
   unbound:
     container_name: unbound

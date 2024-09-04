@@ -157,7 +157,7 @@ RUN set -xe; \
 COPY ./unbound/root/usr/local/unbound/unbound.conf \
   /usr/local/unbound/unbound.conf 
 
-FROM scratch as stage   
+FROM scratch AS stage   
 
 COPY --from=buildenv /usr/local/unbound/ \
   /app/usr/local/unbound/
@@ -210,7 +210,7 @@ COPY --from=buildenv --chmod=0755 /entrypoint \
 
 WORKDIR /
 
-FROM scratch as unbound
+FROM scratch AS unbound
 
 ARG UNBOUND_VERSION \
   IMAGE_BUILD_DATE \
