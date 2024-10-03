@@ -4,7 +4,8 @@ on:
   workflow_run:
     workflows: [CD Check NLnet Labs Unbound Release]
     types:
-      - completed 
+      - completed
+  workflow_dispatch:
  
 jobs:
   buildvars:
