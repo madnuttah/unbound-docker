@@ -50,7 +50,7 @@ RUN set -xe; \
     --with-ssl=/usr/local/openssl \
     --with-libevent \
     --with-libnghttp2 \
-    --with-libngtcp2 \
+#    --with-libngtcp2 \
     --with-libhiredis \
     --with-username=_unbound \
     --disable-shared \
