@@ -49,7 +49,7 @@ RUN set -xe; \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
-  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${UNBOUND_PGP_WIJNGAARDS}" "${UNBOUND_PGP_WIJNGAARDS}" && \
+  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${UNBOUND_PGP_WIJNGAARDS}" "${UNBOUND_PGP_GEORGE}" && \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
   tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
