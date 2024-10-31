@@ -81,8 +81,7 @@ services:
       - ./unbound/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - ./unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
       - ./unbound/zones.d/:/usr/local/unbound/zones.d/:rw
-    volumes_from:
-      - unbound-db-socket:ro
+      - cachedb.d:/usr/local/unbound/cachedb.d/
     restart: always
     depends_on:
       unbound-db:
@@ -99,12 +98,7 @@ services:
     container_name: unbound-db-socket
     init: true
     tty: true
-    command:
-      - /bin/sh
-      - -c
-      - |
-        chown -R 999:1000 /usr/local/unbound/cachedb.d/
-        /bin/sh
+    command: /bin/sh -c "chown -R 999:1000 /usr/local/unbound/cachedb.d/"
     volumes:
        - cachedb.d:/usr/local/unbound/cachedb.d/
     networks:
@@ -124,8 +118,7 @@ services:
       - ./unbound-db/redis.conf:/usr/local/etc/redis/redis.conf
       - ./unbound-db/sysctl.conf:/etc/sysctl.conf
       - ./unbound-db/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
-    volumes_from:
-      - unbound-db-socket:rw
+      - cachedb.d:/usr/local/unbound/cachedb.d/
     healthcheck:
       test: /usr/local/sbin/healthcheck.sh
       interval: 10s

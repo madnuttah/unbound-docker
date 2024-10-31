@@ -1,11 +1,9 @@
-### Put this into your unbound docker-compose service definition:
-### volumes_from:
-###   - redis-socket:ro
-### and put the following at the end of your docker compose *services:* section ###
+### Put the following at the end of your docker compose *services:* section ###
 
   redis-socket:
     image: busybox
     container_name: redis-socket
+    init: true
     tty: true
     command:
       - /bin/sh
@@ -23,8 +21,7 @@
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
       - /.../unbound-db/healthcheck.sh:/usr/local/sbin/healthcheck.sh:ro
-    volumes_from:
-      - redis-socket:rw
+      - cachedb.d:/usr/local/unbound/cachedb.d/
     healthcheck:
       test: /usr/local/sbin/healthcheck.sh
       interval: 10s

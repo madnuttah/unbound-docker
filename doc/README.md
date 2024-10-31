@@ -293,7 +293,7 @@ server:
   module-config: "validator cachedb iterator"
 ```
 
-Create a new mountpoint like `../unbound-db/`, make it available via `fstab` and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
+Create a new mountpoint like `../unbound-db/`, and place this [`redis.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/redis.conf) there.
 
 Create a new entry for cachedb in your `unbound.conf` with the content of this [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
@@ -312,6 +312,21 @@ If you like to have a healtheck for this container which we'd recommend strongly
 In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file by clicking `browse`.
 
 <img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">
+
+
+Another way is to connect to the `unbound-db` container and monitor the `redis-cli`:
+
+Socket:
+
+```bash
+docker exec -ti unbound-db sh -c "redis-cli -s /usr/local/unbound/cachedb.d/redis.sock monitor"
+```
+
+Network:
+
+```bash
+docker exec -ti unbound-db sh -c "redis-cli monitor"
+```
 
 The boot order set in your docker `compose` is also important. **Redis depends on the 'socket server', Unbound depends on Redis. If you use Pi-hole or AdGuard Home, it will depend on Unbound.**
 
