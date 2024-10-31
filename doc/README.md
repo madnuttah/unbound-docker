@@ -297,7 +297,7 @@ Create a new mountpoint like `../unbound-db/`, and place this [`redis.conf`](htt
 
 Create a new entry for cachedb in your `unbound.conf` with the content of this [`cachedb.conf`](https://raw.githubusercontent.com/madnuttah/unbound-docker/main/doc/examples/redis/cachedb.conf) or put the file in your `conf.d` directory if you use the structured directories.
 
-You can verify the connection to redis in the `unbound.log` or by typing `docker logs unbound` in the shell (for alternative methods like monitoring using the `redis-cli` consult the corresponding documentation): 
+You can verify the connection to redis in the `unbound.log` or by typing `docker logs unbound` in the shell: 
 
 ```
 ...
@@ -311,8 +311,7 @@ If you like to have a healtheck for this container which we'd recommend strongly
 
 In [Portainer](https://portainer.io) you can also view the `cachedb.d` volume with a contained `redis.sock` file by clicking `browse`.
 
-<img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af">
-
+<img width="292" alt="image" src="https://github.com/madnuttah/unbound-docker/assets/96331755/7e0e0587-b940-42f7-a807-5e55697313af"><br>
 
 Another way is to connect to the `unbound-db` container and monitor the `redis-cli`:
 
