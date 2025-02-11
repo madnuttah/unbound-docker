@@ -37,7 +37,7 @@ jobs:
           echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
       
   build: 
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-22.04    
     needs: buildvars
     steps:
       - name: Checkout source

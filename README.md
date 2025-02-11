@@ -77,7 +77,7 @@ You can view the changes in the [`Releases`](https://github.com/madnuttah/unboun
 
 ## Feedback
 
-We are here to help! Don't hesitate to contact us through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have any questions, requests or problems with the image. 
+We are here to help! Don't hesitate to contact us through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have problems with the image. Feel free to ask a question or request a feature in the repository's [`Discussions`](https://github.com/madnuttah/unbound-docker/discussions) tab.
 
 You can also reach us on Fosstodon: 
 
