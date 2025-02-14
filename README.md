@@ -39,6 +39,7 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | DNS64                                    | yes |
 | DNS over HTTPS                           | yes |
 | DNS over TLS                             | yes |
+| DNS over Quic (canary)                   | yes |
 | Redis via UNIX Socket or network         | yes |
 | EDNS Client Subnet                       | yes |
 | Optional privacy respecting & meaningful healthcheck | yes |
