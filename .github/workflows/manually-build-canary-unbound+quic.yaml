@@ -22,9 +22,8 @@ jobs:
         id: IMPORT_BUILDVARS
         run: |
           echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT     
-
+          echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
       - name: Get OpenSSL buildenv version
         id: GET_OPENSSL_BUILDENV_VERSION
         run: | 
@@ -57,7 +56,8 @@ jobs:
         uses: docker/build-push-action@v6
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
-          UNBOUND_DOCKER_IMAGE_VERSION: "1.22.0-2"
+          UNBOUND_DOCKER_IMAGE_VERSION: "canary-quic"
+          OPENSSL_BUILDENV_VERSION: "3.1.7-0-quic"
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
@@ -67,10 +67,10 @@ jobs:
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE}}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
             UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=3.1.7-0-quic  
+            OPENSSL_BUILDENV_VERSION=${{ env.OPENSSL_BUILDENV_VERSION }}
           file: ./unbound/canary_quic.Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
+            ${{ env.DOCKERHUB_SLUG }}:canary-quic

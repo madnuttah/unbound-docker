@@ -69,6 +69,10 @@ There are canary builds of the image available. You can pull the image using it'
 
 `docker pull madnuttah/unbound:canary`
 
+If you would like to check out [`DNS over Quic`](https://unbound.docs.nlnetlabs.nl/en/latest/topics/privacy/dns-over-quic.html), there's a modified canary build:
+
+`docker pull madnuttah/unbound:canary-quic`
+
 > [!NOTE] 
 > Canary builds may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by us.
  
