@@ -67,11 +67,10 @@ jobs:
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE}}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
             UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}  
+            OPENSSL_BUILDENV_VERSION=3.1.7-0-quic  
           file: ./unbound/canary_quic.Dockerfile   
           push: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}      
-            ${{ env.DOCKERHUB_SLUG }}:latest 
+            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
