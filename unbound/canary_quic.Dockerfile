@@ -3,7 +3,7 @@ ARG IMAGE_BUILD_DATE \
   UNBOUND_UID="1000" \
   UNBOUND_GID="1000" 
 
-FROM madnuttah/openssl:3.1.7-0-quic AS buildenv
+FROM madnuttah/openssl-buildenv:3.1.7-0-quic AS buildenv
 
 ARG UNBOUND_UID \
   UNBOUND_GID
