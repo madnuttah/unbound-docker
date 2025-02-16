@@ -57,7 +57,7 @@ jobs:
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
           UNBOUND_DOCKER_IMAGE_VERSION: "canary-quic"
-          OPENSSL_BUILDENV_VERSION: "3.1.7-0-quic"
+          OPENSSL_BUILDENV_VERSION: "3.1.7-1-quic"
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
@@ -73,4 +73,4 @@ jobs:
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:canary-quic
+            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}

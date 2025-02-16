@@ -1,9 +1,10 @@
 ARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   UNBOUND_UID="1000" \
-  UNBOUND_GID="1000" 
+  UNBOUND_GID="1000" \
+  OPENSSL_BUILDENV_VERSION="3.1.7-1-quic"
 
-FROM madnuttah/openssl-buildenv:3.1.7-0-quic AS buildenv
+FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}" AS buildenv
 
 ARG UNBOUND_UID \
   UNBOUND_GID
@@ -39,6 +40,7 @@ RUN set -xe; \
   git clone "https://github.com/NLnetLabs/unbound" && \
   cd unbound && \
   ./configure \
+    LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib"
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
     --with-conf-file=/usr/local/unbound/unbound.conf \
