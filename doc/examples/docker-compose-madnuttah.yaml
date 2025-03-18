@@ -27,22 +27,11 @@ services:
       - 53:53/tcp
       - 53:53/udp
     environment:
-      FTLCONF_LOCAL_IPV4: x.x.x.x
-      VIRTUAL_HOST: pihole.domain.private 
-      WEBPASSWORD: x 
-      WEBUIBOXEDLAYOUT: boxed
-      TZ: "Europe/Amsterdam"
-      CORS_HOSTS: domain.private
-      PIHOLE_DNS_1: x.x.x.x#5335
-      IPv6: "false"    
-      DNS_BOGUS_PRIV: "true"
-      DNS_FQDN_REQUIRED: "true"
-      REV_SERVER: "true"
-      REV_SERVER_TARGET: x.x.x.x
-      REV_SERVER_DOMAIN: domain.private
-      REV_SERVER_CIDR: x.x.x.x/x
-      DNSMASQ_LISTENING: all
-      SKIPGRAVITYONBOOT: 1
+      TZ: "Europe/Berlin"
+      FTLCONF_webserver_api_password: '<YOURPASSWORD>' #Set your password
+      FTLCONF_dns_upstreams: 'x.x.x.x#5335;' #Your unbound ipv4 address
+      FTLCONF_dns_revServers: 'true,x.x.x.x/x,x.x.x.x#53,yourdomain.private' #Conditional forwarding, comma separated
+      FTLCONF_webserver_port: '443s' #SSL on port 443      
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/:rw
