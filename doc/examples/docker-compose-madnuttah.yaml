@@ -30,7 +30,7 @@ services:
       TZ: "Europe/Berlin"
       FTLCONF_webserver_api_password: '<YOURPASSWORD>' #Set your password
       FTLCONF_dns_upstreams: 'x.x.x.x#5335;' #Your unbound ipv4 address
-      FTLCONF_dns_revServers: 'true,x.x.x.x/x,x.x.x.x#53,yourdomain.private' #Conditional forwarding, comma separated
+      FTLCONF_dns_revServers: 'true,x.x.x.x/x,x.x.x.x#53,domain.private' #Conditional forwarding, comma separated
       FTLCONF_webserver_port: '443s' #SSL on port 443      
     volumes:
       - /etc/localtime:/etc/localtime:ro
