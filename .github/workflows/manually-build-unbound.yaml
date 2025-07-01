@@ -57,7 +57,7 @@ jobs:
         uses: docker/build-push-action@v6
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
-          UNBOUND_DOCKER_IMAGE_VERSION: "1.22.0-2"
+          UNBOUND_DOCKER_IMAGE_VERSION: "1.23.0-1"
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
