@@ -20,7 +20,7 @@
     <img width=100 src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" alt="Github Logo">
 </p>
 
-[![Maintenance](https://img.shields.io/maintenance/yes/2025?style=flat-square)](https://github.com/madnuttah/unbound-docker/)
+[![Maintenance](https://img.shields.io/maintenance/yes/2026?style=flat-square)](https://github.com/madnuttah/unbound-docker/)
 [![Commit Activity](https://img.shields.io/github/commit-activity/y/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
 [![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker?style=flat-square "Forks")](https://github.com/madnuttah/unbound-docker/network/members)
 [![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker?style=flat-square "Stars")](https://github.com/madnuttah/unbound-docker/stargazers)
@@ -467,3 +467,4 @@ In-depth documentation for NLnet Labs Unbound is available on the [Unbound docum
 # Contributing
 
 You have found a bug, got something to make better, have an idea for a shiny new feature or just a question? That's amazing! Feel free to submit an issue or a pull request, we ❤️ contributions by the open source community.
+
