@@ -25,7 +25,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.35.0
         if: ${{ github.event_name != 'pull_request' }}
         with:
           image-ref: ${{ env.DOCKERHUB_SLUG }}:latest          
