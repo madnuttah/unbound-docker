@@ -1,11 +1,13 @@
 name: CD Build Distroless Unbound Docker Image
-   
-on:   
+
+on:
   workflow_run:
     workflows: [CD Check NLnet Labs Unbound Release]
     types:
       - completed
- 
+
+permissions: {}
+
 jobs:
   buildvars:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -16,10 +18,10 @@ jobs:
       UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
       OPENSSL_BUILDENV_VERSION: ${{ steps.GET_OPENSSL_BUILDENV_VERSION.outputs.OPENSSL_BUILDENV_VERSION }}
-      
-    steps:             
+
+    steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -30,37 +32,37 @@ jobs:
           cat buildvars | grep IMAGE_BUILD_DATE >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
-          
+
       - name: Get OpenSSL buildenv version
         id: GET_OPENSSL_BUILDENV_VERSION
-        run: | 
+        run: |
           echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
-      
-  build: 
-    runs-on: ubuntu-22.04    
+
+  build:
+    runs-on: ubuntu-22.04
     needs: buildvars
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-      
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
+
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v4
-     
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
       - name: Login to Dockerhub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v4
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-              
+
       - name: Build and push
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
         with:
@@ -72,7 +74,7 @@ jobs:
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
             UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
             OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
-          file: ./unbound/release.Dockerfile   
+          file: ./unbound/release.Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}

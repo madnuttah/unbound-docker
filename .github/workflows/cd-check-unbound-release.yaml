@@ -1,13 +1,15 @@
-name: CD Check NLnet Labs Unbound Release   
-             
+name: CD Check NLnet Labs Unbound Release
+
 on:
   schedule:
-    - cron: '0 17 * * mon-fri'
-       
+    - cron: "0 17 * * mon-fri"
+
+permissions: {}
+
 jobs:
   unbound-update:
     runs-on: ubuntu-latest
-              
+
     steps:
       - name: Get versions
         id: GET_VERSIONS
@@ -25,23 +27,26 @@ jobs:
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
         run: |
-          if [[ "${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}" = "${{ steps.GET_VERSIONS.outputs.UNBOUND_DOCKER_VERSION }}" ]]; then
+          if [[ "${STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_VERSION}" = "${STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_DOCKER_VERSION}" ]]; then
             echo "No update found"
             exit 1
           else
             echo "Update found"
-            echo UNBOUND_SHA256="$(curl -s https://nlnetlabs.nl/downloads/unbound/unbound-"${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}".tar.gz.sha256)" >> $GITHUB_OUTPUT
+            echo UNBOUND_SHA256="$(curl -s https://nlnetlabs.nl/downloads/unbound/unbound-"${STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_VERSION}".tar.gz.sha256)" >> $GITHUB_OUTPUT
             echo UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git | head -1 | cut -f 1)" >> $GITHUB_OUTPUT
-          fi 
+          fi
+        env:
+          STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_VERSION: ${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}
+          STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_DOCKER_VERSION: ${{ steps.GET_VERSIONS.outputs.UNBOUND_DOCKER_VERSION }}
 
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-          
-      - name: Import GPG key 
+
+      - name: Import GPG key
         id: IMPORT_GPG
-        uses: crazy-max/ghaction-import-gpg@v7
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
         with:
           gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
@@ -57,15 +62,18 @@ jobs:
           GIT_AUTHOR_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
           GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
+          STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_VERSION: ${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }}
+          STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_SHA256: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_SHA256 }}
+          STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_GIT_SHA: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }}
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}  
-          UNBOUND_VERSION=${{ steps.GET_VERSIONS.outputs.UNBOUND_VERSION }} 
-          UNBOUND_SHA256=${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_SHA256 }} 
+          UNBOUND_VERSION=${STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_VERSION} 
+          UNBOUND_SHA256=${STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_SHA256} 
           echo IMAGE_BUILD_DATE="$(date -u)" > buildvars
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
-          echo ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }} > unbound_git_sha
+          echo ${STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_GIT_SHA} > unbound_git_sha
           git add buildvars unbound_git_sha
           git commit buildvars unbound_git_sha -m "Updated buildvars and unbound_git_sha"
           git push origin main
