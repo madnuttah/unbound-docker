@@ -46,7 +46,7 @@ RUN set -xe; \
     hiredis-dev \
     apk-tools && \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}" -o unbound.tar.gz && \
-  curl -sSL "${UNBOUND_DOWNLOAD_URL}".asc -o unbound.tar.gz.asc && \
+  curl -sSL "${UNBOUND_DOWNLOAD_URL}.asc" -o unbound.tar.gz.asc && \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
