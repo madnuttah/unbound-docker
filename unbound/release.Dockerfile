@@ -50,8 +50,8 @@ RUN set -xe; \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
-  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${UNBOUND_PGP_RELEASES}" "${UNBOUND_PGP_WIJNGAARDS}" "${UNBOUND_PGP_GEORGE}" && \
-  gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
+  curl -sSL https://nlnetlabs.nl/downloads/keys/releases-g2.asc -o "${GNUPGHOME}/releases-g2.asc" && \
+  gpg --import "${GNUPGHOME}/releases-g2.asc" && \
   tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
   cd "unbound-${UNBOUND_VERSION}" && \
