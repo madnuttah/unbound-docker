@@ -15,6 +15,7 @@ ARG UNBOUND_VERSION \
 
 ENV UNBOUND_VERSION="${UNBOUND_VERSION}" \
   UNBOUND_DOWNLOAD_URL="https://www.nlnetlabs.nl/downloads/unbound/unbound-"${UNBOUND_VERSION}".tar.gz" \
+  UNBOUND_PGP_RELEASES="231018690C4D903EF419146AA144323DEAACDF45" \
   UNBOUND_PGP_WIJNGAARDS="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D" \
   UNBOUND_PGP_GEORGE="948EB42322C5D00B79340F5DCFF3344D9087A490" \
   UNBOUND_SHA256="${UNBOUND_SHA256}" \
@@ -49,7 +50,7 @@ RUN set -xe; \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
-  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${UNBOUND_PGP_WIJNGAARDS}" "${UNBOUND_PGP_GEORGE}" && \
+  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "${UNBOUND_PGP_RELEASES}" "${UNBOUND_PGP_WIJNGAARDS}" "${UNBOUND_PGP_GEORGE}" && \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
   tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
