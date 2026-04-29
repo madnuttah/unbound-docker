@@ -1,4 +1,4 @@
-ARG IMAGE_BUILD_DATE \
+oARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   UNBOUND_SHA256 \
   UNBOUND_DOCKER_IMAGE_VERSION \ 
@@ -52,6 +52,7 @@ RUN set -xe; \
   export GNUPGHOME && \
   curl -sSL https://nlnetlabs.nl/downloads/keys/releases-g2.asc -o "${GNUPGHOME}/releases-g2.asc" && \
   gpg --import "${GNUPGHOME}/releases-g2.asc" && \
+  gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
   tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
   cd "unbound-${UNBOUND_VERSION}" && \
