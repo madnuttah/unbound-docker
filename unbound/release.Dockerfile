@@ -54,7 +54,7 @@ RUN set -xe; \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
   tar -xzf unbound.tar.gz && \
   rm unbound.tar.gz && \
-  cd unbound-"${UNBOUND_VERSION}" && \
+  cd "unbound-${UNBOUND_VERSION}" && \
   ./configure \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
