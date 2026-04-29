@@ -128,7 +128,7 @@ RUN set -xe; \
     "/usr/local/unbound/conf.d/" \
     "/usr/local/unbound/certs.d/" \
     "/usr/local/unbound/zones.d/" \
-    "/usr/local/unbound/log.d/" 
+    "/usr/local/unbound/log.d/" \
     "/usr/local/unbound/unbound.d/" && \
   touch /usr/local/unbound/log.d/unbound.log && \  
   chown -R _unbound:_unbound \
