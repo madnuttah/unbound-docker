@@ -33,7 +33,7 @@ jobs:
           echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
 
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: buildvars
     steps:
       - name: Checkout source
@@ -59,7 +59,7 @@ jobs:
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
-          UNBOUND_DOCKER_IMAGE_VERSION: "1.24.2-2"
+          UNBOUND_DOCKER_IMAGE_VERSION: "1.25.0-0"
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
