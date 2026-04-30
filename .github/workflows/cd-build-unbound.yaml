@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
@@ -43,35 +43,35 @@ jobs:
     needs: buildvars
     steps:
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
 
       - name: Login to Dockerhub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
         with:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
-            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}  
-            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}  
-            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}  
+            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
+            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
             OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
           file: ./unbound/release.Dockerfile
@@ -79,7 +79,7 @@ jobs:
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}   
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
             ${{ env.DOCKERHUB_SLUG }}:latest
 
   tag:
@@ -89,13 +89,16 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Create tag
+        env:
+          VERSION: ${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
         run: |
-          VERSION="${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git tag "v$VERSION"
           git push origin "v$VERSION"
