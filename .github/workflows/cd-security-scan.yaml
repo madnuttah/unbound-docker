@@ -4,7 +4,9 @@ on:
   schedule:
     - cron: "0 */24 * * *"
 
-permissions: {}
+permissions:
+  contents: read
+  security-events: read
 
 jobs:
   scan:
