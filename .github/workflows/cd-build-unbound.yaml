@@ -10,7 +10,11 @@ permissions: {}
 
 jobs:
   buildvars:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: >
+      ${{
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.repository.full_name == 'madnuttah/unbound-docker'
+      }}
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.IMPORT_BUILDVARS.outputs.IMAGE_BUILD_DATE }}
