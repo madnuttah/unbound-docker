@@ -29,6 +29,7 @@ RUN set -xe; \
     libsodium-dev \
     linux-headers \
     nghttp2-dev \
+    ngtcp2-dev \
     libevent-dev \
     expat-dev \
     protobuf-c-dev \
