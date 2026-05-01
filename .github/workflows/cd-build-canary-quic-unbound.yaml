@@ -1,14 +1,17 @@
 name: CD Build Canary-QUIC Distroless Unbound Docker Image
 
 on:
-  schedule:
-    - cron: "0 21 * * mon-fri"
+  workflow_run:
+    workflows: ["CD Build Canary Distroless Unbound Docker Image"]
+    types:
+      - completed
 
 permissions: {}
 
 jobs:
 
   check_update:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       UPDATE_FOUND: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UPDATE_FOUND }}
