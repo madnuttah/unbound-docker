@@ -70,6 +70,7 @@ jobs:
       UNBOUND_VERSION: ${{ steps.SET_BUILDVARS.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.SET_BUILDVARS.outputs.UNBOUND_SHA256 }}
       OPENSSL_QUIC_BUILDENV_VERSION: ${{ steps.SET_BUILDVARS.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+      NGTCP2_VERSION: ${{ steps.SET_BUILDVARS.outputs.NGTCP2_VERSION }}
 
     steps:
       - name: Checkout source
@@ -83,12 +84,14 @@ jobs:
           echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
           echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
+
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
           OPENSSL_TAG=$(echo "$RELEASES" | grep -i quic | head -n 1)
-          if [ -z "$OPENSSL_TAG" ]; then
-            exit 1
-          fi
           echo OPENSSL_QUIC_BUILDENV_VERSION="$OPENSSL_TAG" >> $GITHUB_OUTPUT
+
+          NGTCP2_TAG=$(curl -s https://api.github.com/repos/ngtcp2/ngtcp2/releases/latest | jq -r .tag_name)
+          NGTCP2_VERSION=${NGTCP2_TAG#v}
+          echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
 
 
   build:
@@ -130,6 +133,7 @@ jobs:
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
             OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+            NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
           file: ./unbound/canary_quic.Dockerfile
           push: true
           sbom: true
