@@ -66,11 +66,12 @@ jobs:
     if: needs.check_update.outputs.UPDATE_FOUND == 'true'
     runs-on: ubuntu-latest
     outputs:
-      IMAGE_BUILD_DATE: ${{ steps.SET_BUILDVARS.outputs.IMAGE_BUILD_DATE }}
-      UNBOUND_VERSION: ${{ steps.SET_BUILDVARS.outputs.UNBOUND_VERSION }}
-      UNBOUND_SHA256: ${{ steps.SET_BUILDVARS.outputs.UNBOUND_SHA256 }}
-      OPENSSL_QUIC_BUILDENV_VERSION: ${{ steps.SET_BUILDVARS.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
-      NGTCP2_VERSION: ${{ steps.SET_BUILDVARS.outputs.NGTCP2_VERSION }}
+      IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
+      UNBOUND_VERSION: ${{ steps.vars.outputs.UNBOUND_VERSION }}
+      UNBOUND_SHA256: ${{ steps.vars.outputs.UNBOUND_SHA256 }}
+      OPENSSL_QUIC_UPSTREAM: ${{ steps.vars.outputs.OPENSSL_QUIC_UPSTREAM }}
+      OPENSSL_QUIC_IMAGE_TAG: ${{ steps.vars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
+      NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
 
     steps:
       - name: Checkout source
@@ -79,19 +80,21 @@ jobs:
           persist-credentials: false
 
       - name: Set buildvars
-        id: SET_BUILDVARS
+        id: vars
         run: |
           echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
           echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
 
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
-          OPENSSL_TAG=$(echo "$RELEASES" | grep -i quic | head -n 1)
-          echo OPENSSL_QUIC_BUILDENV_VERSION="$OPENSSL_TAG" >> $GITHUB_OUTPUT
+          UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
+          CLEAN=${UPSTREAM#openssl-}
+
+          echo OPENSSL_QUIC_UPSTREAM="$UPSTREAM" >> $GITHUB_OUTPUT
+          echo OPENSSL_QUIC_IMAGE_TAG="$CLEAN" >> $GITHUB_OUTPUT
 
           NGTCP2_TAG=$(curl -s https://api.github.com/repos/ngtcp2/ngtcp2/releases/latest | jq -r .tag_name)
-          NGTCP2_VERSION=${NGTCP2_TAG#v}
-          echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
+          echo NGTCP2_VERSION="${NGTCP2_TAG#v}" >> $GITHUB_OUTPUT
 
 
   build:
@@ -132,11 +135,11 @@ jobs:
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_UPSTREAM }}
             NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
           file: ./unbound/canary_quic.Dockerfile
           push: true
           sbom: true
           provenance: true
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
