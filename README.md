@@ -97,6 +97,7 @@ You can also reach us on Fosstodon:
 - [Redis](https://redis.io/)
 - [Pi-hole](https://pi-hole.net/)
 - [Aqua Security](https://trivy.dev/)
+- [zizmor](https://github.com/zizmorcore/zizmor)
 - The many Docker Images which got us inspired
 
 ## Licenses
