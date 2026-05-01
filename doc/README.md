@@ -89,7 +89,7 @@ When NLnet Labs publishes a new stable Unbound release, the image will be built,
 > [!NOTE]
 > We're not manually building release candidates of Unbound anymore, instead there are automated canary and canary quic builds which will be created from the most recent NLnet Labs Unbound GitHub commit at 20:00 UTC, respectively 22:00 UTC from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound.
 
-The `latest` image is scanned for vulnerabilities using the [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned at buildtime. You need to be logged into GitHub to view the logs.
+The `latest` image is scanned for vulnerabilities using the [zizmor](https://github.com/zizmorcore/zizmor), [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned at buildtime. You need to be logged into GitHub to view the logs.
 
 ## Installation
 
