@@ -2,7 +2,7 @@ name: CD Build Canary-QUIC Distroless Unbound Docker Image
 
 on:
   workflow_run:
-    workflows: ["CD Build Canary Distroless Unbound Docker Image"]
+    workflows: ["CD Build Canary Unbound Docker Image"]
     types:
       - completed
 
@@ -10,63 +10,7 @@ permissions: {}
 
 jobs:
 
-  check_update:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    outputs:
-      UPDATE_FOUND: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UPDATE_FOUND }}
-      UNBOUND_GIT_SHA: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }}
-
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-
-      - name: Is update available
-        id: IS_UPDATE_AVAILABLE
-        run: |
-          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git | head -1 | cut -f 1)"
-          CURRENT_SHA="$(cat unbound_git_sha)"
-          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" ]]; then
-            echo "UPDATE_FOUND=false" >> $GITHUB_OUTPUT
-            exit 0
-          else
-            echo "UPDATE_FOUND=true" >> $GITHUB_OUTPUT
-            echo "UNBOUND_GIT_SHA=$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Import GPG key
-        if: steps.IS_UPDATE_AVAILABLE.outputs.UPDATE_FOUND == 'true'
-        id: IMPORT_GPG
-        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd
-        with:
-          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_push_gpgsign: false
-          trust_level: 5
-
-      - name: Push updated unbound_git_sha
-        if: steps.IS_UPDATE_AVAILABLE.outputs.UPDATE_FOUND == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
-          GIT_AUTHOR_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
-          GIT_AUTHOR_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
-          GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
-          GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          echo "${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }}" > unbound_git_sha
-          git add unbound_git_sha
-          git commit -m "Updated unbound_git_sha"
-          git push origin main
-
-
   buildvars:
-    needs: check_update
-    if: needs.check_update.outputs.UPDATE_FOUND == 'true'
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
@@ -75,6 +19,9 @@ jobs:
       OPENSSL_QUIC_UPSTREAM: ${{ steps.vars.outputs.OPENSSL_QUIC_UPSTREAM }}
       OPENSSL_QUIC_IMAGE_TAG: ${{ steps.vars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
       NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
+      OPENSSL_BUILDENV_VERSION: ${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}
+      OPENSSL_VERSION: ${{ steps.vars.outputs.OPENSSL_VERSION }}
+      OPENSSL_SHA256: ${{ steps.vars.outputs.OPENSSL_SHA256 }}
 
     steps:
       - name: Checkout source
@@ -88,17 +35,28 @@ jobs:
           echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
           echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
-
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
           UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
           CLEAN=${UPSTREAM#openssl-}
-
           echo OPENSSL_QUIC_UPSTREAM="$UPSTREAM" >> $GITHUB_OUTPUT
           echo OPENSSL_QUIC_IMAGE_TAG="$CLEAN" >> $GITHUB_OUTPUT
-
-          NGTCP2_TAG=$(curl -s https://api.github.com/repos/ngtcp2/ngtcp2/releases/latest | jq -r .tag_name)
-          echo NGTCP2_VERSION="${NGTCP2_TAG#v}" >> $GITHUB_OUTPUT
-
+          echo OPENSSL_BUILDENV_VERSION="$UPSTREAM" >> $GITHUB_OUTPUT
+          echo OPENSSL_VERSION="$CLEAN" >> $GITHUB_OUTPUT
+          OPENSSL_SHA256_URL=$(curl -s "https://api.github.com/repos/madnuttah/openssl-buildenv/releases/tags/$UPSTREAM" | jq -r '.assets[]?.browser_download_url | select(test("sha256|sha256sum|.sha256"))' | head -n1)
+          if [ -n "$OPENSSL_SHA256_URL" ]; then
+            OPENSSL_SHA256=$(curl -sL "$OPENSSL_SHA256_URL" | tr -d '[:space:]' | head -n1)
+          else
+            OPENSSL_SHA256=""
+          fi
+          echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
+          DOCKERFILE_URL="https://raw.githubusercontent.com/madnuttah/openssl-buildenv/${UPSTREAM}/Dockerfile"
+          NGTCP2_VERSION_FROM_DOCKERFILE=$(curl -fsSL "$DOCKERFILE_URL" 2>/dev/null | grep -Eo 'NGTCP2_VERSION="?[^" ]+' | head -n1 | sed -E 's/.*=//; s/"//g')
+          if [ -n "$NGTCP2_VERSION_FROM_DOCKERFILE" ]; then
+            echo NGTCP2_VERSION="$NGTCP2_VERSION_FROM_DOCKERFILE" >> $GITHUB_OUTPUT
+          else
+            NGTCP2_TAG=$(curl -s https://api.github.com/repos/ngtcp2/ngtcp2/releases/latest | jq -r .tag_name)
+            echo NGTCP2_VERSION="${NGTCP2_TAG#v}" >> $GITHUB_OUTPUT
+          fi
 
   build:
     needs: buildvars
@@ -133,6 +91,10 @@ jobs:
           platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
+            BUILDENV_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
+            OPENSSL_VERSION=${{ needs.buildvars.outputs.OPENSSL_VERSION }}
+            OPENSSL_SHA256=${{ needs.buildvars.outputs.OPENSSL_SHA256 }}
             DOCKERHUB_SLUG=${{ env.DOCKERHUB_SLUG }}
             UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
@@ -145,12 +107,14 @@ jobs:
           sbom: true
           provenance: true
           tags: |
+            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
             ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
+
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:canary
+          image-ref: ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
           exit-code: "1"
           ignore-unfixed: false
           scan-type: image
@@ -159,11 +123,11 @@ jobs:
           format: "table"
 
       - name: Docker Scout CVEs
-        uses: docker/scout-action@bacf462e8d090c09660de30a6ccc718035f961e3 # v1.20.4
+        uses: docker/scout-action@bacf462e8d090c09660de30a6ccc718035f961e3
         if: ${{ github.event_name != 'pull_request' }}
         with:
           command: cves
-          image: ${{ env.DOCKERHUB_SLUG }}:canary
+          image: ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
           only-fixed: true
           only-severities: critical,high
           write-comment: true
