@@ -68,8 +68,8 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}  
           UNBOUND_VERSION=${STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_VERSION} 
-          UNBOUND_SHA256=${STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_SHA256} 
-          echo IMAGE_BUILD_DATE="$(date -u)" > buildvars
+          UNBOUND_SHA256=${STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_SHA256}
+          echo IMAGE_BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" > buildvars
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
