@@ -62,9 +62,6 @@ jobs:
     needs: buildvars
     runs-on: ubuntu-22.04
 
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
       UNBOUND_DOCKER_IMAGE_VERSION: "canary-quic"
