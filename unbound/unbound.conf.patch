@@ -1,0 +1,10 @@
+--- example.conf
++++ example.conf
+@@ -1,6 +1,6 @@
+ server:
+-    username: "unbound"
+-    chroot: "/var/lib/unbound"
+-    directory: "/etc/unbound"
++    username: ""
++    chroot: ""
++    directory: "/usr/local/unbound"
