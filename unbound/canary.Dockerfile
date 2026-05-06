@@ -19,13 +19,13 @@ RUN set -xe; \
   addgroup -S -g "${UNBOUND_GID}" _unbound && \
   adduser -S -H -h /usr/local/unbound -g _unbound -u "${UNBOUND_UID}" -D -G _unbound _unbound && \
   apk --update --no-cache add \
-  ca-certificates \
-  gnupg \
-  curl \
-  file \ 
-  binutils && \
+    ca-certificates \
+    gnupg \
+    curl \
+    file \
+    binutils && \
   apk --update --no-cache add --virtual .build-deps \
-    build-base\
+    build-base \
     libsodium-dev \
     linux-headers \
     nghttp2-dev \
@@ -50,7 +50,6 @@ RUN set -xe; \
     --with-ssl=/usr/local/openssl \
     --with-libevent \
     --with-libnghttp2 \
-#    --with-libngtcp2 \
     --with-libhiredis \
     --with-username=_unbound \
     --disable-shared \
@@ -69,32 +68,41 @@ RUN set -xe; \
   make && \
   make install && \
   apk del --no-cache .build-deps && \
-  mkdir -p \
-    "/usr/local/unbound/iana.d/" && \
+  mkdir -p "/usr/local/unbound/iana.d/" && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
   curl -sSL https://www.internic.net/domain/named.cache.md5 -o /usr/local/unbound/iana.d/root.hints.md5 && \
   curl -sSL https://www.internic.net/domain/named.cache.sig -o /usr/local/unbound/iana.d/root.hints.sig && \
-  ROOT_HINTS_MD5=`cat /usr/local/unbound/iana.d/root.hints.md5` && \
+  ROOT_HINTS_MD5=$(cat /usr/local/unbound/iana.d/root.hints.md5) && \
   echo "${ROOT_HINTS_MD5} */usr/local/unbound/iana.d/root.hints" | md5sum -c - && \
   curl -sSL https://www.internic.net/domain/root.zone -o /usr/local/unbound/iana.d/root.zone && \
   curl -sSL https://www.internic.net/domain/root.zone.md5 -o /usr/local/unbound/iana.d/root.zone.md5 && \
   curl -sSL https://www.internic.net/domain/root.zone.sig -o /usr/local/unbound/iana.d/root.zone.sig && \
-  ROOT_ZONE_MD5=`cat /usr/local/unbound/iana.d/root.zone.md5` && \
-  echo "${ROOT_ZONE_MD5} */usr/local/unbound/iana.d/root.zone" | md5sum -c - && \   
+  ROOT_ZONE_MD5=$(cat /usr/local/unbound/iana.d/root.zone.md5) && \
+  echo "${ROOT_ZONE_MD5} */usr/local/unbound/iana.d/root.zone" | md5sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
   gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$INTERNIC_PGP" && \
   gpg --verify /usr/local/unbound/iana.d/root.hints.sig /usr/local/unbound/iana.d/root.hints && \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
-    /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true
-  
+  /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true
+
+FROM buildenv AS config-builder
+
+RUN UNBOUND_SRC=$(find /tmp/src -maxdepth 1 -type d -name "unbound") && \
+    cp "$UNBOUND_SRC/doc/example.conf" /tmp/unbound.conf
+
+COPY unbound.conf.patch /patch/
+RUN patch /tmp/unbound.conf /patch/unbound.conf.patch
+
+FROM buildenv AS buildenv-final
+
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
-    
+
 COPY ./unbound/root/entrypoint /
-   
+
 RUN set -xe; \
-    apk --update --no-cache add \
+  apk --update --no-cache add \
     ca-certificates \
     tzdata \
     tini \
@@ -108,23 +116,20 @@ RUN set -xe; \
     protobuf-c \
     hiredis \
     expat && \
-  mkdir -p \   
+  mkdir -p \
     "/usr/local/unbound/conf.d/" \
     "/usr/local/unbound/certs.d/" \
     "/usr/local/unbound/zones.d/" \
     "/usr/local/unbound/log.d/" && \
-  touch /usr/local/unbound/log.d/unbound.log && \  
-  chown -R _unbound:_unbound \
-    /usr/local/unbound/ && \
-  ln -s /dev/random /dev/urandom /dev/null \
-    /usr/local/unbound/unbound.d/ && \
+  touch /usr/local/unbound/log.d/unbound.log && \
+  chown -R _unbound:_unbound /usr/local/unbound/ && \
+  ln -s /dev/random /dev/urandom /dev/null /usr/local/unbound/unbound.d/ && \
   chown -Rh _unbound:_unbound \
     /usr/local/unbound/unbound.d/random \
     /usr/local/unbound/unbound.d/null \
     /usr/local/unbound/unbound.d/urandom && \
-  chmod -R 770 \
-    /usr/local/unbound/sbin/*.sh && \
-  rm -rf \  
+  chmod -R 770 /usr/local/unbound/sbin/*.sh && \
+  rm -rf \
     /usr/local/unbound/unbound.conf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
@@ -132,45 +137,45 @@ RUN set -xe; \
     /usr/local/unbound/iana.d/root.zone.* \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
-    find /usr/local/openssl/lib/libssl.so.* -type f | xargs strip --strip-all && \
-    find /usr/local/openssl/lib/libcrypto.so.* -type f | xargs strip --strip-all && \  
-    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
-    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
-    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
-    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
-    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
-    
-COPY ./unbound/root/usr/local/unbound/unbound.conf \
-  /usr/local/unbound/unbound.conf 
+  find /usr/local/openssl/lib/libssl.so.* -type f | xargs strip --strip-all && \
+  find /usr/local/openssl/lib/libcrypto.so.* -type f | xargs strip --strip-all && \
+  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
+  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
+  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf && \
+  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
+  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
 
-FROM scratch AS stage   
+COPY --from=config-builder /tmp/unbound.conf \
+  /usr/local/unbound/unbound.conf
 
-COPY --from=buildenv /usr/local/unbound/ \
+FROM scratch AS stage
+
+COPY --from=buildenv-final /usr/local/unbound/ \
   /app/usr/local/unbound/
- 
-COPY --from=buildenv /lib/*-musl-* \
+
+COPY --from=buildenv-final /lib/*-musl-* \
   /app/lib/
 
-COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
+COPY --from=buildenv-final /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
   /app/bin/
-  
-COPY --from=buildenv /sbin/su-exec /sbin/tini \
+
+COPY --from=buildenv-final /sbin/su-exec /sbin/tini \
   /app/sbin/
-  
-COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
+
+COPY --from=buildenv-final /usr/sbin/groupmod /usr/sbin/usermod \
   /app/usr/sbin/
-  
-COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
+
+COPY --from=buildenv-final /bin/sh /bin/sed /bin/grep /bin/netstat \
   /app/bin/
-  
-COPY --from=buildenv /usr/bin/awk /usr/bin/drill /usr/bin/id \
+
+COPY --from=buildenv-final /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/
-  
-COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
+
+COPY --from=buildenv-final /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
   /app/lib/
-  
-COPY --from=buildenv /usr/lib/libgcc_s* \
-  /usr/lib/libbsd* \ 
+
+COPY --from=buildenv-final /usr/lib/libgcc_s* \
+  /usr/lib/libbsd* \
   /usr/lib/libmd* \
   /usr/lib/libsodium* \
   /usr/lib/libexpat* \
@@ -181,17 +186,17 @@ COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libevent* \
   /usr/lib/libngtcp2* \
   /app/usr/lib/
- 
-COPY --from=buildenv /etc/ssl/ \
+
+COPY --from=buildenv-final /etc/ssl/ \
   /app/etc/ssl/
-  
-COPY --from=buildenv /etc/passwd /etc/group \
+
+COPY --from=buildenv-final /etc/passwd /etc/group \
   /app/etc/
-  
-COPY --from=buildenv /usr/share/zoneinfo/ \
+
+COPY --from=buildenv-final /usr/share/zoneinfo/ \
   /app/usr/share/zoneinfo/
-  
-COPY --from=buildenv --chmod=0755 /entrypoint \
+
+COPY --from=buildenv-final --chmod=0755 /entrypoint \
   /app/
 
 WORKDIR /
@@ -201,14 +206,14 @@ FROM scratch AS unbound
 ARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   OPENSSL_BUILDENV_VERSION \
-  UNBOUND_UID 
+  UNBOUND_UID
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
-  UNBOUND_VERSION="${UNBOUND_VERSION}" \  
+  UNBOUND_VERSION="${UNBOUND_VERSION}" \
   OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
-  PATH=/usr/local/unbound/unbound.d/sbin:"$PATH" 
-  
+  PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
+
 LABEL org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.created="${IMAGE_BUILD_DATE}" \
   org.opencontainers.image.version="${UNBOUND_VERSION} (canary)" \
@@ -222,4 +227,4 @@ LABEL org.opencontainers.image.title="madnuttah/unbound" \
 
 COPY --from=stage /app/ /
 
-ENTRYPOINT ["/sbin/tini", "--", "/entrypoint" ]
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint"]
