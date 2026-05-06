@@ -5,7 +5,7 @@ on:
     workflows:
       - "CD Build Canary Unbound Docker Image"
       - "CD Build Canary-QUIC Distroless Unbound Docker Image"
-      - "CD Build Multiarch OpenSSL+Quic BuildEnv Docker Image"
+      - "CD Build Distroless Unbound Docker Image"
     types:
       - completed
   workflow_dispatch:
