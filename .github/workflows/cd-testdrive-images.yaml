@@ -9,16 +9,31 @@ on:
     types:
       - completed
 
+permissions: {}
+
 jobs:
   test-image:
     runs-on: ubuntu-latest
-
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Extract image tag from triggering workflow
+      - name: Determine deterministic image tag
+        id: tag
         run: |
-          echo "IMAGE_TAG=${{ github.event.workflow_run.outputs.image_tag }}" >> $GITHUB_ENV
+          case "${{ github.event.workflow_run.name }}" in
+            "CD Build Canary Unbound Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
+              ;;
+            "CD Build Canary-QUIC Distroless Unbound Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> $GITHUB_ENV
+              ;;
+            "CD Build Distroless Unbound Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:latest" >> $GITHUB_ENV
+              ;;
+            *)
+              exit 1
+              ;;
+          esac
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4
