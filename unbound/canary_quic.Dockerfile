@@ -41,7 +41,7 @@ RUN set -xe; \
   git clone "https://github.com/NLnetLabs/unbound" && \
   cd unbound && \
   ./configure \
-    LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib" \
+    LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib -Wl,-rpath -Wl,/usr/local/openssl/lib -Wl,-rpath -Wl,/usr/local/lib" \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
     --with-conf-file=/usr/local/unbound/unbound.conf \
