@@ -48,6 +48,8 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
     
 </details>
 
+This image is built to provide a precise, fully reliable Unbound deployment with complete DNSSEC support - designed for you and engineered to avoid the subtle failures and maintenance gaps that affect many other container images: _"It just works."_
+
 ## Getting started
 
 Docker containers are most easily used with docker compose. 
