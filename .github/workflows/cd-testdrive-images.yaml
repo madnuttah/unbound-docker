@@ -1,0 +1,75 @@
+name: CD Testdrive Unbound Images
+
+on:
+  workflow_run:
+    workflows:
+      - "CD Build Canary Unbound Docker Image"
+      - "CD Build Canary-QUIC Distroless Unbound Docker Image"
+      - "CD Build Multiarch OpenSSL+Quic BuildEnv Docker Image"
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  test-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull images
+        run: |
+          docker pull madnuttah/unbound:canary || true
+          docker pull madnuttah/unbound:canary-quic || true
+
+      - name: Test Unbound (standard)
+        run: |
+          if docker image inspect madnuttah/unbound:canary >/dev/null 2>&1; then
+            docker run --rm madnuttah/unbound:canary unbound-checkconf
+          fi
+
+      - name: Test Unbound (QUIC)
+        run: |
+          if docker image inspect madnuttah/unbound:canary-quic >/dev/null 2>&1; then
+            docker run --rm madnuttah/unbound:canary-quic unbound-checkconf
+          fi
+
+      - name: DNS test
+        run: |
+          if docker image inspect madnuttah/unbound:canary-quic >/dev/null 2>&1; then
+            docker run -d --name unbound-dns -p 5353:53/udp madnuttah/unbound:canary-quic
+            sleep 4
+            dig @127.0.0.1 -p 5353 cloudflare.com A || true
+            docker rm -f unbound-dns
+          fi
+
+      - name: DNSSEC validation test
+        run: |
+          if docker image inspect madnuttah/unbound:canary-quic >/dev/null 2>&1; then
+            docker run -d --name unbound-dnssec -p 5353:53/udp madnuttah/unbound:canary-quic
+            sleep 4
+
+            dig @127.0.0.1 -p 5353 dnssec-failed.org A +dnssec +adflag > dnssec_fail.out || true
+            if grep -q "status: SERVFAIL" dnssec_fail.out; then
+              echo "dnssec-failed.org correctly failed DNSSEC validation"
+            else
+              echo "ERROR: dnssec-failed.org should fail DNSSEC validation"
+              docker rm -f unbound-dnssec
+              exit 1
+            fi
+
+            dig @127.0.0.1 -p 5353 cloudflare.com A +dnssec +adflag > dnssec_ok.out || true
+            if grep -q "ad;" dnssec_ok.out; then
+              echo "cloudflare.com DNSSEC validation succeeded"
+            else
+              echo "ERROR: cloudflare.com DNSSEC validation failed"
+              docker rm -f unbound-dnssec
+              exit 1
+            fi
+
+            docker rm -f unbound-dnssec
+          fi
