@@ -32,7 +32,7 @@ jobs:
       - name: Set buildvars
         id: vars
         run: |
-          echo IMAGE_BUILD_DATE=$(date -u) >> $GITHUB_OUTPUT
+          echo IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $GITHUB_OUTPUT
           echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
@@ -62,6 +62,9 @@ jobs:
     needs: buildvars
     runs-on: ubuntu-22.04
 
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
       UNBOUND_DOCKER_IMAGE_VERSION: "canary-quic"
@@ -85,6 +88,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_SLUG }}
+          tags: |
+            type=raw,value=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
+            type=raw,value=${{ needs.buildvars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
+
       - name: Build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         with:
@@ -106,9 +118,7 @@ jobs:
           push: true
           sbom: true
           provenance: true
-          tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
+          tags: ${{ steps.meta.outputs.tags }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
