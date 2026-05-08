@@ -1,7 +1,6 @@
 name: CD Build Canary Distroless Unbound Docker Image
 
 on:
-  workflow_dispatch: 
   schedule:
     - cron: "0 19 * * mon-fri"
 
@@ -26,7 +25,7 @@ jobs:
           UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git | head -1 | cut -f 1)"
           UNBOUND_SHA="$(cat unbound_git_sha)"
           if [[ "$UNBOUND_SHA" = "$UNBOUND_GIT_SHA" ]]; then
-          #  exit 1
+            exit 1
           else
             echo UNBOUND_GIT_SHA="$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
           fi
