@@ -38,16 +38,68 @@ jobs:
           GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}  
-          IMAGE_BUILD_DATE="$(cat ./buildvars | grep "^IMAGE_BUILD_DATE=" | cut -d"=" -f2-)"
-          UNBOUND_VERSION="$(cat ./buildvars | grep "^UNBOUND_VERSION=" | cut -d"=" -f2-)"
-          UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
-          RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
-          RELEASE_NOTE=$(echo -e "\x23\x23 $(date '+%Y-%m-%d') <madnuttah-bot>\n\x23\x23 What's Changed?\n\x2A Updated Unbound to version $UNBOUND_VERSION\n\n\x2A\x2ANLnet Labs Unbound changelog\x2A\x2A: https://github.com/NLnetLabs/unbound/releases/tag/release-$UNBOUND_VERSION")
-          git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
-          git push -u origin "$RELEASE_TAG"
-          git fetch --all --tags
-          git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
-          git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
-          gh release create "$RELEASE_TAG" -t "$UNBOUND_DOCKER_VERSION" -n "$RELEASE_NOTE" --latest
-          exit 0
+          set -euo pipefail
+
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+
+          IMAGE_BUILD_DATE="$(grep '^IMAGE_BUILD_DATE=' buildvars | cut -d'=' -f2-)"
+          UNBOUND_VERSION="$(grep '^UNBOUND_VERSION=' buildvars | cut -d'=' -f2-)"
+          UNBOUND_DOCKER_VERSION="${UNBOUND_VERSION}-0"
+          TAG="v${UNBOUND_DOCKER_VERSION}"
+
+          git fetch --prune origin --tags
+          if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists."
+            exit 1
+          fi
+
+          git tag -a "${TAG}" -m "${TAG}"
+          git push origin "${TAG}"
+
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${TAG}$" | head -n 1)
+
+          echo "## ${TAG} — $(date -u +"%Y-%m-%d")" > CHANGELOG_TMP
+          echo "" >> CHANGELOG_TMP
+
+          echo "### Updated components" >> CHANGELOG_TMP
+          echo "* Updated Unbound to version ${UNBOUND_VERSION}" >> CHANGELOG_TMP
+          echo "" >> CHANGELOG_TMP
+
+          echo "### Commits" >> CHANGELOG_TMP
+          git log "${PREV_TAG}..${TAG}" --oneline >> CHANGELOG_TMP
+          echo "" >> CHANGELOG_TMP
+
+          echo "### Contributors" >> CHANGELOG_TMP
+          git log "${PREV_TAG}..${TAG}" --format="%aN|%aE" \
+            | sort -u \
+            | while IFS='|' read -r NAME EMAIL; do
+                LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+                if echo "$LOWER" | grep -Eq "bot|github-actions"; then
+                  continue
+                fi
+                USER=$(curl -s "https://api.github.com/search/users?q=${EMAIL}" \
+                  | jq -r '.items[0].login // empty')
+                if [ -n "$USER" ]; then
+                  echo "- @${USER}" >> CHANGELOG_TMP
+                else
+                  echo "- ${NAME}" >> CHANGELOG_TMP
+                fi
+              done
+          echo "" >> CHANGELOG_TMP
+
+          if [ -f CHANGELOG.md ]; then
+            cat CHANGELOG.md >> CHANGELOG_TMP
+          fi
+          mv CHANGELOG_TMP CHANGELOG.md
+
+          git add CHANGELOG.md
+          git commit -m "Update changelog for ${TAG}" || true
+          git push
+
+          gh release create "${TAG}" \
+            -t "${TAG}" \
+            -F CHANGELOG.md \
+            --latest || \
+          gh release edit "${TAG}" \
+            -t "${TAG}" \
+            -F CHANGELOG.md
