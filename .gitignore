@@ -2,3 +2,4 @@
 .dockerignore
 LICENSE
 *.md
+!CHANGELOG.md
