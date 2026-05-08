@@ -91,8 +91,11 @@ FROM buildenv AS config-builder
 RUN UNBOUND_SRC=$(find /tmp/src -maxdepth 1 -type d -name "unbound") && \
     cp "$UNBOUND_SRC/doc/example.conf" /tmp/unbound.conf
 
-COPY unbound.conf.patch /patch/
-RUN patch /tmp/unbound.conf /patch/unbound.conf.patch
+#COPY unbound.conf.patch /patch/
+#RUN patch /tmp/unbound.conf /patch/unbound.conf.patch
+
+COPY ./unbound/root/usr/local/unbound/unbound.conf \
+  /usr/local/unbound/unbound.conf 
 
 FROM buildenv AS buildenv-final
 
