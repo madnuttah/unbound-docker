@@ -1,6 +1,7 @@
 name: CD Build Canary Distroless Unbound Docker Image
 
 on:
+  workflow_dispatch: 
   schedule:
     - cron: "0 19 * * mon-fri"
 
