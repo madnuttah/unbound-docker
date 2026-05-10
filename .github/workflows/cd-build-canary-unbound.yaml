@@ -18,17 +18,25 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-
+      
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
         run: |
-          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git | head -1 | cut -f 1)"
-          UNBOUND_SHA="$(cat unbound_git_sha)"
+          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
+      
+          if [[ -z "$UNBOUND_GIT_SHA" ]]; then
+            echo "Failed to fetch remote SHA"
+            exit 1
+          fi
+      
+          UNBOUND_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
+      
           if [[ "$UNBOUND_SHA" = "$UNBOUND_GIT_SHA" ]]; then
             exit 1
           else
-            echo UNBOUND_GIT_SHA="$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
+            echo "UNBOUND_GIT_SHA=$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
           fi
+
 
       - name: Import GPG key
         id: IMPORT_GPG
@@ -53,8 +61,8 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}
           echo ${STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_GIT_SHA} > unbound_git_sha
           git add unbound_git_sha
-          git commit unbound_git_sha -m "Updated unbound_git_sha"
-          git push origin main
+          git commit -m "Updated unbound_git_sha" || true
+          git push origin main || true
 
       - name: Set buildvars
         id: SET_BUILDVARS
