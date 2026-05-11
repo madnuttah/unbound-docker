@@ -69,6 +69,15 @@ RUN set -xe; \
     --enable-relro-now && \
   make && \
   make install && \
+  awk '
+  /^[[:space:]]*server:/ { inserver=1 }
+  inserver && /^[^[:space:]]/ && $0 !~ /^[[:space:]]*server:/ { inserver=0 }
+  inserver && /^[[:space:]]*username:/ { sub(/".*"/,"\"\"") }
+  inserver && /^[[:space:]]*chroot:/ { sub(/".*"/,"\"\"") }
+  inserver && /^[[:space:]]*directory:/ { sub(/".*"/,"\"\/usr\/local\/unbound\"") }
+  { print }
+  ' /usr/local/unbound/unbound.conf > /usr/local/unbound/unbound.conf.tmp && \
+  mv /usr/local/unbound/unbound.conf.tmp /usr/local/unbound/unbound.conf && \
   apk del --no-cache .build-deps && \
   mkdir -p "/usr/local/unbound/iana.d/" && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
@@ -92,12 +101,6 @@ FROM buildenv AS config-builder
 
 RUN UNBOUND_SRC=$(find /tmp/src -maxdepth 1 -type d -name "unbound") && \
     cp "$UNBOUND_SRC/doc/example.conf" /tmp/unbound.conf
-
-#COPY unbound.conf.patch /patch/
-#RUN patch /tmp/unbound.conf /patch/unbound.conf.patch
-
-COPY ./unbound/root/usr/local/unbound/unbound.conf \
-  /usr/local/unbound/unbound.conf 
 
 FROM buildenv AS buildenv-final
 
@@ -148,9 +151,6 @@ RUN set -xe; \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
 
-COPY --from=config-builder /tmp/unbound.conf \
-  /usr/local/unbound/unbound.conf
-
 FROM scratch AS stage
 
 COPY --from=buildenv-final /usr/local/unbound/ \
@@ -167,9 +167,6 @@ COPY --from=buildenv-final /sbin/su-exec /sbin/tini \
 
 COPY --from=buildenv-final /usr/sbin/groupmod /usr/sbin/usermod \
   /app/usr/sbin/
-
-COPY --from=buildenv-final /bin/sh /bin/sed /bin/grep /bin/netstat \
-  /app/bin/
 
 COPY --from=buildenv-final /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/

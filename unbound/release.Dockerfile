@@ -1,7 +1,7 @@
 ARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   UNBOUND_SHA256 \
-  UNBOUND_DOCKER_IMAGE_VERSION \ 
+  UNBOUND_DOCKER_IMAGE_VERSION \
   UNBOUND_UID="1000" \
   UNBOUND_GID="1000" \
   OPENSSL_BUILDENV_VERSION
@@ -32,7 +32,7 @@ RUN set -xe; \
   ca-certificates \
   gnupg \
   curl \
-  file \ 
+  file \
   binutils && \
   apk --update --no-cache add --virtual .build-deps \
     build-base\
@@ -83,6 +83,15 @@ RUN set -xe; \
     --enable-relro-now && \
   make && \
   make install && \
+  awk '
+  /^[[:space:]]*server:/ { inserver=1 }
+  inserver && /^[^[:space:]]/ && $0 !~ /^[[:space:]]*server:/ { inserver=0 }
+  inserver && /^[[:space:]]*username:/ { sub(/".*"/,"\"\"") }
+  inserver && /^[[:space:]]*chroot:/ { sub(/".*"/,"\"\"") }
+  inserver && /^[[:space:]]*directory:/ { sub(/".*"/,"\"\/usr\/local\/unbound\"") }
+  { print }
+  ' /usr/local/unbound/unbound.conf > /usr/local/unbound/unbound.conf.tmp && \
+  mv /usr/local/unbound/unbound.conf.tmp /usr/local/unbound/unbound.conf && \
   apk del --no-cache .build-deps && \
   mkdir -p \
     "/usr/local/unbound/iana.d/" && \
@@ -95,7 +104,7 @@ RUN set -xe; \
   curl -sSL https://www.internic.net/domain/root.zone.md5 -o /usr/local/unbound/iana.d/root.zone.md5 && \
   curl -sSL https://www.internic.net/domain/root.zone.sig -o /usr/local/unbound/iana.d/root.zone.sig && \
   ROOT_ZONE_MD5=`cat /usr/local/unbound/iana.d/root.zone.md5` && \
-  echo "${ROOT_ZONE_MD5} */usr/local/unbound/iana.d/root.zone" | md5sum -c - && \   
+  echo "${ROOT_ZONE_MD5} */usr/local/unbound/iana.d/root.zone" | md5sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
   gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$INTERNIC_PGP" && \
@@ -130,7 +139,7 @@ RUN set -xe; \
     "/usr/local/unbound/certs.d/" \
     "/usr/local/unbound/zones.d/" \
     "/usr/local/unbound/log.d/" && \
-  touch /usr/local/unbound/log.d/unbound.log && \  
+  touch /usr/local/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound \
     /usr/local/unbound/ && \
   ln -s /dev/random /dev/urandom /dev/null \
@@ -141,7 +150,7 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/sbin/*.sh && \
-  rm -rf \  
+  rm -rf \
     /usr/local/unbound/unbound.conf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
@@ -150,21 +159,18 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
     find /usr/local/openssl/lib/libssl.so.* -type f | xargs strip --strip-all && \
-    find /usr/local/openssl/lib/libcrypto.so.* -type f | xargs strip --strip-all && \  
+    find /usr/local/openssl/lib/libcrypto.so.* -type f | xargs strip --strip-all && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
     
-COPY ./unbound/root/usr/local/unbound/unbound.conf \
-  /usr/local/unbound/unbound.conf 
-
-FROM scratch AS stage   
+FROM scratch AS stage
 
 COPY --from=buildenv /usr/local/unbound/ \
   /app/usr/local/unbound/
- 
+
 COPY --from=buildenv /lib/*-musl-* \
   /app/lib/
 
@@ -187,7 +193,7 @@ COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/l
   /app/lib/
   
 COPY --from=buildenv /usr/lib/libgcc_s* \
-  /usr/lib/libbsd* \ 
+  /usr/lib/libbsd* \
   /usr/lib/libmd* \
   /usr/lib/libsodium* \
   /usr/lib/libexpat* \

@@ -66,7 +66,7 @@ jobs:
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
         with:
-          platforms: linux/386,linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64
+          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
