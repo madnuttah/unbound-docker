@@ -83,15 +83,6 @@ RUN set -xe; \
     --enable-relro-now && \
   make && \
   make install && \
-  awk '
-  /^[[:space:]]*server:/ { inserver=1 }
-  inserver && /^[^[:space:]]/ && $0 !~ /^[[:space:]]*server:/ { inserver=0 }
-  inserver && /^[[:space:]]*username:/ { sub(/".*"/,"\"\"") }
-  inserver && /^[[:space:]]*chroot:/ { sub(/".*"/,"\"\"") }
-  inserver && /^[[:space:]]*directory:/ { sub(/".*"/,"\"\/usr\/local\/unbound\"") }
-  { print }
-  ' /usr/local/unbound/unbound.conf > /usr/local/unbound/unbound.conf.tmp && \
-  mv /usr/local/unbound/unbound.conf.tmp /usr/local/unbound/unbound.conf && \
   apk del --no-cache .build-deps && \
   mkdir -p \
     "/usr/local/unbound/iana.d/" && \

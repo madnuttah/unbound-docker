@@ -68,10 +68,10 @@ RUN set -xe; \
   make && \
   make install && \
   sed -i \
-  -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s/^[[:space:]]*username:.*/    username: ""/' \
-  -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s/^[[:space:]]*chroot:.*/    chroot: ""/' \
-  -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s#^[[:space:]]*directory:.*#    directory: "/usr/local/unbound"#' \
-  /usr/local/unbound/unbound.conf && \
+    -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s/^[[:space:]]*username:.*/    username: ""/' \
+    -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s/^[[:space:]]*chroot:.*/    chroot: ""/' \
+    -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s#^[[:space:]]*directory:.*#    directory: "/usr/local/unbound"#' \
+    /usr/local/unbound/unbound.conf && \
   apk del --no-cache .build-deps && \
   mkdir -p "/usr/local/unbound/iana.d/" && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
@@ -125,7 +125,6 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 /usr/local/unbound/sbin/*.sh && \
   rm -rf \
-    /usr/local/unbound/unbound.conf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
     /usr/local/unbound/iana.d/root.hints.* \
@@ -139,9 +138,6 @@ RUN set -xe; \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
-
-COPY ./unbound/root/usr/local/unbound/unbound.conf \
-  /usr/local/unbound/unbound.conf 
 
 FROM scratch AS stage
 
