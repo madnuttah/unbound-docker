@@ -91,13 +91,6 @@ RUN set -xe; \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
   /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true
 
-FROM buildenv AS config-builder
-
-RUN UNBOUND_SRC=$(find /tmp/src -maxdepth 1 -type d -name "unbound") && \
-    cp "$UNBOUND_SRC/doc/example.conf" /tmp/unbound.conf
-
-FROM buildenv AS buildenv-final
-
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
 
@@ -147,30 +140,33 @@ RUN set -xe; \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
 
+COPY ./unbound/root/usr/local/unbound/unbound.conf \
+  /usr/local/unbound/unbound.conf 
+
 FROM scratch AS stage
 
-COPY --from=buildenv-final /usr/local/unbound/ \
+COPY --from=buildenv /usr/local/unbound/ \
   /app/usr/local/unbound/
 
-COPY --from=buildenv-final /lib/*-musl-* \
+COPY --from=buildenv /lib/*-musl-* \
   /app/lib/
 
-COPY --from=buildenv-final /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
+COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
   /app/bin/
 
-COPY --from=buildenv-final /sbin/su-exec /sbin/tini \
+COPY --from=buildenv /sbin/su-exec /sbin/tini \
   /app/sbin/
 
-COPY --from=buildenv-final /usr/sbin/groupmod /usr/sbin/usermod \
+COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
   /app/usr/sbin/
 
-COPY --from=buildenv-final /usr/bin/awk /usr/bin/drill /usr/bin/id \
+COPY --from=buildenv /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/
 
-COPY --from=buildenv-final /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
+COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
   /app/lib/
 
-COPY --from=buildenv-final /usr/lib/libgcc_s* \
+COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libbsd* \
   /usr/lib/libmd* \
   /usr/lib/libsodium* \
@@ -183,16 +179,16 @@ COPY --from=buildenv-final /usr/lib/libgcc_s* \
   /usr/lib/libngtcp2* \
   /app/usr/lib/
 
-COPY --from=buildenv-final /etc/ssl/ \
+COPY --from=buildenv /etc/ssl/ \
   /app/etc/ssl/
 
-COPY --from=buildenv-final /etc/passwd /etc/group \
+COPY --from=buildenv /etc/passwd /etc/group \
   /app/etc/
 
-COPY --from=buildenv-final /usr/share/zoneinfo/ \
+COPY --from=buildenv /usr/share/zoneinfo/ \
   /app/usr/share/zoneinfo/
 
-COPY --from=buildenv-final --chmod=0755 /entrypoint \
+COPY --from=buildenv --chmod=0755 /entrypoint \
   /app/
 
 WORKDIR /

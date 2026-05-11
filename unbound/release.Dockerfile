@@ -150,7 +150,7 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/sbin/*.sh && \
-  rm -rf \
+   rm -rf \
     /usr/local/unbound/unbound.conf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
@@ -165,6 +165,9 @@ RUN set -xe; \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
     strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
+    
+COPY ./unbound/root/usr/local/unbound/unbound.conf \
+  /usr/local/unbound/unbound.conf 
     
 FROM scratch AS stage
 
