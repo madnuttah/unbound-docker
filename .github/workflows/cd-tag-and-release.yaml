@@ -38,68 +38,67 @@ jobs:
           GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
-          set -euo pipefail
-
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
           IMAGE_BUILD_DATE="$(grep '^IMAGE_BUILD_DATE=' buildvars | cut -d'=' -f2-)"
           UNBOUND_VERSION="$(grep '^UNBOUND_VERSION=' buildvars | cut -d'=' -f2-)"
-          UNBOUND_DOCKER_VERSION="${UNBOUND_VERSION}-0"
-          TAG="v${UNBOUND_DOCKER_VERSION}"
+          UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
+          RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
 
-          git fetch --prune origin --tags
-          if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
-            echo "Tag ${TAG} already exists."
+          git fetch --all --tags
+          if git rev-parse "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
             exit 1
           fi
 
-          git tag -a "${TAG}" -m "${TAG}"
-          git push origin "${TAG}"
+          git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
+          git push -u origin "$RELEASE_TAG"
 
-          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${TAG}$" | head -n 1)
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^$RELEASE_TAG$" | head -n 1)
 
-          echo "## ${TAG} — $(date -u +"%Y-%m-%d")" > CHANGELOG_TMP
-          echo "" >> CHANGELOG_TMP
+          CURRENT=$(git log "$PREV_TAG..$RELEASE_TAG" --format="%aN|%aE" | sort -u || true)
+          ALL_PREVIOUS=$(git log --format="%aN|%aE" "$PREV_TAG" --all | sort -u || true)
 
-          echo "### Updated components" >> CHANGELOG_TMP
-          echo "* Updated Unbound to version ${UNBOUND_VERSION}" >> CHANGELOG_TMP
-          echo "" >> CHANGELOG_TMP
+          FILTERED_CURRENT=$(echo "$CURRENT" | while IFS='|' read -r NAME EMAIL; do
+            LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+            if echo "$LOWER" | grep -Eq "github-actions|madnuttah-bot|dependabot"; then
+              continue
+            fi
+            echo "$NAME|$EMAIL"
+          done)
 
-          echo "### Commits" >> CHANGELOG_TMP
-          git log "${PREV_TAG}..${TAG}" --oneline >> CHANGELOG_TMP
-          echo "" >> CHANGELOG_TMP
+          NEW_CONTRIB=$(echo "$FILTERED_CURRENT" | while IFS='|' read -r NAME EMAIL; do
+            if ! echo "$ALL_PREVIOUS" | grep -q "|$EMAIL$"; then
+              echo "$NAME|$EMAIL"
+            fi
+          done)
 
-          echo "### Contributors" >> CHANGELOG_TMP
-          git log "${PREV_TAG}..${TAG}" --format="%aN|%aE" \
-            | sort -u \
-            | while IFS='|' read -r NAME EMAIL; do
-                LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
-                if echo "$LOWER" | grep -Eq "bot|github-actions"; then
-                  continue
-                fi
-                USER=$(curl -s "https://api.github.com/search/users?q=${EMAIL}" \
-                  | jq -r '.items[0].login // empty')
-                if [ -n "$USER" ]; then
-                  echo "- @${USER}" >> CHANGELOG_TMP
-                else
-                  echo "- ${NAME}" >> CHANGELOG_TMP
-                fi
-              done
-          echo "" >> CHANGELOG_TMP
+          CONTRIB_MD=$(echo "$FILTERED_CURRENT" | while IFS='|' read -r NAME EMAIL; do
+            USER=$(curl -s "https://api.github.com/search/users?q=$EMAIL" | jq -r '.items[0].login // empty')
+            if [ -n "$USER" ]; then
+              echo "- @$USER"
+            else
+              echo "- $NAME"
+            fi
+          done)
 
-          if [ -f CHANGELOG.md ]; then
-            cat CHANGELOG.md >> CHANGELOG_TMP
+          NEW_MD=$(echo "$NEW_CONTRIB" | while IFS='|' read -r NAME EMAIL; do
+            USER=$(curl -s "https://api.github.com/search/users?q=$EMAIL" | jq -r '.items[0].login // empty')
+            if [ -n "$USER" ]; then
+              echo "- @$USER"
+            else
+              echo "- $NAME"
+            fi
+          done)
+
+          if [ -z "$NEW_MD" ]; then
+            NEW_MD="- None"
           fi
-          mv CHANGELOG_TMP CHANGELOG.md
 
-          git add CHANGELOG.md
-          git commit -m "Update changelog for ${TAG}" || true
-          git push
+          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## Updated components\n* Updated Unbound to version %s\n\n## Contributors\n%s\n\n## New contributors\n%s\n\n## NLnet Labs Unbound changelog\nhttps://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
+            "$(date '+%Y-%m-%d')" "$UNBOUND_VERSION" "$CONTRIB_MD" "$NEW_MD" "$UNBOUND_VERSION")
 
-          gh release create "${TAG}" \
-            -t "${TAG}" \
-            -F CHANGELOG.md \
-            --latest || \
-          gh release edit "${TAG}" \
-            -t "${TAG}" \
-            -F CHANGELOG.md
+          git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
+          git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
+
+          gh release create "$RELEASE_TAG" -t "$UNBOUND_DOCKER_VERSION" -n "$RELEASE_NOTE" --latest
+          exit 0
