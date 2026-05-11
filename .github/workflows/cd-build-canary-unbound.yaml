@@ -3,12 +3,13 @@ name: CD Build Canary Distroless Unbound Docker Image
 on:
   schedule:
     - cron: "0 19 * * mon-fri"
+  workflow_dispatch:
 
 permissions: {}
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
@@ -18,7 +19,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      
+            
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
         run: |
@@ -28,9 +29,14 @@ jobs:
             echo "Failed to fetch remote SHA"
             exit 1
           fi
-      
+
+          if [[ "${{ github.event_name }}" = "workflow_dispatch" ]]; then
+            echo "UNBOUND_GIT_SHA=$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           UNBOUND_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
-      
+     
           if [[ "$UNBOUND_SHA" = "$UNBOUND_GIT_SHA" ]]; then
             exit 1
           else
@@ -50,6 +56,7 @@ jobs:
           trust_level: 5
 
       - name: Push unbound_git_sha to repository
+        if: steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA != '' && github.event_name != 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
