@@ -65,7 +65,7 @@ RUN set -xe; \
     --enable-tfo-client \
     --enable-pie \
     --enable-relro-now && \
-  make && \
+  make -j$(nproc) && \
   make install && \
   apk del --no-cache .build-deps && \
   mkdir -p "/usr/local/unbound/iana.d/" && \
@@ -119,13 +119,6 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/null \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 /usr/local/unbound/sbin/*.sh && \
-  rm -rf \
-    /usr/local/unbound/unbound.d/share \
-    /usr/local/unbound/etc \
-    /usr/local/unbound/iana.d/root.hints.* \
-    /usr/local/unbound/iana.d/root.zone.* \
-    /usr/local/unbound/unbound.d/include \
-    /usr/local/unbound/unbound.d/lib && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*username:.*|    username: ""|' /usr/local/unbound/unbound.conf && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*chroot:.*|    chroot: ""|' /usr/local/unbound/unbound.conf && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*directory:.*|    directory: "/usr/local/unbound"|' /usr/local/unbound/unbound.conf && \
@@ -135,6 +128,13 @@ RUN set -xe; \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*root-hints:.*|    root-hints: "/usr/local/unbound/iana.d/root.hints"|' /usr/local/unbound/unbound.conf && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*verbosity:.*|    verbosity: 1|' /usr/local/unbound/unbound.conf && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*logfile:.*|    logfile: ""|' /usr/local/unbound/unbound.conf && \
+  rm -rf \
+    /usr/local/unbound/unbound.d/share \
+    /usr/local/unbound/etc \
+    /usr/local/unbound/iana.d/root.hints.* \
+    /usr/local/unbound/iana.d/root.zone.* \
+    /usr/local/unbound/unbound.d/include \
+    /usr/local/unbound/unbound.d/lib && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf && \

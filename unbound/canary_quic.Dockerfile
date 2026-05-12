@@ -29,7 +29,6 @@ RUN set -xe; \
     libsodium-dev \
     linux-headers \
     nghttp2-dev \
-    ngtcp2-dev \
     libevent-dev \
     expat-dev \
     protobuf-c-dev \
@@ -67,13 +66,8 @@ RUN set -xe; \
     --enable-tfo-client \
     --enable-pie \
     --enable-relro-now && \
-  make && \
+  make -j$(nproc) && \
   make install && \
-  sed -i \
-    -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s/^[[:space:]]*username:.*/    username: ""/' \
-    -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s/^[[:space:]]*chroot:.*/    chroot: ""/' \
-    -e '/^[[:space:]]*server:/,/^[^[:space:]]/ s#^[[:space:]]*directory:.*#    directory: "/usr/local/unbound"#' \
-    /usr/local/unbound/unbound.conf && \
   apk del --no-cache .build-deps && \
   mkdir -p "/usr/local/unbound/iana.d/" && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
@@ -125,6 +119,15 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/null \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 /usr/local/unbound/sbin/*.sh && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*username:.*|    username: ""|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*chroot:.*|    chroot: ""|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*directory:.*|    directory: "/usr/local/unbound"|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*do-daemonize:.*|    do-daemonize: no|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*interface:.*|    interface: 0.0.0.0@5335|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*access-control:.*|    access-control: 0.0.0.0/0 allow|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*root-hints:.*|    root-hints: "/usr/local/unbound/iana.d/root.hints"|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*verbosity:.*|    verbosity: 1|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*logfile:.*|    logfile: ""|' /usr/local/unbound/unbound.conf && \
   rm -rf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
@@ -132,7 +135,6 @@ RUN set -xe; \
     /usr/local/unbound/iana.d/root.zone.* \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
-  find /usr/local/ngtcp2/lib/lib*.so.* -type f | xargs strip --strip-all && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf && \
