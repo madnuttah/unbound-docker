@@ -86,6 +86,11 @@ RUN set -xe; \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
   /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true
 
+RUN echo "=== DEBUG: unbound.conf ===" && \
+    ls -l /usr/local/unbound/ && \
+    sed -n '1,200p' /usr/local/unbound/unbound.conf || true
+
+
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
 
@@ -120,23 +125,26 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 /usr/local/unbound/sbin/*.sh && \
   rm -rf \
-    /usr/local/unbound/unbound.conf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
     /usr/local/unbound/iana.d/root.hints.* \
     /usr/local/unbound/iana.d/root.zone.* \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
-  find /usr/local/openssl/lib/libssl.so.* -type f | xargs strip --strip-all && \
-  find /usr/local/openssl/lib/libcrypto.so.* -type f | xargs strip --strip-all && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*username:.*|    username: ""|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*chroot:.*|    chroot: ""|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*directory:.*|    directory: "/usr/local/unbound"|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*do-daemonize:.*|    do-daemonize: no|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*interface:.*|    interface: 0.0.0.0@5335|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*access-control:.*|    access-control: 0.0.0.0/0 allow|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*root-hints:.*|    root-hints: "/usr/local/unbound/iana.d/root.hints"|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*verbosity:.*|    verbosity: 1|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*logfile:.*|    logfile: ""|' /usr/local/unbound/unbound.conf && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
-  
-  COPY ./unbound/root/usr/local/unbound/unbound.conf \
-  /usr/local/unbound/unbound.conf 
 
 FROM scratch AS stage
 
