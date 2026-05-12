@@ -86,11 +86,6 @@ RUN set -xe; \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
   /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true
 
-RUN echo "=== DEBUG: unbound.conf ===" && \
-    ls -l /usr/local/unbound/ && \
-    sed -n '1,200p' /usr/local/unbound/unbound.conf || true
-
-
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
 
