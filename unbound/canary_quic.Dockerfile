@@ -6,7 +6,7 @@ ARG IMAGE_BUILD_DATE \
 
 #FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}"-quic AS buildenv
 
-FROM madnuttah/openssl-buildenv:3.1.7-1-quic AS buildenv
+FROM madnuttah/openssl-buildenv:3.6.2-3-quic AS buildenv
 
 ARG UNBOUND_UID \
   UNBOUND_GID
