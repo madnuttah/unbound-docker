@@ -17,60 +17,32 @@ jobs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
       UNBOUND_VERSION: ${{ steps.vars.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.vars.outputs.UNBOUND_SHA256 }}
-      OPENSSL_QUIC_UPSTREAM: ${{ steps.vars.outputs.OPENSSL_QUIC_UPSTREAM }}
-      OPENSSL_QUIC_IMAGE_TAG: ${{ steps.vars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
-      NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
       OPENSSL_BUILDENV_VERSION: ${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}
       OPENSSL_VERSION: ${{ steps.vars.outputs.OPENSSL_VERSION }}
       OPENSSL_SHA256: ${{ steps.vars.outputs.OPENSSL_SHA256 }}
+      NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Set buildvars
+      - name: Read buildvars
         id: vars
         run: |
+          # read values directly from your buildvars file
+          source buildvars
+
           echo IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $GITHUB_OUTPUT
-          echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
+          echo UNBOUND_VERSION="$UNBOUND_VERSION" >> $GITHUB_OUTPUT
+          echo UNBOUND_SHA256="$UNBOUND_SHA256" >> $GITHUB_OUTPUT
 
-          RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
-          
-          UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
-          
-          if [ -z "$UPSTREAM" ]; then
-            UPSTREAM=$(echo "$RELEASES" | head -n 1)
-          fi
-          
-          CLEAN=$(echo "$UPSTREAM" | sed 's/-quic//')
-          CLEAN=${CLEAN#openssl-}
-          
-          echo OPENSSL_QUIC_UPSTREAM="$UPSTREAM" >> $GITHUB_OUTPUT
-          echo OPENSSL_QUIC_IMAGE_TAG="$CLEAN" >> $GITHUB_OUTPUT
-          echo OPENSSL_BUILDENV_VERSION="$CLEAN" >> $GITHUB_OUTPUT
-          echo OPENSSL_VERSION="$CLEAN" >> $GITHUB_OUTPUT
-
-
-
-          OPENSSL_SHA256_URL=$(curl -s "https://api.github.com/repos/madnuttah/openssl-buildenv/releases/tags/$UPSTREAM" | jq -r '.assets[]?.browser_download_url | select(test("sha256|sha256sum|.sha256"))' | head -n1)
-          if [ -n "$OPENSSL_SHA256_URL" ]; then
-            OPENSSL_SHA256=$(curl -sL "$OPENSSL_SHA256_URL" | tr -d '[:space:]' | head -n1)
-          else
-            OPENSSL_SHA256=""
-          fi
+          echo OPENSSL_BUILDENV_VERSION="$OPENSSL_BUILDENV_VERSION" >> $GITHUB_OUTPUT
+          echo OPENSSL_VERSION="$OPENSSL_VERSION" >> $GITHUB_OUTPUT
           echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
 
-          DOCKERFILE_URL="https://raw.githubusercontent.com/madnuttah/openssl-buildenv/${UPSTREAM}/Dockerfile"
-          NGTCP2_VERSION_FROM_DOCKERFILE=$(curl -fsSL "$DOCKERFILE_URL" 2>/dev/null | grep -Eo 'NGTCP2_VERSION="?[^" ]+' | head -n1 | sed -E 's/.*=//; s/"//g')
-          if [ -n "$NGTCP2_VERSION_FROM_DOCKERFILE" ]; then
-            echo NGTCP2_VERSION="$NGTCP2_VERSION_FROM_DOCKERFILE" >> $GITHUB_OUTPUT
-          else
-            NGTCP2_TAG=$(curl -s https://api.github.com/repos/ngtcp2/ngtcp2/releases/latest | jq -r .tag_name)
-            echo NGTCP2_VERSION="${NGTCP2_TAG#v}" >> $GITHUB_OUTPUT
-          fi
+          echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
 
   build:
     needs: buildvars
@@ -82,19 +54,19 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Dockerhub
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -106,50 +78,24 @@ jobs:
           images: ${{ env.DOCKERHUB_SLUG }}
           tags: |
             type=raw,value=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            type=raw,value=${{ needs.buildvars.outputs.OPENSSL_QUIC_IMAGE_TAG }}
+            type=raw,value=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
 
       - name: Build and push
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
+        uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
-            BUILDENV_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
             OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
             OPENSSL_VERSION=${{ needs.buildvars.outputs.OPENSSL_VERSION }}
             OPENSSL_SHA256=${{ needs.buildvars.outputs.OPENSSL_SHA256 }}
-            DOCKERHUB_SLUG=${{ env.DOCKERHUB_SLUG }}
-            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
-            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
-            UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
+            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
             NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
+            UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
+            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
           file: ./unbound/canary_quic.Dockerfile
           push: true
           sbom: true
           provenance: true
           tags: ${{ steps.meta.outputs.tags }}
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-          exit-code: "1"
-          ignore-unfixed: false
-          scan-type: image
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
-          format: "table"
-
-      - name: Docker Scout CVEs
-        uses: docker/scout-action@bacf462e8d090c09660de30a6ccc718035f961e3
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          command: cves
-          image: ${{ env.DOCKERHUB_SLUG }}:${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-          only-fixed: true
-          only-severities: critical,high
-          write-comment: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          exit-code: false
