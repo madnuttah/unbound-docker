@@ -28,20 +28,27 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Read buildvars
+      - name: Set buildvars
         id: vars
         run: |
-          # read values directly from your buildvars file
-          source buildvars
-
           echo IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $GITHUB_OUTPUT
+
+          source buildvars
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> $GITHUB_OUTPUT
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> $GITHUB_OUTPUT
 
-          echo OPENSSL_BUILDENV_VERSION="$OPENSSL_BUILDENV_VERSION" >> $GITHUB_OUTPUT
+          OPENSSL_ENV=$(curl -s https://raw.githubusercontent.com/madnuttah/openssl-buildenv/master/buildvars)
+
+          OPENSSL_VERSION=$(echo "$OPENSSL_ENV" | grep '^OPENSSL_VERSION=' | cut -d= -f2)
+          SUBVERSION=$(echo "$OPENSSL_ENV" | grep '^SUBVERSION=' | cut -d= -f2)
+          OPENSSL_SHA256=$(echo "$OPENSSL_ENV" | grep '^OPENSSL_SHA256=' | cut -d= -f2)
+          NGTCP2_VERSION=$(echo "$OPENSSL_ENV" | grep '^NGTCP2_VERSION=' | cut -d= -f2)
+
+          FINAL="${OPENSSL_VERSION}-${SUBVERSION}"
+
+          echo OPENSSL_BUILDENV_VERSION="$FINAL" >> $GITHUB_OUTPUT
           echo OPENSSL_VERSION="$OPENSSL_VERSION" >> $GITHUB_OUTPUT
           echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
-
           echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
 
   build:
