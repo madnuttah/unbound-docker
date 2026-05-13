@@ -141,15 +141,15 @@ RUN set -xe; \
     /usr/local/unbound/unbound.d/urandom && \
   chmod -R 770 \
     /usr/local/unbound/sbin/*.sh && \
-  sed -i '/^server:/a\    logfile: ""' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    verbosity: 1' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    root-hints: "/usr/local/unbound/iana.d/root.hints"' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    access-control: 0.0.0.0/0 allow' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    interface: 0.0.0.0@5335' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    do-daemonize: no' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    directory: "/usr/local/unbound"' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    chroot: ""' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/a\    username: ""' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*username:.*|    username: ""|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*chroot:.*|    chroot: ""|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*directory:.*|    directory: "/usr/local/unbound"|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*do-daemonize:.*|    do-daemonize: no|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ {0,/^[[:space:]]*#\?[[:space:]]*interface:/ s//    interface: 0.0.0.0@5335/}' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*access-control:.*|    access-control: 0.0.0.0/0 allow|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*root-hints:.*|    root-hints: "/usr/local/unbound/iana.d/root.hints"|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*verbosity:.*|    verbosity: 1|' /usr/local/unbound/unbound.conf && \
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*logfile:.*|    logfile: ""|' /usr/local/unbound/unbound.conf && \
   rm -rf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
