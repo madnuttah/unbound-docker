@@ -36,13 +36,16 @@ jobs:
           echo IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $GITHUB_OUTPUT
           echo UNBOUND_VERSION="$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
+
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
           UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
           CLEAN=${UPSTREAM#openssl-}
+
           echo OPENSSL_QUIC_UPSTREAM="$UPSTREAM" >> $GITHUB_OUTPUT
           echo OPENSSL_QUIC_IMAGE_TAG="$CLEAN" >> $GITHUB_OUTPUT
           echo OPENSSL_BUILDENV_VERSION="$UPSTREAM" >> $GITHUB_OUTPUT
           echo OPENSSL_VERSION="$CLEAN" >> $GITHUB_OUTPUT
+
           OPENSSL_SHA256_URL=$(curl -s "https://api.github.com/repos/madnuttah/openssl-buildenv/releases/tags/$UPSTREAM" | jq -r '.assets[]?.browser_download_url | select(test("sha256|sha256sum|.sha256"))' | head -n1)
           if [ -n "$OPENSSL_SHA256_URL" ]; then
             OPENSSL_SHA256=$(curl -sL "$OPENSSL_SHA256_URL" | tr -d '[:space:]' | head -n1)
@@ -50,6 +53,7 @@ jobs:
             OPENSSL_SHA256=""
           fi
           echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
+
           DOCKERFILE_URL="https://raw.githubusercontent.com/madnuttah/openssl-buildenv/${UPSTREAM}/Dockerfile"
           NGTCP2_VERSION_FROM_DOCKERFILE=$(curl -fsSL "$DOCKERFILE_URL" 2>/dev/null | grep -Eo 'NGTCP2_VERSION="?[^" ]+' | head -n1 | sed -E 's/.*=//; s/"//g')
           if [ -n "$NGTCP2_VERSION_FROM_DOCKERFILE" ]; then
@@ -110,7 +114,6 @@ jobs:
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_UPSTREAM }}
             NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
           file: ./unbound/canary_quic.Dockerfile
           push: true
