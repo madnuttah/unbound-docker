@@ -5,6 +5,7 @@ on:
     workflows: ["CD Build Canary Distroless Unbound Docker Image"]
     types:
       - completed
+  workflow_dispatch:
 
 permissions: {}
 
@@ -60,7 +61,7 @@ jobs:
 
   build:
     needs: buildvars
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
@@ -97,8 +98,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         with:
-#          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
-          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             BUILDENV_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
