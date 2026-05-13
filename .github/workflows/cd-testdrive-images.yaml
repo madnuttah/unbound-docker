@@ -9,17 +9,24 @@ on:
     types:
       - completed
 
+  workflow_dispatch:
+
 permissions: {}
 
 jobs:
   test-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Determine deterministic image tag
         id: tag
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
+            exit 0
+          fi
+
           case "${{ github.event.workflow_run.name }}" in
             "CD Build Canary Unbound Docker Image")
               echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
@@ -51,7 +58,9 @@ jobs:
         run: |
           docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG"
           sleep 4
-          dig @127.0.0.1 -p 5353 cloudflare.com A || true
+
+          dig @127.0.0.1 -p 5353 cloudflare.com A +time=1 +tries=1
+
           docker rm -f unbound-dns
 
       - name: DNSSEC validation test
@@ -59,13 +68,13 @@ jobs:
           docker run -d --name unbound-dnssec -p 5353:53/udp "$IMAGE_TAG"
           sleep 4
 
-          dig @127.0.0.1 -p 5353 dnssec-failed.org A +dnssec +adflag > dnssec_fail.out || true
+          dig @127.0.0.1 -p 5353 dnssec-failed.org A +dnssec +adflag +time=1 +tries=1 > dnssec_fail.out
           if ! grep -q "status: SERVFAIL" dnssec_fail.out; then
             docker rm -f unbound-dnssec
             exit 1
           fi
 
-          dig @127.0.0.1 -p 5353 cloudflare.com A +dnssec +adflag > dnssec_ok.out || true
+          dig @127.0.0.1 -p 5353 cloudflare.com A +dnssec +adflag +time=1 +tries=1 > dnssec_ok.out
           if ! grep -q "ad;" dnssec_ok.out; then
             docker rm -f unbound-dnssec
             exit 1
