@@ -4,9 +4,7 @@ ARG IMAGE_BUILD_DATE \
   UNBOUND_GID="1000" \
   OPENSSL_BUILDENV_VERSION
 
-#FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}"-quic AS buildenv
-
-FROM madnuttah/openssl-buildenv:3.1.7-1-quic AS buildenv
+FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}"-quic AS buildenv
 
 ARG UNBOUND_UID \
   UNBOUND_GID
@@ -42,7 +40,7 @@ RUN set -xe; \
   git clone "https://github.com/NLnetLabs/unbound" && \
   cd unbound && \
   ./configure \
-    LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib -Wl,-rpath -Wl,/usr/local/openssl/lib -Wl,-rpath -Wl,/usr/local/lib" \
+    LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib -Wl,-rpath -Wl,/usr/local/openssl/lib" \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
     --with-conf-file=/usr/local/unbound/unbound.conf \
@@ -51,7 +49,7 @@ RUN set -xe; \
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
     --with-ssl=/usr/local/openssl \
     --with-libevent \
-    --with-libnghttp2 \
+    --with-libnghttp2 \   
     --with-libngtcp2=/usr/local/ngtcp2 \
     --with-libhiredis \
     --with-username=_unbound \
@@ -153,15 +151,21 @@ COPY --from=buildenv /lib/*-musl-* \
 
 COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
   /app/bin/
-
+  
 COPY --from=buildenv /sbin/su-exec /sbin/tini \
   /app/sbin/
-
+  
 COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
   /app/usr/sbin/
-
+  
+COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
+  /app/bin/
+  
 COPY --from=buildenv /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/
+  
+COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
+  /app/lib/
 
 COPY --from=buildenv /usr/local/ngtcp2/lib/lib*.so.* \
   /app/lib/
