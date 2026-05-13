@@ -2,7 +2,7 @@ name: CD Build Canary-QUIC Distroless Unbound Docker Image
 
 on:
   workflow_run:
-    workflows: [""CD Build Canary Distroless Unbound Docker Image]
+    workflows: ["CD Build Canary Distroless Unbound Docker Image"]
     types:
       - completed
 
