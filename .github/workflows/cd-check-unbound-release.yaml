@@ -22,27 +22,26 @@ jobs:
             echo UNBOUND_VERSION="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT
             echo UNBOUND_DOCKER_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)" >> $GITHUB_OUTPUT
             echo UNBOUND_DOCKER_IMAGE_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
-      
+
             RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
             UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
             CLEAN=${UPSTREAM#openssl-}
-      
+
             echo OPENSSL_QUIC_UPSTREAM="$UPSTREAM" >> $GITHUB_OUTPUT
             echo OPENSSL_BUILDENV_VERSION="$UPSTREAM" >> $GITHUB_OUTPUT
             echo OPENSSL_VERSION="$CLEAN" >> $GITHUB_OUTPUT
-      
+
             OPENSSL_SHA256_URL=$(curl -s "https://api.github.com/repos/madnuttah/openssl-buildenv/releases/tags/$UPSTREAM" \
               | jq -r '.assets[]?.browser_download_url | select(test("sha256|sha256sum|.sha256"))' | head -n1)
-      
+
             if [ -n "$OPENSSL_SHA256_URL" ]; then
               OPENSSL_SHA256=$(curl -sL "$OPENSSL_SHA256_URL" | tr -d '[:space:]' | head -n1)
             else
               OPENSSL_SHA256=""
             fi
-      
+
             echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
           fi
-
 
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
@@ -60,13 +59,13 @@ jobs:
           STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_DOCKER_VERSION: ${{ steps.GET_VERSIONS.outputs.UNBOUND_DOCKER_VERSION }}
 
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Import GPG key
         id: IMPORT_GPG
-        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
