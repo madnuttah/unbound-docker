@@ -38,13 +38,22 @@ jobs:
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
 
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
+          
           UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
-          CLEAN=${UPSTREAM#openssl-}
-
+          
+          if [ -z "$UPSTREAM" ]; then
+            UPSTREAM=$(echo "$RELEASES" | head -n 1)
+          fi
+          
+          CLEAN=$(echo "$UPSTREAM" | sed 's/-quic//')
+          CLEAN=${CLEAN#openssl-}
+          
           echo OPENSSL_QUIC_UPSTREAM="$UPSTREAM" >> $GITHUB_OUTPUT
           echo OPENSSL_QUIC_IMAGE_TAG="$CLEAN" >> $GITHUB_OUTPUT
-          echo OPENSSL_BUILDENV_VERSION="$UPSTREAM" >> $GITHUB_OUTPUT
+          echo OPENSSL_BUILDENV_VERSION="$CLEAN" >> $GITHUB_OUTPUT
           echo OPENSSL_VERSION="$CLEAN" >> $GITHUB_OUTPUT
+
+
 
           OPENSSL_SHA256_URL=$(curl -s "https://api.github.com/repos/madnuttah/openssl-buildenv/releases/tags/$UPSTREAM" | jq -r '.assets[]?.browser_download_url | select(test("sha256|sha256sum|.sha256"))' | head -n1)
           if [ -n "$OPENSSL_SHA256_URL" ]; then
