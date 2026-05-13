@@ -85,7 +85,6 @@ jobs:
           images: ${{ env.DOCKERHUB_SLUG }}
           tags: |
             type=raw,value=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            type=raw,value=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
