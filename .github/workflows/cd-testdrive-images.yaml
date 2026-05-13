@@ -52,7 +52,7 @@ jobs:
         run: docker pull "$IMAGE_TAG"
 
       - name: Test Unbound config
-        run: docker run --rm "$IMAGE_TAG" unbound-checkconf
+        run: docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG"
 
       - name: DNS test
         run: |
