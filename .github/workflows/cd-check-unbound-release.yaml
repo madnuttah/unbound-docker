@@ -59,7 +59,7 @@ jobs:
           STEPS_GET_VERSIONS_OUTPUTS_UNBOUND_DOCKER_VERSION: ${{ steps.GET_VERSIONS.outputs.UNBOUND_DOCKER_VERSION }}
 
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
