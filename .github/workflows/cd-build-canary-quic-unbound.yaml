@@ -1,4 +1,4 @@
-name: CD Build Canary-QUIC Distroless Unbound Docker Image
+name: CD Build Canary Distroless Unbound QUIC Docker Image
 
 on:
   workflow_run:
@@ -104,4 +104,6 @@ jobs:
           push: true
           sbom: true
           provenance: true
+          cache-from: type=registry,ref=madnuttah/unbound:buildcache
+          cache-to: type=registry,ref=madnuttah/unbound:buildcache,mode=max
           tags: ${{ steps.meta.outputs.tags }}

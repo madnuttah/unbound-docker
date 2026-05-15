@@ -84,16 +84,16 @@ To provide always the latest stable, hardened and optimized versions per hardwar
     
 All components as well as the Internic files (root.hints and root.zone) are verified with their corresponding PGP keys and signature files if available to guarantee maximum security and trust.
 
-When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by the bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As we take your network security serious, we are still able to manually update the image as soon as security fixes of the images' components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released. 
+When NLnet Labs publishes a new stable Unbound release, the image will be built, pushed to Docker Hub, tagged and released -including the required signing by our bot [`@madnuttah-bot`](https://github.com/madnuttah-bot) according to the repo's strict security policies- to GitHub on a week-daily schedule without sacrificing security measures like SHA256 verification of the downloaded source tarball. As we take your network security serious, we are still able to manually update the image as soon as security fixes of the images' components were released. The same applies to the OpenSSL build environment when an OpenSSL update got released. 
 
 > [!NOTE]
-> We're not manually building release candidates of Unbound anymore, instead there are automated canary and canary quic builds which will be created from the most recent NLnet Labs Unbound GitHub commit at 20:00 UTC, respectively 22:00 UTC from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound.
+> We're not manually building release candidates of Unbound anymore, instead there are automated canary and canary-quic builds which will be created from the most recent NLnet Labs Unbound GitHub commit at 20:00 UTC, respectively 22:00 UTC from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound. The quic image will be built right after the canary image on success.
 
-The `latest` image is scanned for vulnerabilities using the [zizmor](https://github.com/zizmorcore/zizmor), [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` build only shows the results in the workflow's run details and are being scanned at buildtime. You need to be logged into GitHub to view the logs.
+The `latest` image is scanned for vulnerabilities and the repos are secured against supply-chain attacks using the [zizmor](https://github.com/zizmorcore/zizmor), [Aqua Security Trivy](https://trivy.dev/) and [Docker Scout](https://docs.docker.com/scout/) vulnerability scan on a daily schedule. If vulnerabilities have been detected, they'll show up in [Security](https://github.com/madnuttah/unbound-docker/security). The `canary` and `canary-quic` build only shows the results in the workflow's run details and are being scanned at buildtime. You need to be logged into GitHub to view the logs.
 
 ## Installation
 
-Distroless production and canary multiarch-builds for Linux-based 386, arm/v6, arm/v7, arm64 or amd64 platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
+Distroless production and canary/canary-quic multiarch-builds for Linux-based 386, arm/v6, arm/v7, arm64 or amd64, riscv64, ppc64le, s 390x platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
 
 ## How to use this Image
 

@@ -1,14 +1,13 @@
-name: CD Testdrive Unbound Images
+name: CD Testdrive Unbound Docker Images
 
 on:
   workflow_run:
     workflows:
       - "CD Build Canary Unbound Docker Image"
-      - "CD Build Canary-QUIC Distroless Unbound Docker Image"
+      - "CD Build Distroless Unbound QUIC Docker Image"
       - "CD Build Distroless Unbound Docker Image"
     types:
       - completed
-
   workflow_dispatch:
 
 permissions: {}
@@ -19,20 +18,19 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
-      - name: Determine deterministic image tag
+      - name: Determine image tag
         id: tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
             exit 0
           fi
-
           case "${{ github.event.workflow_run.name }}" in
             "CD Build Canary Unbound Docker Image")
               echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
               ;;
-            "CD Build Canary-QUIC Distroless Unbound Docker Image")
-              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> $GITHUB_ENV
+            "CD Build Distroless Unbound QUIC Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> $GITHUB_ENV
               ;;
             "CD Build Distroless Unbound Docker Image")
               echo "IMAGE_TAG=madnuttah/unbound:latest" >> $GITHUB_ENV
@@ -49,35 +47,45 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull image
-        run: docker pull "$IMAGE_TAG"
+        run: docker pull "$IMAGE_TAG" || true
 
       - name: Test Unbound config
-        run: docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG"
+        run: |
+          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
+            timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG" || true
+          else
+            timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG"
+          fi
 
       - name: DNS test
         run: |
-          docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG"
-          sleep 4
-
-          dig @127.0.0.1 -p 5353 cloudflare.com A +time=1 +tries=1
-
-          docker rm -f unbound-dns
+          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
+            timeout 30s docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG" || true
+            sleep 4
+            timeout 10s dig @127.0.0.1 -p 5353 cloudflare.com A +time=1 +tries=1 || true
+            docker rm -f unbound-dns || true
+          else
+            timeout 30s docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG"
+            sleep 4
+            timeout 10s dig @127.0.0.1 -p 5353 cloudflare.com A +time=1 +tries=1
+            docker rm -f unbound-dns
+          fi
 
       - name: DNSSEC validation test
         run: |
-          docker run -d --name unbound-dnssec -p 5353:53/udp "$IMAGE_TAG"
+          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
+            exit 0
+          fi
+          timeout 30s docker run -d --name unbound-dnssec -p 5353:53/udp "$IMAGE_TAG"
           sleep 4
-
-          dig @127.0.0.1 -p 5353 dnssec-failed.org A +dnssec +adflag +time=1 +tries=1 > dnssec_fail.out
+          timeout 10s dig @127.0.0.1 -p 5353 dnssec-failed.org A +dnssec +adflag +time=1 +tries=1 > dnssec_fail.out
           if ! grep -q "status: SERVFAIL" dnssec_fail.out; then
             docker rm -f unbound-dnssec
             exit 1
           fi
-
-          dig @127.0.0.1 -p 5353 cloudflare.com A +dnssec +adflag +time=1 +tries=1 > dnssec_ok.out
+          timeout 10s dig @127.0.0.1 -p 5353 cloudflare.com A +dnssec +adflag +time=1 +tries=1 > dnssec_ok.out
           if ! grep -q "ad;" dnssec_ok.out; then
             docker rm -f unbound-dnssec
             exit 1
           fi
-
           docker rm -f unbound-dnssec

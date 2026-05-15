@@ -2,7 +2,7 @@ name: CD Tag And Release
 
 on:
   workflow_run:
-    workflows: [CD Build Distroless Unbound Docker Image]
+    workflows: [CD Testdrive Unbound Images]
     types:
       - completed
 
@@ -14,13 +14,13 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.repository.full_name == 'madnuttah/unbound-docker' }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Import GPG key
         id: IMPORT_GPG
-        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd
         with:
           gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
@@ -42,12 +42,26 @@ jobs:
 
           IMAGE_BUILD_DATE="$(grep '^IMAGE_BUILD_DATE=' buildvars | cut -d'=' -f2-)"
           UNBOUND_VERSION="$(grep '^UNBOUND_VERSION=' buildvars | cut -d'=' -f2-)"
+          OPENSSL_BUILDENV_VERSION="$(grep '^OPENSSL_BUILDENV_VERSION=' buildvars | cut -d'=' -f2- || true)"
           UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
           RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
 
           git fetch --all --tags
           if git rev-parse "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
             exit 1
+          fi
+
+          WORKFLOW_ID=$(gh api repos/${GITHUB_REPOSITORY}/actions/workflows --jq '.workflows[] | select(.name=="CD Build Distroless Unbound Docker QUIC Image") | .id' || true)
+          if [ -n "$WORKFLOW_ID" ]; then
+            QUIC_RUN_CONCLUSION=$(gh api repos/${GITHUB_REPOSITORY}/actions/workflows/$WORKFLOW_ID/runs --jq '.workflow_runs[0].conclusion' || true)
+          else
+            QUIC_RUN_CONCLUSION=""
+          fi
+
+          if [ "$QUIC_RUN_CONCLUSION" = "success" ]; then
+            QUIC_SECTION=$(printf "## QUIC components\n* OpenSSL QUIC buildenv: %s\n\n" "$OPENSSL_BUILDENV_VERSION")
+          else
+            QUIC_SECTION=$(printf "## QUIC status\n* QUIC image build failed or was not available for this release.\n\n")
           fi
 
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
@@ -94,8 +108,8 @@ jobs:
             NEW_MD="- None"
           fi
 
-          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## Updated components\n* Updated Unbound to version %s\n\n## Contributors\n%s\n\n## New contributors\n%s\n\n## NLnet Labs Unbound changelog\nhttps://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
-            "$(date '+%Y-%m-%d')" "$UNBOUND_VERSION" "$CONTRIB_MD" "$NEW_MD" "$UNBOUND_VERSION")
+          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## Updated components\n* Updated Unbound to version %s\n\n%s## Contributors\n%s\n\n## New contributors\n%s\n\n## NLnet Labs Unbound changelog\nhttps://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
+            "$(date '+%Y-%m-%d')" "$UNBOUND_VERSION" "$QUIC_SECTION" "$CONTRIB_MD" "$NEW_MD" "$UNBOUND_VERSION")
 
           git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
           git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
