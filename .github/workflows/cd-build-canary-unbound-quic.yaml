@@ -12,6 +12,7 @@ permissions: {}
 jobs:
 
   buildvars:
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
