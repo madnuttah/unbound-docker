@@ -1,4 +1,4 @@
-name: CD Build Canary Distroless Unbound QUIC Docker Image"
+name: CD Build Canary Distroless Unbound DDocker Image"
 
 on:
   workflow_run:
