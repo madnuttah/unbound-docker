@@ -3,31 +3,30 @@ name: CD Testdrive Unbound Docker Images
 on:
   workflow_run:
     workflows:
-      - "CD Build Canary Unbound Docker Image"
-      - "CD Build Distroless Unbound QUIC Docker Image"
+      - "CD Build Canary Distroless Unbound Docker Image"
+      - "CD Build Canary Distroless Unbound QUIC Docker Image"
       - "CD Build Distroless Unbound Docker Image"
+      - "CD Build Distroless Unbound QUIC Docker Image"
     types:
       - completed
-  workflow_dispatch:
 
 permissions: {}
 
 jobs:
   test-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Determine image tag
         id: tag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
-            exit 0
-          fi
           case "${{ github.event.workflow_run.name }}" in
-            "CD Build Canary Unbound Docker Image")
+            "CD Build Canary Distroless Unbound Docker Image")
               echo "IMAGE_TAG=madnuttah/unbound:canary" >> $GITHUB_ENV
+              ;;
+            "CD Build Canary Distroless Unbound QUIC Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> $GITHUB_ENV
               ;;
             "CD Build Distroless Unbound QUIC Docker Image")
               echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> $GITHUB_ENV
