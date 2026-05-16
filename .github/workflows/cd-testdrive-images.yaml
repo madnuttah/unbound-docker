@@ -61,30 +61,45 @@ jobs:
           if [[ "$IMAGE_TAG" == *"-quic" ]]; then
             timeout 30s docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG" || true
             sleep 4
-            timeout 10s dig @127.0.0.1 -p 5353 cloudflare.com A +time=1 +tries=1 || true
+            timeout 10s docker exec unbound-dns drill cloudflare.com A || true
             docker rm -f unbound-dns || true
           else
             timeout 30s docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG"
             sleep 4
-            timeout 10s dig @127.0.0.1 -p 5353 cloudflare.com A +time=1 +tries=1
+            timeout 10s docker exec unbound-dns drill cloudflare.com A
             docker rm -f unbound-dns
           fi
 
       - name: DNSSEC validation test
         run: |
-          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            exit 0
-          fi
           timeout 30s docker run -d --name unbound-dnssec -p 5353:53/udp "$IMAGE_TAG"
           sleep 4
-          timeout 10s dig @127.0.0.1 -p 5353 dnssec-failed.org A +dnssec +adflag +time=1 +tries=1 > dnssec_fail.out
-          if ! grep -q "status: SERVFAIL" dnssec_fail.out; then
+
+          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
+            timeout 10s docker exec unbound-dnssec drill -D cloudflare.com A > quic_dnssec_ok.out
+            if ! grep -q "ad;" quic_dnssec_ok.out; then
+              docker rm -f unbound-dnssec
+              exit 1
+            fi
+            timeout 10s docker exec unbound-dnssec drill -D cloudflare.com DNSKEY > quic_dnskey.out
+            if ! grep -q "DNSKEY" quic_dnskey.out; then
+              docker rm -f unbound-dnssec
+              exit 1
+            fi
+            docker rm -f unbound-dnssec
+            exit 0
+          fi
+
+          timeout 10s docker exec unbound-dnssec drill -D dnssec-failed.org A > dnssec_fail.out
+          if ! grep -q "SERVFAIL" dnssec_fail.out; then
             docker rm -f unbound-dnssec
             exit 1
           fi
-          timeout 10s dig @127.0.0.1 -p 5353 cloudflare.com A +dnssec +adflag +time=1 +tries=1 > dnssec_ok.out
+
+          timeout 10s docker exec unbound-dnssec drill -D cloudflare.com A > dnssec_ok.out
           if ! grep -q "ad;" dnssec_ok.out; then
             docker rm -f unbound-dnssec
             exit 1
           fi
+
           docker rm -f unbound-dnssec
