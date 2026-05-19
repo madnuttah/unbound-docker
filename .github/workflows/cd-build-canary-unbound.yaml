@@ -126,7 +126,7 @@ jobs:
           format: "table"
 
       - name: Docker Scout CVEs
-        uses: docker/scout-action@bacf462e8d090c09660de30a6ccc718035f961e3
+        uses: docker/scout-action@cd72f264beff1cd72735de31148b9d3244a0234a
         if: ${{ github.event_name != 'pull_request' }}
         with:
           command: cves
