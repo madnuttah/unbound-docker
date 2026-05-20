@@ -14,8 +14,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion != 'cancelled' &&
         github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.repository.full_name == 'madnuttah/unbound-docker' &&
-        startsWith(github.event.workflow_run.head_ref, 'refs/tags/v') &&
-        !contains(github.event.workflow_run.head_ref, '-quic') }}
+        startsWith(github.event.workflow_run.head_branch, 'refs/tags/v') &&
+        !contains(github.event.workflow_run.head_branch, '-quic') }}
 
     steps:
       - name: Checkout source
