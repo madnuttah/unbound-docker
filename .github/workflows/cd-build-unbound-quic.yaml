@@ -19,7 +19,7 @@ jobs:
       UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
       NGTCP2_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.NGTCP2_VERSION }}
-      OPENSSL_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_BUILDENV_VERSION }}
+      OPENSSL_QUIC_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
 
     steps:
       - name: Checkout source
@@ -38,7 +38,7 @@ jobs:
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep NGTCP2_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep OPENSSL_BUILDENV_VERSION >> $GITHUB_OUTPUT
+          cat buildvars | grep OPENSSL_QUIC_BUILDENV_VERSION >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -75,7 +75,7 @@ jobs:
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
             NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
           file: ./unbound/release_quic.Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
@@ -86,24 +86,3 @@ jobs:
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
             ${{ env.DOCKERHUB_SLUG }}:latest-quic
-
-  # tag:
-    # runs-on: ubuntu-latest
-    # needs: build
-    # permissions:
-      # contents: write
-    # steps:
-      # - name: Checkout
-        # uses: actions/checkout@v6
-        # with:
-          # fetch-depth: 0
-          # persist-credentials: false
-
-      # - name: Create tag
-        # env:
-          # VERSION: ${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
-        # run: |
-          # git config user.name "github-actions"
-          # git config user.email "github-actions@github.com"
-          # git tag "v$VERSION-quic"
-          # git push origin "v$VERSION-quic"
