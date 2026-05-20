@@ -49,10 +49,15 @@ jobs:
           if [[ -z "$UNBOUND_GIT_SHA" ]]; then
             exit 1
           fi
+
           CURRENT_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
-          if [[ "$CURRENT_SHA" != "$UNBOUND_GIT_SHA" ]]; then
-            echo "UNBOUND_GIT_SHA=$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
+
+          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" ]]; then
+            echo "No update — SHA unchanged"
+            exit 1
           fi
+
+          echo "UNBOUND_GIT_SHA=$UNBOUND_GIT_SHA" >> $GITHUB_OUTPUT
 
       - name: Import GPG key
         id: IMPORT_GPG
