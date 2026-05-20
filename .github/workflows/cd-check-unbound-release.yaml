@@ -89,8 +89,7 @@ jobs:
           echo OPENSSL_QUIC_BUILDENV_VERSION="$OPENSSL_QUIC_BUILDENV_VERSION" >> buildvars
 
           echo NGTCP2_VERSION="$NGTCP2_VERSION" >> buildvars
-          echo NGHTTP3_VERSION="$NGHTTP3_VERSION" >> buildvars
-
+          
           echo ${STEPS_IS_UPDATE_AVAILABLE_OUTPUTS_UNBOUND_GIT_SHA} > unbound_git_sha
 
           git add buildvars unbound_git_sha
