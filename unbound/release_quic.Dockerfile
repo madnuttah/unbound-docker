@@ -147,7 +147,7 @@ RUN set -xe; \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*access-control:.*|    access-control: 0.0.0.0/0 allow|' /usr/local/unbound/unbound.conf && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*root-hints:.*|    root-hints: "/usr/local/unbound/iana.d/root.hints"|' /usr/local/unbound/unbound.conf && \
   sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*verbosity:.*|    verbosity: 1|' /usr/local/unbound/unbound.conf && \
-  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*logfile:.*|    logfile: ""|' /usr/local/unbound/unbound.conf
+  sed -i '/^server:/,/^[^[:space:]]/ s|^[[:space:]]*#\?[[:space:]]*logfile:.*|    logfile: ""|' /usr/local/unbound/unbound.conf && \
   rm -rf \
     /usr/local/unbound/unbound.d/share \
     /usr/local/unbound/etc \
