@@ -45,9 +45,7 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
-          IMAGE_BUILD_DATE="$(grep '^IMAGE_BUILD_DATE=' buildvars | cut -d'=' -f2-)"
           UNBOUND_VERSION="$(grep '^UNBOUND_VERSION=' buildvars | cut -d'=' -f2-)"
-          OPENSSL_BUILDENV_VERSION="$(grep '^OPENSSL_BUILDENV_VERSION=' buildvars | cut -d'=' -f2- || true)"
           UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
           RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
 
@@ -64,9 +62,9 @@ jobs:
           fi
 
           if [ "$QUIC_RUN_CONCLUSION" = "success" ]; then
-            QUIC_SECTION=$(printf "## QUIC components\n* OpenSSL QUIC buildenv: %s\n\n" "$OPENSSL_BUILDENV_VERSION")
+            WHATS_NEW=$(printf "* Updated Unbound and Unbound+QUIC to version %s\n\n" "$UNBOUND_VERSION")
           else
-            QUIC_SECTION=$(printf "## QUIC status\n* QUIC image build failed or was not available for this release.\n\n")
+            WHATS_NEW=$(printf "* Updated Unbound to version %s\n* Unbound+QUIC build failed or was not available for this release\n\n" "$UNBOUND_VERSION")
           fi
 
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
@@ -113,8 +111,8 @@ jobs:
             NEW_MD="- None"
           fi
 
-          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## Updated components\n* Updated Unbound to version %s\n\n%s## Contributors\n%s\n\n## New contributors\n%s\n\n## NLnet Labs Unbound changelog\nhttps://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
-            "$(date '+%Y-%m-%d')" "$UNBOUND_VERSION" "$QUIC_SECTION" "$CONTRIB_MD" "$NEW_MD" "$UNBOUND_VERSION")
+          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## What's new?\n%s## Contributors\n%s\n\n## New contributors\n%s\n\n## NLnet Labs Unbound changelog\nhttps://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
+            "$(date '+%Y-%m-%d')" "$WHATS_NEW" "$CONTRIB_MD" "$NEW_MD" "$UNBOUND_VERSION")
 
           git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
           git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
