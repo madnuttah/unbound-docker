@@ -1,6 +1,7 @@
 name: CD Check NLnet Labs Unbound Release
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 12-17 * * mon-fri"
 
