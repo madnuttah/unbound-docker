@@ -32,8 +32,11 @@ jobs:
           RELEASES=$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq -r '.[].tag_name')
           UPSTREAM=$(echo "$RELEASES" | grep -i quic | head -n 1)
           CLEAN=${UPSTREAM#openssl-}
-
           echo "OPENSSL_QUIC_VERSION=$CLEAN" >> $GITHUB_OUTPUT
+
+          OPENSSL_BUILDENV_VERSION=$(echo "$RELEASES" | grep -vi quic | head -n 1)
+          OPENSSL_BUILDENV_VERSION=${OPENSSL_BUILDENV_VERSION#openssl-}
+          echo "OPENSSL_BUILDENV_VERSION=$OPENSSL_BUILDENV_VERSION" >> $GITHUB_OUTPUT
 
           NGTCP2_VERSION=$(curl -s https://api.github.com/repos/ngtcp2/ngtcp2/releases | jq -r '.[0].tag_name')
           echo "NGTCP2_VERSION=$NGTCP2_VERSION" >> $GITHUB_OUTPUT
@@ -83,6 +86,7 @@ jobs:
           UNBOUND_SHA256: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_SHA256 }}
           UNBOUND_GIT_SHA: ${{ steps.IS_UPDATE_AVAILABLE.outputs.UNBOUND_GIT_SHA }}
           OPENSSL_QUIC_VERSION: ${{ steps.GET_VERSIONS.outputs.OPENSSL_QUIC_VERSION }}
+          OPENSSL_BUILDENV_VERSION: ${{ steps.GET_VERSIONS.outputs.OPENSSL_BUILDENV_VERSION }}
           NGTCP2_VERSION: ${{ steps.GET_VERSIONS.outputs.NGTCP2_VERSION }}
           NGHTTP3_VERSION: ${{ steps.GET_VERSIONS.outputs.NGHTTP3_VERSION }}
         run: |
@@ -92,6 +96,7 @@ jobs:
           echo UNBOUND_VERSION="$UNBOUND_VERSION" >> buildvars
           echo UNBOUND_SHA256="$UNBOUND_SHA256" >> buildvars
           echo UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_VERSION}-0" >> buildvars
+          echo OPENSSL_BUILDENV_VERSION="$OPENSSL_BUILDENV_VERSION" >> buildvars
           echo OPENSSL_QUIC_VERSION="$OPENSSL_QUIC_VERSION" >> buildvars
           echo NGTCP2_VERSION="$NGTCP2_VERSION" >> buildvars
           echo NGHTTP3_VERSION="$NGHTTP3_VERSION" >> buildvars
