@@ -18,7 +18,7 @@ jobs:
       UNBOUND_DOCKER_IMAGE_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
       UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
-      OPENSSL_QUIC_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_QUIC_VERSION }}
+      OPENSSL_QUIC_VERSION: ${{ steps.SET_QUIC.outputs.OPENSSL_QUIC_VERSION }}
       NGTCP2_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.NGTCP2_VERSION }}
       NGHTTP3_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.NGHTTP3_VERSION }}
 
@@ -38,10 +38,14 @@ jobs:
           cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep OPENSSL_QUIC_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep NGTCP2_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep NGHTTP3_VERSION >> $GITHUB_OUTPUT
 
+      - name: Set OPENSSL_QUIC_VERSION
+        id: SET_QUIC
+        run: |
+          source buildvars
+          echo "OPENSSL_QUIC_VERSION=${OPENSSL_BUILDENV_VERSION}-quic" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
