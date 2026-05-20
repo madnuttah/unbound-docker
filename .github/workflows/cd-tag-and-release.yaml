@@ -1,6 +1,7 @@
 name: CD Tag And Release
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [CD Testdrive Unbound Images]
     types:
