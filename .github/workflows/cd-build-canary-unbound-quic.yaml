@@ -18,7 +18,7 @@ jobs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
       UNBOUND_VERSION: ${{ steps.vars.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.vars.outputs.UNBOUND_SHA256 }}
-      OPENSSL_BUILDENV_VERSION: ${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}
+      OPENSSL_QUIC_BUILDENV_VERSION: ${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
       OPENSSL_VERSION: ${{ steps.vars.outputs.OPENSSL_VERSION }}
       OPENSSL_SHA256: ${{ steps.vars.outputs.OPENSSL_SHA256 }}
       NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
@@ -47,7 +47,7 @@ jobs:
 
           FINAL="${OPENSSL_VERSION}-${SUBVERSION}"
 
-          echo OPENSSL_BUILDENV_VERSION="$FINAL" >> $GITHUB_OUTPUT
+          echo OPENSSL_QUIC_BUILDENV_VERSION="$FINAL-quic" >> $GITHUB_OUTPUT
           echo OPENSSL_VERSION="$OPENSSL_VERSION" >> $GITHUB_OUTPUT
           echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
           echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
@@ -93,7 +93,7 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
+            OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
             OPENSSL_VERSION=${{ needs.buildvars.outputs.OPENSSL_VERSION }}
             OPENSSL_SHA256=${{ needs.buildvars.outputs.OPENSSL_SHA256 }}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
@@ -109,6 +109,7 @@ jobs:
           cache-to: type=registry,ref=madnuttah/unbound:buildcache,mode=max
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary-quic
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         if: ${{ github.event_name != 'pull_request' }}
