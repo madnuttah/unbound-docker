@@ -34,14 +34,6 @@
       ],
       "datasourceTemplate": "docker"
     }
-    // {
-    //   "description": "curl GitHub release URLs in workflows",
-    //   "fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
-    //   "matchStrings": [
-    //     "https://github.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>[^/]+)/"
-    //   ],
-    //   "datasourceTemplate": "github-releases"
-    // }
   ],
 
   "packageRules": [
