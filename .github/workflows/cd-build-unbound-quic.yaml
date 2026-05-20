@@ -75,7 +75,7 @@ jobs:
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+            OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
             NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
           file: ./unbound/release_quic.Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
