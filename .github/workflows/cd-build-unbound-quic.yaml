@@ -18,9 +18,8 @@ jobs:
       UNBOUND_DOCKER_IMAGE_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
       UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
-      OPENSSL_QUIC_VERSION: ${{ steps.SET_QUIC.outputs.OPENSSL_QUIC_VERSION }}
       NGTCP2_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.NGTCP2_VERSION }}
-      NGHTTP3_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.NGHTTP3_VERSION }}
+      OPENSSL_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_BUILDENV_VERSION }}
 
     steps:
       - name: Checkout source
@@ -39,13 +38,7 @@ jobs:
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep NGTCP2_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep NGHTTP3_VERSION >> $GITHUB_OUTPUT
-
-      - name: Set OPENSSL_QUIC_VERSION
-        id: SET_QUIC
-        run: |
-          source buildvars
-          echo "OPENSSL_QUIC_VERSION=${OPENSSL_BUILDENV_VERSION}-quic" >> $GITHUB_OUTPUT
+          cat buildvars | grep OPENSSL_BUILDENV_VERSION >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -75,18 +68,16 @@ jobs:
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
             UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
-            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_VERSION }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}-quic
             NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
-            NGHTTP3_VERSION=${{ needs.buildvars.outputs.NGHTTP3_VERSION }}
-            QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_VERSION }}
-          file: ./unbound/release-quic.Dockerfile
+          file: ./unbound/release_quic.Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
