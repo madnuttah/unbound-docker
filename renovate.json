@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": [
+    "github-actions",
+    "dockerfile",
+    "docker-compose",
+    "regex"
+  ],
+  "extends": [
+    "config:recommended",
+    ":pinDigests",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)"
+  ],
+
+  "github-actions": {
+    "enabled": true,
+    "pinDigests": true
+  },
+
+  "docker": {
+    "enabled": true,
+    "pinDigests": true
+  },
+
+  "regexManagers": [
+    {
+      "description": "Docker images in GitHub Actions workflows",
+      "fileMatch": [
+        "^\\.github/workflows/.*\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "image:\\s*(?<depName>[^:@\\s]+)(?::(?<currentValue>[^@\\s]+))?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+    // {
+    //   "description": "curl GitHub release URLs in workflows",
+    //   "fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+    //   "matchStrings": [
+    //     "https://github.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>[^/]+)/"
+    //   ],
+    //   "datasourceTemplate": "github-releases"
+    // }
+  ],
+
+  "packageRules": [
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions"
+    },
+    {
+      "description": "Group Docker image digest updates",
+      "matchManagers": ["dockerfile", "docker-compose", "regex"],
+      "groupName": "docker-images"
+    },
+    {
+      "description": "Pin alpine and keep it updated",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["alpine"],
+      "pinDigests": true
+    }
+  ]
+}
