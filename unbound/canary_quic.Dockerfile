@@ -4,8 +4,7 @@ ARG IMAGE_BUILD_DATE \
   UNBOUND_GID="1000" \
   OPENSSL_BUILDENV_VERSION \
   NGTCP2_VERSION \
-  NGHTTP3_VERSION \
-  QUIC_BUILDENV_VERSION
+  NGHTTP3_VERSION
 
 FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}"-quic AS buildenv
 
@@ -52,7 +51,7 @@ RUN set -xe; \
     --with-rootkey-file=/usr/local/unbound/iana.d/root.key \
     --with-ssl=/usr/local/openssl \
     --with-libevent \
-    --with-libnghttp2 \   
+    --with-libnghttp2 \
     --with-libngtcp2=/usr/local/ngtcp2 \
     --with-libhiredis \
     --with-username=_unbound \
@@ -154,19 +153,16 @@ COPY --from=buildenv /lib/*-musl-* \
 
 COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat /bin/chown /bin/chgrp \
   /app/bin/
-  
+
 COPY --from=buildenv /sbin/su-exec /sbin/tini \
   /app/sbin/
-  
+
 COPY --from=buildenv /usr/sbin/groupmod /usr/sbin/usermod \
   /app/usr/sbin/
-  
-COPY --from=buildenv /bin/sh /bin/sed /bin/grep /bin/netstat \
-  /app/bin/
-  
+
 COPY --from=buildenv /usr/bin/awk /usr/bin/drill /usr/bin/id \
   /app/usr/bin/
-  
+
 COPY --from=buildenv /usr/local/openssl/lib/libssl.so.* /usr/local/openssl/lib/libcrypto.so.* \
   /app/lib/
 
@@ -204,14 +200,15 @@ FROM scratch AS unbound
 ARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   OPENSSL_BUILDENV_VERSION \
-  UNBOUND_UID
+  UNBOUND_UID \
+  NGTCP2_VERSION \
+  NGHTTP3_VERSION
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
   UNBOUND_VERSION="${UNBOUND_VERSION}" \
   OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}" \
   NGTCP2_VERSION="${NGTCP2_VERSION}" \
   NGHTTP3_VERSION="${NGHTTP3_VERSION}" \
-  QUIC_BUILDENV_VERSION="${QUIC_BUILDENV_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
 
