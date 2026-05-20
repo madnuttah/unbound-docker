@@ -92,18 +92,28 @@ jobs:
     needs: build
     permissions:
       contents: write
+  
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           persist-credentials: false
-
-      - name: Create tag
-        env:
-          VERSION: ${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+  
+      - name: Configure Git
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+  
+      - name: Create and push tag
+        env:
+          VERSION: ${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+        run: |
+          if [ -z "$VERSION" ]; then
+            echo "VERSION is empty — aborting"
+            exit 1
+          fi
+  
           git tag "v$VERSION"
           git push origin "v$VERSION"
