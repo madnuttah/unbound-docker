@@ -14,13 +14,13 @@ jobs:
       - name: Get versions
         id: GET_VERSIONS
         run: |
-          BOOL="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq '.[0] | .prerelease')"
+          BOOL="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq 'map(select(.prerelease == false))[0].prerelease')"
           if $BOOL; then
             echo "Pre-release, skipping"
             exit 1
           fi
 
-          UNBOUND_VERSION="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq -r '.[0].name' | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)"
+          UNBOUND_VERSION="$(curl -s https://api.github.com/repos/NLnetLabs/unbound/releases | jq -r 'map(select(.prerelease == false))[0].name' | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)"
           echo "UNBOUND_VERSION=$UNBOUND_VERSION" >> $GITHUB_OUTPUT
 
           UNBOUND_DOCKER_VERSION="$(curl -s https://api.github.com/repos/madnuttah/unbound-docker/releases | jq -r '.[0].name' | grep -Eo '([0-9]+)(\.?[0-9]+)*' | head -1)"
