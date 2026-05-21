@@ -47,7 +47,7 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
           UNBOUND_VERSION="$(grep '^UNBOUND_VERSION=' buildvars | cut -d'=' -f2-)"
-          UNBOUND_DOCKER_VERSION="$UNBOUND_VERSION-0"
+          UNBOUND_DOCKER_VERSION="$(grep '^UNBOUND_DOCKER_IMAGE_VERSION=' buildvars | cut -d'=' -f2-)"
           RELEASE_TAG="v$UNBOUND_DOCKER_VERSION"
 
           git fetch --all --tags
