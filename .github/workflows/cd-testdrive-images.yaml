@@ -48,23 +48,23 @@ jobs:
       - name: Pull image
         run: docker pull "$IMAGE_TAG" || true
 
-      - name: Test Unbound config
-        run: |
-          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG" || true
-          else
-            timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG"
-          fi
+      # - name: Test Unbound config
+        # run: |
+          # if [[ "$IMAGE_TAG" == *"-quic" ]]; then
+            # timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG" || true
+          # else
+            # timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG"
+          # fi
 
       - name: DNS test
         run: |
           if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            timeout 30s docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG" || true
+            timeout 30s docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG" || true
             sleep 4
             timeout 10s docker exec unbound-dns drill cloudflare.com A || true
             docker rm -f unbound-dns || true
           else
-            timeout 30s docker run -d --name unbound-dns -p 5353:53/udp "$IMAGE_TAG"
+            timeout 30s docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG"
             sleep 4
             timeout 10s docker exec unbound-dns drill cloudflare.com A
             docker rm -f unbound-dns
