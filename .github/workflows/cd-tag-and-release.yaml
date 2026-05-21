@@ -3,7 +3,8 @@ name: CD Tag And Release
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: [CD Testdrive Unbound Images]
+    workflows:
+      - "CD Build Distroless Unbound Docker Image"
     types:
       - completed
 
@@ -14,12 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.repository.full_name == 'madnuttah/unbound-docker' &&
-        startsWith(github.event.workflow_run.head_branch, 'refs/tags/v') &&
-        !contains(github.event.workflow_run.head_branch, '-quic')
-      )
+      github.event.workflow_run.conclusion == 'success'
+
 
     steps:
       - name: Checkout source
@@ -58,18 +55,7 @@ jobs:
             exit 1
           fi
 
-          WORKFLOW_ID=$(gh api repos/${GITHUB_REPOSITORY}/actions/workflows --jq '.workflows[] | select(.name=="CD Build Distroless Unbound Docker QUIC Image") | .id' || true)
-          if [ -n "$WORKFLOW_ID" ]; then
-            QUIC_RUN_CONCLUSION=$(gh api repos/${GITHUB_REPOSITORY}/actions/workflows/$WORKFLOW_ID/runs --jq '.workflow_runs[0].conclusion' || true)
-          else
-            QUIC_RUN_CONCLUSION=""
-          fi
-
-          if [ "$QUIC_RUN_CONCLUSION" = "success" ]; then
-            WHATS_NEW=$(printf "* Updated Unbound and Unbound+QUIC to version %s\n\n" "$UNBOUND_VERSION")
-          else
-            WHATS_NEW=$(printf "* Updated Unbound to version %s\n* Unbound+QUIC build failed or was not available for this release\n\n" "$UNBOUND_VERSION")
-          fi
+          WHATS_NEW="* Updated Unbound to version ${UNBOUND_VERSION}\n* Unbound+QUIC build is currently building…"
 
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
           git push -u origin "$RELEASE_TAG"
@@ -93,30 +79,22 @@ jobs:
             fi
           done)
 
-          CONTRIB_MD=$(echo "$FILTERED_CURRENT" | while IFS='|' read -r NAME EMAIL; do
-            USER=$(curl -s "https://api.github.com/search/users?q=$EMAIL" | jq -r '.items[0].login // empty')
-            if [ -n "$USER" ]; then
-              echo "- @$USER"
-            else
-              echo "- $NAME"
-            fi
-          done)
-
-          NEW_MD=$(echo "$NEW_CONTRIB" | while IFS='|' read -r NAME EMAIL; do
-            USER=$(curl -s "https://api.github.com/search/users?q=$EMAIL" | jq -r '.items[0].login // empty')
-            if [ -n "$USER" ]; then
-              echo "- @$USER"
-            else
-              echo "- $NAME"
-            fi
-          done)
-
-          if [ -z "$NEW_MD" ]; then
-            NEW_MD="- None"
+          if [ -n "$NEW_CONTRIB" ]; then
+            NEW_CONTRIB_MD=$(echo "$NEW_CONTRIB" | while IFS='|' read -r NAME EMAIL; do
+              USER=$(curl -s "https://api.github.com/search/users?q=$EMAIL" | jq -r '.items[0].login // empty')
+              if [ -n "$USER" ]; then
+                echo "- @$USER"
+              else
+                echo "- $NAME"
+              fi
+            done)
+            NEW_CONTRIB_SECTION=$(printf "## New contributors\n%s\n\n" "$NEW_CONTRIB_MD")
+          else
+            NEW_CONTRIB_SECTION=""
           fi
 
-          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## What's new?\n%s## Contributors\n%s\n\n## New contributors\n%s\n\n## NLnet Labs Unbound changelog\nhttps://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
-            "$(date '+%Y-%m-%d')" "$WHATS_NEW" "$CONTRIB_MD" "$NEW_MD" "$UNBOUND_VERSION")
+          RELEASE_NOTE=$(printf "## %s <madnuttah-bot>\n\n## What's new?\n%s\n\n%sNLnet Labs Unbound changelog: https://github.com/NLnetLabs/unbound/releases/tag/release-%s\n" \
+            "$(date '+%Y-%m-%d')" "$WHATS_NEW" "$NEW_CONTRIB_SECTION" "$UNBOUND_VERSION")
 
           git checkout -b "$UNBOUND_DOCKER_VERSION" "$RELEASE_TAG"
           git push --set-upstream origin "$UNBOUND_DOCKER_VERSION"
