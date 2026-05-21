@@ -7,7 +7,6 @@
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
 [![CD Build Nightly Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-canary-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20canary%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-canary-unbound.yaml)
-[![Manual Build Unbound Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/manually-build-unbound.yaml?branch=main&label=Manually%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/manually-build-unbound.yaml)
 
 </details>
 
@@ -63,17 +62,13 @@ Docker containers are most easily used with docker compose.
 
 You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number:
 
-`docker pull madnuttah/unbound:latest` or `docker pull madnuttah/unbound:1.1.0-0`
+`docker pull madnuttah/unbound:latest` or `docker pull madnuttah/unbound:1.1.0-0` and their __stable__ [`DNS over Quic/QUIC/DoQ`](https://unbound.docs.nlnetlabs.nl/en/latest/topics/privacy/dns-over-quic.html) variants by simply appending `-quic` to the tag like `docker pull madnuttah/unbound:latest-quic` or `docker pull madnuttah/unbound:1.1.0-0-quic`.
 
-The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.1.0-0`.
+The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.1.0-0[-quic]`.
  
-There are canary builds of the image available. You can pull the image using it's `canary` tag: 
+There are canary and also canary-quic builds of the image available. You can pull the image using it's `canary` or `canary-quic`tag: 
 
-`docker pull madnuttah/unbound:canary`
-
-If you would like to check out [`DNS over Quic`](https://unbound.docs.nlnetlabs.nl/en/latest/topics/privacy/dns-over-quic.html), there's a modified canary build:
-
-`docker pull madnuttah/unbound:canary-quic`
+`docker pull madnuttah/unbound:canary` and `docker pull madnuttah/unbound:canary-quic` respectively.
 
 > [!NOTE] 
 > Canary builds may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by us.
