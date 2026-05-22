@@ -19,7 +19,7 @@ jobs:
           persist-credentials: false
           
       - name: Lint Dockerfiles
-        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.30
+        uses: hadolint/hadolint-action@v3.30
         with:
           dockerfile: |
             unbound/*.Dockerfile
