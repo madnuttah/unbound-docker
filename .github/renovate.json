@@ -10,9 +10,9 @@
     "regexManagers:dockerfileVersions",
     "regexManagers:githubActionsVersions",
     "regexManagers:tfvarsVersions",
-    "group:allDigest",
-    "schedule:weekends"
+    "group:allDigest"
   ],
+  "schedule": ["every weekday", "on saturday"],
   "timezone": "Europe/Berlin",
   "pinDigest": {
     "automerge": true
