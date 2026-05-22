@@ -7,9 +7,9 @@
     ":automergeStableNonMajor",
     ":automergePatch",
     ":automergeDigest",
-    "regexManagers:dockerfileVersions",
-    "regexManagers:githubActionsVersions",
-    "regexManagers:tfvarsVersions",
+    "customManagers:dockerfileVersions",
+    "customManagers:githubActionsVersions",
+    "customManagers:tfvarsVersions",
     "group:allDigest"
   ],
   "schedule": ["every weekday", "on saturday"],
@@ -20,8 +20,10 @@
   "packageRules": [
     {
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^madnuttah/openssl-buildenv$"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": [
+        "/^madnuttah/openssl-buildenv$/"
+      ]
     },
     {
       "matchFileNames": ["buildvars", "*.sh"],
