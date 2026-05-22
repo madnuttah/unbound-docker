@@ -1,7 +1,7 @@
 # Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
 <details>
-  <summary>Build status</summary><br>
+  <summary>Build status (click to expand)</summary><br>
 
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
@@ -18,32 +18,53 @@
 This repository provides a lightweight Alpine Linux based Docker image running [Unbound](https://unbound.net), an open source high performance DNS resolver developed by the people at [NLnet Labs](https://nlnetlabs.nl). The image is a secure single layer distroless scratch build that follows best practice principles and is suitable for professional and personal use alike.
 
 <details>
-  <summary>Features</summary><br>
+  <summary>Features (click to expand)</summary><br>
 
-| Feature                                  | Supported |
-| ---------------------------------------- | --------- |
-| Unprivileged user                        | yes |
-| Unprivileged port (privileged possible)  | yes |
-| Custom UID and GID build and environment variables | yes |
-| Optional full rootless mode              | yes |
-| CD built single layer distroless scratch image running Alpine Linux | yes |
-| Per hardware architecture optimized and CD built [OpenSSL&OpenSSL+QUIC](https://github.com/madnuttah/openssl-buildenv) | yes |
-| Libevent                                 | yes |
-| Recursive DNS as default                 | yes |
-| DNSSEC                                   | yes |
-| DNSCrypt                                 | yes |
-| DNSTap                                   | yes |
-| DNS64                                    | yes |
-| DNS over HTTPS                           | yes |
-| DNS over TLS                             | yes |
-| DNS over Quic (separate [-quic] builds)  | yes |
-| Redis via UNIX socket or network         | yes |
-| EDNS Client Subnet                       | yes |
-| Optional privacy respecting and meaningful healthcheck | yes |
-| Optional Unbound statistics for Grafana via Zabbix without third party tools | yes |
-| Python                                   | no |
+| Feature                                  | Supported | Explanation |
+| ---------------------------------------- | --------- | ----------- |
+| Unprivileged user                        | yes | Runs Unbound without root to reduce attack surface. |
+| Unprivileged port (privileged possible)  | yes | Allows binding to high ports by default or low ports when needed. |
+| Custom UID and GID build and environment variables | yes | Lets you match container permissions to host requirements. |
+| Optional full rootless mode              | yes | Enables running the container without any root privileges. |
+| CD built single layer distroless scratch image running Alpine Linux | yes | Produces a minimal and secure runtime with no package manager or shell. |
+| Per hardware architecture optimized and CD built [OpenSSL&OpenSSL+QUIC](https://github.com/madnuttah/openssl-buildenv) | yes | Ensures optimal crypto performance and QUIC support per architecture. |
+| Libevent                                 | yes | Provides efficient event handling for high performance DNS resolution. |
+| Recursive DNS as default                 | yes | Configured to perform full recursion without relying on upstream resolvers. |
+| DNSSEC                                   | yes | Validates DNS responses cryptographically for authenticity. |
+| DNSCrypt                                 | yes | Supports encrypted DNS queries using the DNSCrypt protocol. |
+| DNSTap                                   | yes | Allows structured logging of DNS queries for analysis and debugging. |
+| DNS64                                    | yes | Synthesizes IPv6 addresses for IPv4 only destinations. |
+| DNS over HTTPS                           | yes | Accepts and serves DNS queries over HTTPS. |
+| DNS over TLS                             | yes | Accepts and serves DNS queries over TLS. |
+| DNS over Quic (separate [-quic] builds)  | yes | Provides DNS over QUIC support in dedicated QUIC enabled images. |
+| Redis via UNIX socket or network         | yes | Enables caching or persistent storage through Redis. |
+| EDNS Client Subnet                       | yes | Supports forwarding client subnet information when required. |
+| Optional privacy respecting and meaningful healthcheck | yes | Offers a healthcheck that avoids leaking DNS queries. |
+| Optional Unbound statistics for Grafana via Zabbix without third party tools | yes | Exposes metrics directly for monitoring without extra exporters. |
+| Python                                   | no | Python is intentionally excluded to keep the image minimal. |
 
 </details>
+
+<details>
+  <summary>Supported Architectures (click to expand)</summary><br>
+
+This image is built for a wide range of hardware architectures. All builds are produced using Docker Buildx with QEMU emulation where required and optimized OpenSSL or OpenSSL QUIC build environments.
+
+| Architecture | Supported | Notes |
+|-------------|-----------|-------|
+| linux/amd64 | yes | Fully supported and optimized |
+| linux/arm64 | yes | Fully supported and optimized |
+| linux/386   | yes | Legacy compatibility |
+| linux/arm/v6 | yes | For older ARM devices |
+| linux/arm/v7 | yes | Common for SBCs like Raspberry Pi 2 and 3 |
+| linux/ppc64le | yes | Little endian PowerPC |
+| linux/s390x | yes | IBM Z and LinuxONE |
+| linux/riscv64 | yes | Experimental but supported |
+
+All architectures are built and published automatically through continuous delivery pipelines.
+
+</details>
+
 
 ## Getting started
 
