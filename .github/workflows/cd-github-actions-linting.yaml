@@ -19,7 +19,7 @@ jobs:
           persist-credentials: false
 
       - name: actionlint
-        uses: docker://rhysd/actionlint:1.7.1
+        uses: docker://rhysd/actionlint:1.7.1@sha256:435ecdb63b1169e80ca3e136290072548c07fc4d76a044cf5541021712f8f344
 
       - name: zizmor
         uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
