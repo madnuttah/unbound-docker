@@ -26,6 +26,11 @@
     {
       "matchFileNames": ["buildvars", "*.sh"],
       "enabled": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "automerge": true
     }
   ]
 }
