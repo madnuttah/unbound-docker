@@ -1,9 +1,8 @@
-# `Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image`
+# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
-<details> 
-    
+<details>
   <summary>Build status</summary><br>
-  
+
 [![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
 [![CD Build Nightly Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-canary-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20canary%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-canary-unbound.yaml)
@@ -16,22 +15,19 @@
 [![GitHub Actions Security Analysis with zizmor](https://github.com/madnuttah/unbound-docker/actions/workflows/zizmor.yml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/zizmor.yml)
 [![CD Security Scan](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-security-scan.yaml?branch=main&label=CD%20security%20scan&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-security-scan.yaml)
 
-This is a lightweight Alpine Linux based Docker image that runs [Unbound](https://unbound.net), an open source high-performance DNS resolver developed by the nice people at [NLnet Labs](https://nlnetlabs.nl) running as **your own recursive DNS server** in a secure single-layer distroless scratch image modeled by following the best practice principles.
+This repository provides a lightweight Alpine Linux based Docker image running [Unbound](https://unbound.net), an open source high performance DNS resolver developed by the people at [NLnet Labs](https://nlnetlabs.nl). The image is a secure single layer distroless scratch build that follows best practice principles and is suitable for professional and personal use alike.
 
-While it leaves _almost_ nothing to be desired, it is perfectly suited for professional and personal use alike. 
-
-<details> 
-    
+<details>
   <summary>Features</summary><br>
-    
+
 | Feature                                  | Supported |
 | ---------------------------------------- | --------- |
 | Unprivileged user                        | yes |
 | Unprivileged port (privileged possible)  | yes |
-| Custom UID/GID build & environment variables     | yes |
+| Custom UID and GID build and environment variables | yes |
 | Optional full rootless mode              | yes |
-| CD built single-layer distroless scratch image running Alpine Linux | yes |
-| Per hardware architecture optimized & CD built [`OpenSSL`](https://github.com/madnuttah/openssl-buildenv) | yes |
+| CD built single layer distroless scratch image running Alpine Linux | yes |
+| Per hardware architecture optimized and CD built [OpenSSL&OpenSSL+QUIC](https://github.com/madnuttah/openssl-buildenv) | yes |
 | Libevent                                 | yes |
 | Recursive DNS as default                 | yes |
 | DNSSEC                                   | yes |
@@ -40,75 +36,133 @@ While it leaves _almost_ nothing to be desired, it is perfectly suited for profe
 | DNS64                                    | yes |
 | DNS over HTTPS                           | yes |
 | DNS over TLS                             | yes |
-| DNS over Quic (separate `[-quic]` builds)| yes |
-| Redis via UNIX Socket or network         | yes |
+| DNS over Quic (separate [-quic] builds)  | yes |
+| Redis via UNIX socket or network         | yes |
 | EDNS Client Subnet                       | yes |
-| Optional privacy respecting & meaningful healthcheck | yes |
-| Optional Unbound statistics for Grafana via Zabbix without 3rd party tools | yes |
+| Optional privacy respecting and meaningful healthcheck | yes |
+| Optional Unbound statistics for Grafana via Zabbix without third party tools | yes |
 | Python                                   | no |
-    
+
 </details>
 
 ## Getting started
 
-Docker containers are most easily used with docker compose. 
+Docker containers are most easily used with Docker Compose.
 
-> [!IMPORTANT] 
-> We encourage you to read the [`Documentation`](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md) page to learn how to get this up and running, some example Docker `Compose` files can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).
->
-> If you prefer to use Podman and systemd to manage your containers, example `Quadlets` can be found [`here`](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/podman-systemd).
+> [!IMPORTANT]  
+> Please read the [Documentation](https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md) to learn how to get this image running.  
+> Example Docker Compose files can be found [here](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples).  
+> If you prefer Podman and systemd, example Quadlets can be found [here](https://github.com/madnuttah/unbound-docker/tree/main/doc/examples/podman-systemd).
 
 ## Available Docker Tags
 
-You can pull the most recent image from Docker Hub using it's `latest` tag or by using the corresponding image version number:
+This image is published in four variants: standard, QUIC, canary, and canary QUIC.
 
-`docker pull madnuttah/unbound:latest` or `docker pull madnuttah/unbound:1.1.0-0` and their __stable__ [`DNS over Quic/QUIC/DoQ`](https://unbound.docs.nlnetlabs.nl/en/latest/topics/privacy/dns-over-quic.html) variants by simply appending `-quic` to the tag like `docker pull madnuttah/unbound:latest-quic` or `docker pull madnuttah/unbound:1.1.0-0-quic`.
+All tags follow a consistent versioning scheme based on the upstream Unbound release.
 
-The image versioning scheme follows unbound - complemented by a dash and the desired image revision, for example `1.1.0-0[-quic]`.
- 
-There are canary and also canary-quic builds of the image available. You can pull the image using it's `canary` or `canary-quic`tag: 
+---
 
-`docker pull madnuttah/unbound:canary` and `docker pull madnuttah/unbound:canary-quic` respectively.
+# Standard Images (DNS over TLS, UDP, TCP)
 
-> [!NOTE] 
-> Canary builds may contain bugs and are not recommended to be used in production environments. These builds are untested and also unsupported by us.
- 
+The standard Unbound images can be pulled using the latest tag or a specific version:
+
+```
+docker pull madnuttah/unbound:latest
+docker pull madnuttah/unbound:1.1.0-0
+```
+
+Versioning scheme:
+
+```
+<UNBOUND_VERSION>-<REVISION>
+e.g. 1.1.0-0
+```
+
+---
+
+# QUIC Images (DNS over QUIC and DoQ)
+
+QUIC enabled images follow the same versioning scheme as the standard images but append -quic:
+
+```
+docker pull madnuttah/unbound:latest-quic
+docker pull madnuttah/unbound:1.1.0-0-quic
+```
+
+Versioning scheme:
+
+```
+<UNBOUND_VERSION>-<REVISION>-quic
+e.g. 1.1.0-0-quic
+```
+
+---
+
+# Canary Images (Nightly Builds)
+
+Nightly builds of the standard image are published under the canary tag:
+
+```
+docker pull madnuttah/unbound:canary
+```
+
+These builds track the latest upstream Unbound master branch.
+
+---
+
+# Canary QUIC Images (Nightly QUIC Builds)
+
+Nightly QUIC enabled builds are available under the canary-quic tag:
+
+```
+docker pull madnuttah/unbound:canary-quic
+```
+
+These builds combine the latest Unbound master branch with the QUIC enabled OpenSSL and NGTCP2 stack.
+
+---
+
+> [!NOTE]  
+> Canary builds may contain bugs and are not recommended for production use. They are untested and unsupported.
+
 ## Changes
-    
-You can view the changes in the [`Releases`](https://github.com/madnuttah/unbound-docker/releases) section.
+
+You can view the changes in the [Releases](https://github.com/madnuttah/unbound-docker/releases) section.
 
 ## Feedback
 
-We are here to help! Don't hesitate to contact us through a [`GitHub Issue`](https://github.com/madnuttah/unbound-docker/issues) if you have problems with the image. Feel free to ask a question or request a feature in the repository's [`Discussions`](https://github.com/madnuttah/unbound-docker/discussions) tab.
+If you have questions or encounter issues, please open a [GitHub Issue](https://github.com/madnuttah/unbound-docker/issues).
 
-You can also reach us on Fosstodon: 
+Feature requests and general discussion are welcome in the repository [Discussions](https://github.com/madnuttah/unbound-docker/discussions) tab.
+
+You can also reach us on Fosstodon:
 
 [![Follow me on Mastodon](https://img.shields.io/mastodon/follow/107779375129112763?domain=https%3A%2F%2Ffosstodon.org%2F&style=social)](https://fosstodon.org/@madnuttah)
 
 ## Acknowledgements
 
-- [Alpine Linux](https://www.alpinelinux.org/)
-- [Docker](https://www.docker.com/)
-- [Unbound](https://unbound.net/)
-- [OpenSSL](https://www.openssl.org/)
-- [Redis](https://redis.io/)
-- [Pi-hole](https://pi-hole.net/)
-- [Aqua Security](https://trivy.dev/)
-- [zizmor](https://github.com/zizmorcore/zizmor)
-- The many Docker Images which got us inspired
+- [Alpine Linux](https://www.alpinelinux.org/)  
+- [Docker](https://www.docker.com/)  
+- [Unbound](https://unbound.net/)  
+- [OpenSSL](https://www.openssl.org/)  
+- [Redis](https://redis.io/)  
+- [Pi-hole](https://pi-hole.net/)  
+- [Aqua Security](https://trivy.dev/)  
+- [zizmor](https://github.com/zizmorcore/zizmor)  
+- The many Docker images that inspired this project
 
 ## Licenses
 
 ### License
 
-Unless otherwise specified, all code is released under the MIT license.
-See the [`LICENSE`](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE) for details.
+Unless otherwise specified, all code is released under the MIT license.  
+See the [LICENSE](https://github.com/madnuttah/unbound-docker/blob/main/LICENSE) for details.
 
 ### Licenses for other components
 
-- Docker: [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)
-- Unbound: [BSD License](https://unbound.nlnetlabs.nl/svn/trunk/LICENSE)
-- OpenSSL: [Apache-style license](https://www.openssl.org/source/license.html)
+- Docker: [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)  
+- Unbound: [BSD License](https://unbound.nlnetlabs.nl/svn/trunk/LICENSE)  
+- OpenSSL: [Apache style license](https://www.openssl.org/source/license.html)
 
 ## Legal
 
@@ -116,6 +170,6 @@ Please note that this is a work of private contributors and we're neither affili
 
 ## Supporting our mission
 
-In case you would like to donate money, please rather spend it on the upstream projects this image relies on.
+In case you would like to donate money, please rather spend it on the upstream projects this image depends on.
 
-If you like what we do and if you find this image protecting your privacy and giving back your DNS liberty useful - spread the word, fork our repo, open an issue, make a pull request and don't forget to leave a ⭐ on Docker Hub and GitHub. Many thanks for your support! ❤️
+If you like what we do and if you find this image protecting your privacy and giving back your DNS liberty useful - spread the word, fork our repo, open an issue, make a pull request and don't forget to leave a star on Docker Hub and GitHub. Many thanks for your support!
