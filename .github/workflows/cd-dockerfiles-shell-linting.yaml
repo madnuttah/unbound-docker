@@ -18,8 +18,18 @@ jobs:
         with:
           persist-credentials: false
           
-      - name: hadolint
-        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.30
+        with:
+          dockerfile: |
+            unbound/canary.Dockerfile
+            unbound/canary_quic.Dockerfile            
+            unbound/release.Dockerfile
+            unbound/release_quic.Dockerfile
 
       - name: shellcheck
+<<<<<<< Updated upstream
         uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # 2.0.0
+=======
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # 2.0.0
+>>>>>>> Stashed changes
