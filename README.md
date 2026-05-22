@@ -12,7 +12,7 @@
 [![GitHub version](https://img.shields.io/github/v/release/madnuttah/unbound-docker?include_prereleases&label=madnuttah/unbound%20release&style=flat-square)](https://github.com/madnuttah/unbound-docker/releases)
 [![OpenSSL buildenv](https://img.shields.io/github/v/release/madnuttah/openssl-buildenv?include_prereleases&label=madnuttah/openssl-buildenv%20release&style=flat-square)](https://github.com/madnuttah/openssl-buildenv/releases)
 
-[![GitHub Actions Security Analysis with zizmor](https://github.com/madnuttah/unbound-docker/actions/workflows/zizmor.yml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/zizmor.yml)
+[![GitHub Actions Security Analysis with zizmor](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-gh-action-zizmor-scan.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-gh-action-zizmor-scan.yaml)
 [![CD Security Scan](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-security-scan.yaml?branch=main&label=CD%20security%20scan&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-security-scan.yaml)
 
 This repository provides a lightweight Alpine Linux based Docker image running [Unbound](https://unbound.net), an open source high performance DNS resolver developed by the people at [NLnet Labs](https://nlnetlabs.nl). The image is a secure single layer distroless scratch build that follows best practice principles and is suitable for professional and personal use alike.
