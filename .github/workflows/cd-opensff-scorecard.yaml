@@ -1,0 +1,20 @@
+name: OpenSSF Scorecard
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # weekly Monday 03:00
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Scorecard
+        uses: ossf/scorecard-action@v2.3.1
+        with:
+          results_file: results.sarif
+          publish_results: true

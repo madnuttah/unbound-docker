@@ -1,0 +1,25 @@
+name: Lint Dockerfiles and Shell Scripts
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          
+      - name: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+
+      - name: shellcheck
+        uses: ludeeus/action-shellcheck@04e3c8f3e3e5e5f6f6c3e8d9e2f4a3b8c7d9e1f
