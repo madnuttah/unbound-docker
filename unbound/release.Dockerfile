@@ -23,6 +23,7 @@ ENV UNBOUND_VERSION="${UNBOUND_VERSION}" \
 
 WORKDIR /tmp/src
 
+# hadolint ignore=DL3018
 RUN set -xe; \
   addgroup -S -g "${UNBOUND_GID}" _unbound && \
   adduser -S -H -h /usr/local/unbound -g _unbound -u "${UNBOUND_UID}" -D -G _unbound _unbound && \
@@ -108,6 +109,7 @@ COPY ./unbound/root/*.sh \
 
 COPY ./unbound/root/entrypoint /
 
+# hadolint ignore=DL3018
 RUN set -xe; \
     apk --update --no-cache add \
     ca-certificates \
