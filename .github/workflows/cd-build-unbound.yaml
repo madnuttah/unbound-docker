@@ -26,6 +26,11 @@ jobs:
       OPENSSL_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_BUILDENV_VERSION }}
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        with:
+          egress-policy: audit
+          
       - name: Checkout source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -47,6 +52,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: buildvars
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        with:
+          egress-policy: audit
+
       - name: Checkout source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -66,10 +76,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
+          GHCR_SLUG: "ghcr.io/madnuttah/unbound"
         with:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
@@ -83,8 +102,15 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
-          cache-from: type=registry,ref=madnuttah/unbound:buildcache
-          cache-to: type=registry,ref=madnuttah/unbound:buildcache,mode=max
+          cache-from: |
+            type=registry,ref=madnuttah/unbound:buildcache
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache
+          cache-to: |
+            type=registry,ref=madnuttah/unbound:buildcache,mode=max
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache,mode=max
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
             ${{ env.DOCKERHUB_SLUG }}:latest
+            ${{ env.GHCR_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+            ${{ env.GHCR_SLUG }}:latest
+

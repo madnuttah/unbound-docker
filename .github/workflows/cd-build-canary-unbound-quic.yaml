@@ -24,6 +24,11 @@ jobs:
       NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        with:
+          egress-policy: audit
+          
       - name: Checkout source
         uses: actions/checkout@v6
         with:
@@ -58,9 +63,15 @@ jobs:
 
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
+      GHCR_SLUG: "ghcr.io/madnuttah/unbound"
       UNBOUND_DOCKER_IMAGE_VERSION: "canary-quic"
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        with:
+          egress-policy: audit
+
       - name: Checkout source
         uses: actions/checkout@v6
         with:
@@ -79,11 +90,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ${{ env.DOCKERHUB_SLUG }}
+          images: |
+            ${{ env.DOCKERHUB_SLUG }}
+            ${{ env.GHCR_SLUG }}
           tags: |
             type=raw,value=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
 
@@ -105,10 +125,17 @@ jobs:
           push: true
           sbom: true
           provenance: true
-          cache-from: type=registry,ref=madnuttah/unbound:buildcache
-          cache-to: type=registry,ref=madnuttah/unbound:buildcache,mode=max
+
+          cache-from: |
+            type=registry,ref=madnuttah/unbound:buildcache-quic
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic
+          cache-to: |
+            type=registry,ref=madnuttah/unbound:buildcache-quic,mode=max
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic,mode=max
+
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary-quic
+            ${{ env.GHCR_SLUG }}:canary-quic
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
