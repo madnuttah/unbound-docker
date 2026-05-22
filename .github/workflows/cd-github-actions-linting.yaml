@@ -1,4 +1,4 @@
-name: Lint GitHub Actions and run zizmor
+name: Lint GitHub Actions
 
 on:
   push:
