@@ -61,6 +61,8 @@ jobs:
 
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
+        env:
+          FORCE_INPUT: ${{ github.event.inputs.force }}
         run: |
           UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
           if [[ -z "$UNBOUND_GIT_SHA" ]]; then
@@ -69,7 +71,7 @@ jobs:
 
           CURRENT_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
 
-          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" && "${{ github.event.inputs.force }}" != "true" ]]; then
+          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" && "$FORCE_INPUT" != "true" ]]; then
             echo "No update — SHA unchanged"
             exit 1
           fi
