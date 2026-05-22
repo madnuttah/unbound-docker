@@ -19,7 +19,7 @@ jobs:
           persist-credentials: false
           
       - name: hadolint
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
 
       - name: shellcheck
         uses: ludeeus/action-shellcheck@04e3c8f3e3e5e5f6f6c3e8d9e2f4a3b8c7d9e1f
