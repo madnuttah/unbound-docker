@@ -7,11 +7,147 @@ on:
       - completed
   workflow_dispatch:
 
-permissions: {}
+name: CD Build Distroless Unbound Docker Image
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CD Check NLnet Labs Unbound Release]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
 
 jobs:
   buildvars:
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Check NLnet Labs Unbound Release' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
+
+      
+    runs-on: ubuntu-latest
+    outputs:
+      IMAGE_BUILD_DATE: ${{ steps.SET_DATE.outputs.IMAGE_BUILD_DATE }}
+      UNBOUND_DOCKER_IMAGE_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+      UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
+      UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
+      OPENSSL_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_BUILDENV_VERSION }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        with:
+          egress-policy: audit
+          
+      - name: Checkout source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Set IMAGE_BUILD_DATE
+        id: SET_DATE
+        run: echo "IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_OUTPUT
+
+      - name: Import build variables from buildvars file
+        id: IMPORT_BUILDVARS
+        run: |
+          cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
+          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
+          cat buildvars | grep OPENSSL_BUILDENV_VERSION >> $GITHUB_OUTPUT
+
+  build:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Check NLnet Labs Unbound Release' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
+    runs-on: ubuntu-latest
+    needs: buildvars
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        with:
+          egress-policy: audit
+
+      - name: Checkout source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
+
+      - name: Login to Dockerhub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
+        env:
+          DOCKERHUB_SLUG: "madnuttah/unbound"
+          GHCR_SLUG: "ghcr.io/madnuttah/unbound"
+        with:
+          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
+            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
+            UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
+          file: ./unbound/release.Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          sbom: ${{ github.event_name != 'pull_request' }}
+          provenance: ${{ github.event_name != 'pull_request' }}
+          cache-from: |
+            type=registry,ref=madnuttah/unbound:buildcache
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache
+          cache-to: |
+            type=registry,ref=madnuttah/unbound:buildcache,mode=max
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache,mode=max
+          tags: |
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+            ${{ env.DOCKERHUB_SLUG }}:latest
+            ${{ env.GHCR_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+            ${{ env.GHCR_SLUG }}:latest
+
+
+
+jobs:
+  buildvars:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Distroless Unbound Docker Image' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.SET_DATE.outputs.IMAGE_BUILD_DATE }}
@@ -46,6 +182,13 @@ jobs:
           cat buildvars | grep OPENSSL_QUIC_BUILDENV_VERSION >> $GITHUB_OUTPUT
 
   build:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Distroless Unbound Docker Image' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
     runs-on: ubuntu-latest
     needs: buildvars
     steps:

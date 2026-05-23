@@ -7,7 +7,11 @@ on:
       - completed
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
 
 jobs:
 
@@ -15,9 +19,12 @@ jobs:
     if: >
       github.event_name == 'workflow_dispatch' ||
       (
+        github.event_name == 'workflow_run' &&
         github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image'
+        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image' &&
+        github.event.workflow_run.head_branch == 'main'
       )
+
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
@@ -66,8 +73,10 @@ jobs:
     if: >
       github.event_name == 'workflow_dispatch' ||
       (
+        github.event_name == 'workflow_run' &&
         github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image'
+        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image' &&
+        github.event.workflow_run.head_branch == 'main'
       )
     needs: buildvars
     runs-on: ubuntu-latest
