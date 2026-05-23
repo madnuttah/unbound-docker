@@ -12,7 +12,12 @@ permissions: {}
 jobs:
 
   buildvars:
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image'
+      )
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
@@ -30,7 +35,7 @@ jobs:
           egress-policy: audit
           
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
@@ -58,6 +63,12 @@ jobs:
           echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
 
   build:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image'
+      )
     needs: buildvars
     runs-on: ubuntu-latest
 
@@ -73,25 +84,25 @@ jobs:
           egress-policy: audit
 
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
 
       - name: Login to Dockerhub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GHCR
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -99,7 +110,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
@@ -108,7 +119,7 @@ jobs:
             type=raw,value=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
 
       - name: Build and push
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
         with:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}

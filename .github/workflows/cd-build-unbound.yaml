@@ -13,10 +13,11 @@ jobs:
   buildvars:
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.repository.full_name == 'madnuttah/unbound-docker')
-
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Check NLnet Labs Unbound Release'
+      )
+      
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.SET_DATE.outputs.IMAGE_BUILD_DATE }}

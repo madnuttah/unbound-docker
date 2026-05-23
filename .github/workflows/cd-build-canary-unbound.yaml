@@ -10,12 +10,17 @@ on:
         required: false
         default: "false"
 
-
 permissions: {}
 
 jobs:
 
   buildvars:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image'
+      )
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
@@ -41,6 +46,12 @@ jobs:
           echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
 
   build:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image'
+      )
     needs: buildvars
     runs-on: ubuntu-latest
 
@@ -121,7 +132,7 @@ jobs:
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -152,3 +163,27 @@ jobs:
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary
             ${{ env.GHCR_SLUG }}:canary
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          image-ref: ${{ env.DOCKERHUB_SLUG }}:canary
+          exit-code: "1"
+          ignore-unfixed: false
+          scan-type: image
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+          format: "table"
+
+      - name: Docker Scout CVEs
+        uses: docker/scout-action@cd72f264beff1cd72735de31148b9d3244a0234a
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          command: cves
+          image: ${{ env.DOCKERHUB_SLUG }}:canary
+          only-fixed: true
+          only-severities: critical,high
+          write-comment: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          exit-code: false

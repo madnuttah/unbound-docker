@@ -8,14 +8,18 @@ on:
     types:
       - completed
 
-permissions: {}
+permissions:
+  contents: write
 
 jobs:
   tag_and_release:
-    runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.name == 'CD Build Distroless Unbound Docker Image'
+      )
+
 
 
     steps:
