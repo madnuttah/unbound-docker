@@ -7,15 +7,6 @@ on:
       - completed
   workflow_dispatch:
 
-name: CD Build Distroless Unbound Docker Image
-
-on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: [CD Check NLnet Labs Unbound Release]
-    types:
-      - completed
-
 permissions:
   contents: write
   packages: write
