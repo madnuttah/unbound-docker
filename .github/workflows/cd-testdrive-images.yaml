@@ -25,28 +25,28 @@ jobs:
         with:
           egress-policy: audit
 
-     - name: Determine image tag
-       id: tag
-       env:
-         WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
-       run: |
-         case "$WORKFLOW_NAME" in
-           "CD Build Canary Distroless Unbound Docker Image")
-             echo "IMAGE_TAG=madnuttah/unbound:canary" >> "$GITHUB_ENV"
-             ;;
-           "CD Build Canary Distroless Unbound QUIC Docker Image")
-             echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> "$GITHUB_ENV"
-             ;;
-           "CD Build Distroless Unbound QUIC Docker Image")
-             echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> "$GITHUB_ENV"
-             ;;
-           "CD Build Distroless Unbound Docker Image")
-             echo "IMAGE_TAG=madnuttah/unbound:latest" >> "$GITHUB_ENV"
-             ;;
-           *)
-             exit 1
-             ;;
-         esac
+      - name: Determine image tag
+        id: tag
+        env:
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          case "$WORKFLOW_NAME" in
+            "CD Build Canary Distroless Unbound Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:canary" >> "$GITHUB_ENV"
+              ;;
+            "CD Build Canary Distroless Unbound QUIC Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> "$GITHUB_ENV"
+              ;;
+            "CD Build Distroless Unbound QUIC Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> "$GITHUB_ENV"
+              ;;
+            "CD Build Distroless Unbound Docker Image")
+              echo "IMAGE_TAG=madnuttah/unbound:latest" >> "$GITHUB_ENV"
+              ;;
+            *)
+              exit 1
+              ;;
+          esac
 
 
       - name: Login to Docker Hub

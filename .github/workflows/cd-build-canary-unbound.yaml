@@ -151,7 +151,7 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}:canary
             ${{ env.GHCR_SLUG }}:canary
             
-                  - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         if: ${{ github.event_name != 'pull_request' }}
         with:

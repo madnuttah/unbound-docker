@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   tag_and_release:
+  runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
       (
