@@ -5,11 +5,9 @@ on:
     - cron: "0 19 * * mon-fri"
   workflow_dispatch:
     inputs:
-      force:
-        description: "Force build"
-        required: false
-        default: "false"
-
+      unbound_sha:
+        description: "Explicit Unbound upstream SHA"
+        required: true
 
 permissions: {}
 
@@ -62,14 +60,19 @@ jobs:
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
         run: |
-          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
+          if [[ -n "${{ github.event.inputs.unbound_sha }}" ]]; then
+            UNBOUND_GIT_SHA="${{ github.event.inputs.unbound_sha }}"
+          else
+            UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
+          fi
+
           if [[ -z "$UNBOUND_GIT_SHA" ]]; then
             exit 1
           fi
 
           CURRENT_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
 
-          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" && "${{ github.event.inputs.force }}" != "true" ]]; then
+          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" ]]; then
             echo "No update — SHA unchanged"
             exit 1
           fi
@@ -119,7 +122,7 @@ jobs:
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
