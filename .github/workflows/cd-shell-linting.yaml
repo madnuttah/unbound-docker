@@ -18,8 +18,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install shellcheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Install latest ShellCheck (supports SARIF)
+        run: |
+          SC_VERSION="stable"
+          wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.x86_64.tar.xz" \
+            | tar -xJ
+          sudo mv "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/shellcheck
+          shellcheck --version
 
       - name: Run shellcheck and generate SARIF
         run: |
