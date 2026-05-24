@@ -26,27 +26,10 @@ jobs:
           sudo mv "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/shellcheck
           shellcheck --version
 
-      - name: Install .NET SDK (required for SARIF Multitool)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dotnet-sdk-8.0
-
-      - name: Install SARIF Multitool
-        run: |
-          dotnet tool install --global Sarif.Multitool
-
-      - name: Add dotnet tools to PATH
-        run: |
-          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
-
-      - name: Run shellcheck and generate JSON
+      - name: Run shellcheck and generate SARIF
         run: |
           shopt -s globstar
-          shellcheck -f json **/*.sh > shellcheck.json || true
-
-      - name: Convert JSON to SARIF
-        run: |
-          sarif-multitool convert shellcheck.json --output shellcheck.sarif
+          shellcheck -f sarif **/*.sh > shellcheck.sarif || true
 
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa
