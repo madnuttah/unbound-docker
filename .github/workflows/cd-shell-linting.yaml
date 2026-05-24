@@ -6,18 +6,27 @@ on:
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write # Required for upload-sarif to upload SARIF files.
+
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          
-      - name: Lint shell scripts
-              
- 
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck and generate SARIF
+        run: |
+          shopt -s globstar
+          shellcheck -f sarif **/*.sh > shellcheck.sarif
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: shellcheck.sarif
