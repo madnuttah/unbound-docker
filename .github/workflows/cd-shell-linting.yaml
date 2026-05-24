@@ -26,10 +26,20 @@ jobs:
           sudo mv "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/shellcheck
           shellcheck --version
 
-      - name: Run shellcheck and generate SARIF
+      - name: Install SARIF Multitool
+        run: |
+          wget -q https://github.com/microsoft/sarif-sdk/releases/latest/download/sarif-multitool-linux-x64.zip
+          unzip -q sarif-multitool-linux-x64.zip -d sarif-tools
+          sudo mv sarif-tools/sarif-multitool /usr/local/bin/sarif-multitool
+
+      - name: Run shellcheck and generate JSON
         run: |
           shopt -s globstar
-          shellcheck -f sarif **/*.sh > shellcheck.sarif
+          shellcheck -f json **/*.sh > shellcheck.json
+
+      - name: Convert JSON to SARIF
+        run: |
+          sarif-multitool convert shellcheck.json --output shellcheck.sarif
 
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
