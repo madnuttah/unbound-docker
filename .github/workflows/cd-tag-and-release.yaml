@@ -13,16 +13,13 @@ permissions:
 
 jobs:
   tag_and_release:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
       (
         github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.name == 'CD Build Distroless Unbound Docker Image'
       )
-
-
-
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
