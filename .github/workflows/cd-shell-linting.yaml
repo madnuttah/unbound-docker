@@ -39,7 +39,7 @@ jobs:
       - name: Run shellcheck and generate JSON
         run: |
           shopt -s globstar
-          shellcheck -f json --exit-code=0 **/*.sh > shellcheck.json
+          shellcheck -f json **/*.sh > shellcheck.json || true
 
       - name: Convert JSON to SARIF
         run: |
