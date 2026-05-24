@@ -12,11 +12,14 @@ jobs:
 
   buildvars:
     if: >
+      github.event_name == 'workflow_dispatch' ||
       (
         github.event_name == 'workflow_run' &&
         github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image' &&
-        github.event.workflow_run.head_branch == 'main'
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.repository.full_name == github.repository &&
+        github.event.workflow_run.event != 'pull_request'
       )
 
     runs-on: ubuntu-latest
@@ -65,11 +68,14 @@ jobs:
 
   build:
     if: >
+      github.event_name == 'workflow_dispatch' ||
       (
         github.event_name == 'workflow_run' &&
         github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.name == 'CD Build Canary Distroless Unbound Docker Image' &&
-        github.event.workflow_run.head_branch == 'main'
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.repository.full_name == github.repository &&
+        github.event.workflow_run.event != 'pull_request'
       )
     needs: buildvars
     runs-on: ubuntu-latest
