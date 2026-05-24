@@ -10,14 +10,12 @@ on:
         required: false
         default: "false"
 
+
 permissions: {}
 
 jobs:
 
   buildvars:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'schedule'
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
@@ -43,10 +41,6 @@ jobs:
           echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases | jq '.[0] | .name' -r)" >> $GITHUB_OUTPUT
 
   build:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'schedule'
-
     needs: buildvars
     runs-on: ubuntu-latest
 
@@ -67,8 +61,6 @@ jobs:
 
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
-        env:
-          FORCE_INPUT: ${{ github.event.inputs.force }}
         run: |
           UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
           if [[ -z "$UNBOUND_GIT_SHA" ]]; then
@@ -77,7 +69,7 @@ jobs:
 
           CURRENT_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
 
-          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" && "$FORCE_INPUT" != "true" ]]; then
+          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" && "${{ github.event.inputs.force }}" != "true" ]]; then
             echo "No update — SHA unchanged"
             exit 1
           fi
@@ -127,7 +119,7 @@ jobs:
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -158,12 +150,12 @@ jobs:
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary
             ${{ env.GHCR_SLUG }}:canary
-
-      - name: Run Trivy vulnerability scanner
+            
+                  - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:canary
+          image-ref: ${{ env.DOCKERHUB_SLUG }}:canary-quic
           exit-code: "1"
           ignore-unfixed: false
           scan-type: image
@@ -176,9 +168,9 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         with:
           command: cves
-          image: ${{ env.DOCKERHUB_SLUG }}:canary
+          image: ${{ env.DOCKERHUB_SLUG }}:canary-quic
           only-fixed: true
           only-severities: critical,high
-          write-comment: false
+          write-comment: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           exit-code: false
