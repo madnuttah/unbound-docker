@@ -42,6 +42,6 @@ jobs:
           sarif-multitool convert shellcheck.json --output shellcheck.sarif
 
       - name: Upload SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4
         with:
           sarif_file: shellcheck.sarif
