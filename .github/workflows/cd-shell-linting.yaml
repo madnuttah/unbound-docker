@@ -34,6 +34,9 @@ jobs:
       - name: Install SARIF Multitool
         run: |
           dotnet tool install --global Sarif.Multitool
+
+      - name: Add dotnet tools to PATH
+        run: |
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       - name: Run shellcheck and generate JSON
