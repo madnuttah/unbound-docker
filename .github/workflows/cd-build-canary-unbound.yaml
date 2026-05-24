@@ -10,9 +10,7 @@ on:
         required: false
         default: "false"
 
-permissions:
-  contents: read
-  packages: write
+permissions: {}
 
 jobs:
 
