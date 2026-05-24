@@ -19,8 +19,6 @@ if: >
     github.event.workflow_run.name == 'CD Check NLnet Labs Unbound Release' &&
     github.event.workflow_run.head_branch == 'main'
   )
-
-
       
     runs-on: ubuntu-latest
     outputs:

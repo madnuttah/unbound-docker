@@ -19,7 +19,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (
         github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.name == 'CD Check NLnet Labs Unbound Release' &&
+        github.event.workflow_run.name == 'CD Build Distroless Unbound Docker Image' &&
         github.event.workflow_run.head_branch == 'main'
       )
 

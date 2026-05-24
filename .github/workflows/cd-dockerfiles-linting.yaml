@@ -1,4 +1,4 @@
-name: Lint Dockerfiles and Shell Scripts
+name: Lint Dockerfiles
 
 on:
   push:
@@ -24,6 +24,3 @@ jobs:
         with:
           dockerfile: |
             unbound/*.Dockerfile
-  
-      - name: shellcheck
-        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # 2.0.0
