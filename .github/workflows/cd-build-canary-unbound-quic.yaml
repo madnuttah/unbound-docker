@@ -6,9 +6,7 @@ on:
     types:
       - completed
 
-permissions:
-  contents: read
-  packages: write
+permissions: {}
 
 jobs:
 
