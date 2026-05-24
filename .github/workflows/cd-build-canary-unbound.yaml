@@ -4,10 +4,6 @@ on:
   schedule:
     - cron: "0 19 * * mon-fri"
   workflow_dispatch:
-    inputs:
-      unbound_sha:
-        description: "Explicit Unbound upstream SHA"
-        required: true
 
 permissions: {}
 
@@ -60,11 +56,7 @@ jobs:
       - name: Is update available
         id: IS_UPDATE_AVAILABLE
         run: |
-          if [[ -n "${{ github.event.inputs.unbound_sha }}" ]]; then
-            UNBOUND_GIT_SHA="${{ github.event.inputs.unbound_sha }}"
-          else
-            UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
-          fi
+          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
 
           if [[ -z "$UNBOUND_GIT_SHA" ]]; then
             exit 1
