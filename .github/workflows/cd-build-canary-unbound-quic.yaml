@@ -11,54 +11,29 @@ permissions: {}
 
 jobs:
 
-  buildvars:
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
+  check-update:
     runs-on: ubuntu-latest
-    outputs:
-      IMAGE_BUILD_DATE: ${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
-      UNBOUND_VERSION: ${{ steps.vars.outputs.UNBOUND_VERSION }}
-      UNBOUND_SHA256: ${{ steps.vars.outputs.UNBOUND_SHA256 }}
-      OPENSSL_QUIC_BUILDENV_VERSION: ${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
-      OPENSSL_VERSION: ${{ steps.vars.outputs.OPENSSL_VERSION }}
-      OPENSSL_SHA256: ${{ steps.vars.outputs.OPENSSL_SHA256 }}
-      NGTCP2_VERSION: ${{ steps.vars.outputs.NGTCP2_VERSION }}
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
         with:
           egress-policy: audit
-          
-      - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-        with:
-          persist-credentials: false
 
-      - name: Set buildvars
-        id: vars
+      - name: Confirm upstream workflow success
         run: |
-          echo IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+              echo "Upstream workflow did not succeed"
+              exit 1
+            fi
+          fi
+          echo "Update triggered"
 
-          source buildvars
-          echo UNBOUND_VERSION="$UNBOUND_VERSION" >> $GITHUB_OUTPUT
-          echo UNBOUND_SHA256="$UNBOUND_SHA256" >> $GITHUB_OUTPUT
-
-          OPENSSL_ENV=$(curl -s https://raw.githubusercontent.com/madnuttah/openssl-buildenv/master/buildvars)
-
-          OPENSSL_VERSION=$(echo "$OPENSSL_ENV" | grep '^OPENSSL_VERSION=' | cut -d= -f2)
-          SUBVERSION=$(echo "$OPENSSL_ENV" | grep '^SUBVERSION=' | cut -d= -f2)
-          OPENSSL_SHA256=$(echo "$OPENSSL_ENV" | grep '^OPENSSL_SHA256=' | cut -d= -f2)
-          NGTCP2_VERSION=$(echo "$OPENSSL_ENV" | grep '^NGTCP2_VERSION=' | cut -d= -f2)
-
-          FINAL="${OPENSSL_VERSION}-${SUBVERSION}"
-
-          echo OPENSSL_QUIC_BUILDENV_VERSION="$FINAL-quic" >> $GITHUB_OUTPUT
-          echo OPENSSL_VERSION="$OPENSSL_VERSION" >> $GITHUB_OUTPUT
-          echo OPENSSL_SHA256="$OPENSSL_SHA256" >> $GITHUB_OUTPUT
-          echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
 
   build:
-    needs: buildvars
+    needs: check-update
     runs-on: ubuntu-latest
 
     env:
@@ -73,25 +48,34 @@ jobs:
           egress-policy: audit
 
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
+      - name: Set buildvars
+        id: vars
+        run: |
+          echo IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $GITHUB_OUTPUT
+          source buildvars
+          echo UNBOUND_VERSION="$UNBOUND_VERSION" >> $GITHUB_OUTPUT
+          echo OPENSSL_QUIC_BUILDENV_VERSION="$OPENSSL_QUIC_BUILDENV_VERSION" >> $GITHUB_OUTPUT
+          echo NGTCP2_VERSION="$NGTCP2_VERSION" >> $GITHUB_OUTPUT
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
 
       - name: Login to Dockerhub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GHCR
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -99,7 +83,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
@@ -108,30 +92,25 @@ jobs:
             type=raw,value=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
 
       - name: Build and push
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
         with:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
-            OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
-            OPENSSL_VERSION=${{ needs.buildvars.outputs.OPENSSL_VERSION }}
-            OPENSSL_SHA256=${{ needs.buildvars.outputs.OPENSSL_SHA256 }}
-            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
-            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
-            NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
-            UNBOUND_DOCKER_IMAGE_VERSION=${{ env.UNBOUND_DOCKER_IMAGE_VERSION }}
-            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            OPENSSL_QUIC_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+            NGTCP2_VERSION=${{ steps.vars.outputs.NGTCP2_VERSION }}
+            IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
           file: ./unbound/canary_quic.Dockerfile
           push: true
           sbom: true
           provenance: true
 
           cache-from: |
-            type=registry,ref=madnuttah/unbound:buildcache-quic
-            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic
+            type=registry,ref=madnuttah/unbound:buildcache-canary-quic
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary-quic
           cache-to: |
-            type=registry,ref=madnuttah/unbound:buildcache-quic,mode=max
-            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic,mode=max
+            type=registry,ref=madnuttah/unbound:buildcache-canary-quic,mode=max
+            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary-quic,mode=max
 
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary-quic
