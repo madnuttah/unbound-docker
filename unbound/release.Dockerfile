@@ -38,7 +38,6 @@ RUN set -xe; \
     libsodium-dev \
     linux-headers \
     nghttp2-dev \
-    ngtcp2-dev \
     libevent-dev \
     expat-dev \
     protobuf-c-dev \
@@ -120,7 +119,6 @@ RUN set -xe; \
     su-exec \
     libsodium \
     nghttp2 \
-    ngtcp2 \
     libevent \
     protobuf-c \
     hiredis \
@@ -194,7 +192,6 @@ COPY --from=buildenv /usr/lib/libgcc_s* \
   /usr/lib/libldns* \
   /usr/lib/libhiredis* \
   /usr/lib/libevent* \
-  /usr/lib/libngtcp2* \
   /app/usr/lib/
  
 COPY --from=buildenv /etc/ssl/ \
