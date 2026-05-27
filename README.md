@@ -83,7 +83,7 @@ All tags follow a consistent versioning scheme based on the upstream Unbound rel
 
 ---
 
-# Standard Images (DNS over TLS, UDP, TCP)
+### Standard Images (DNS over TLS, UDP, TCP)
 
 The standard Unbound images can be pulled using the latest tag or a specific version:
 
@@ -101,7 +101,7 @@ e.g. 1.1.0-0
 
 ---
 
-# QUIC Images (DNS over QUIC and DoQ)
+### QUIC Images (DNS over QUIC and DoQ)
 
 QUIC enabled images follow the same versioning scheme as the standard images but append -quic:
 
@@ -119,7 +119,7 @@ e.g. 1.1.0-0-quic
 
 ---
 
-# Canary Images (Nightly Builds)
+### Canary Images (Nightly Builds)
 
 Nightly builds of the standard image are published under the canary tag:
 
@@ -131,7 +131,7 @@ These builds track the latest upstream Unbound master branch.
 
 ---
 
-# Canary QUIC Images (Nightly QUIC Builds)
+### Canary QUIC Images (Nightly QUIC Builds)
 
 Nightly QUIC enabled builds are available under the canary-quic tag:
 
