@@ -73,19 +73,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to GHCR
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Login to GHCR
+#        if: github.event_name != 'pull_request'
+#        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+#        with:
+#          registry: ghcr.io
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push QUIC image
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
-          GHCR_SLUG: "ghcr.io/madnuttah/unbound"
+#          GHCR_SLUG: "ghcr.io/madnuttah/unbound"
         with:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
@@ -103,13 +103,13 @@ jobs:
 
           cache-from: |
             type=registry,ref=madnuttah/unbound:buildcache-quic
-            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic
+ #           type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic
           cache-to: |
             type=registry,ref=madnuttah/unbound:buildcache-quic,mode=max
-            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic,mode=max
+#            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic,mode=max
 
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
             ${{ env.DOCKERHUB_SLUG }}:latest-quic
-            ${{ env.GHCR_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
-            ${{ env.GHCR_SLUG }}:latest-quic
+#            ${{ env.GHCR_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
+#            ${{ env.GHCR_SLUG }}:latest-quic
