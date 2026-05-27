@@ -74,12 +74,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to GHCR
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Login to GHCR
+#        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+#        with:
+#          registry: ghcr.io
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker meta
         id: meta
@@ -107,14 +107,14 @@ jobs:
 
           cache-from: |
             type=registry,ref=madnuttah/unbound:buildcache-canary-quic
-            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary-quic
+ #           type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary-quic
           cache-to: |
             type=registry,ref=madnuttah/unbound:buildcache-canary-quic,mode=max
-            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary-quic,mode=max
+ #           type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary-quic,mode=max
 
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary-quic
-            ${{ env.GHCR_SLUG }}:canary-quic
+  #          ${{ env.GHCR_SLUG }}:canary-quic
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
