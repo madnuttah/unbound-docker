@@ -1,4 +1,4 @@
-# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
+6# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
 <details>
   <summary>Build status (click to expand)</summary><br>
@@ -83,7 +83,7 @@ All tags follow a consistent versioning scheme based on the upstream Unbound rel
 
 ---
 
-### Standard Images (DNS over TLS, UDP, TCP)
+### Standard Images (DNS over TLS/DoT, UDP, TCP)
 
 The standard Unbound images can be pulled using the latest tag or a specific version:
 
@@ -101,7 +101,7 @@ e.g. 1.1.0-0
 
 ---
 
-### QUIC Images (DNS over QUIC and DoQ)
+### QUIC Images (DNS over QUIC/DoQ)
 
 QUIC enabled images follow the same versioning scheme as the standard images but append -quic:
 
