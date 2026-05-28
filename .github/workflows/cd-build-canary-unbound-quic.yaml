@@ -51,15 +51,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Fetch upstream Unbound version
-        id: upstream
-        run: |
-          git clone https://github.com/NLnetLabs/unbound.git unbound-upstream
-          cd unbound-upstream
-          VERSION_LINE="$(grep '^PACKAGE_VERSION=' configure)"
-          VERSION_VALUE="$(echo "$VERSION_LINE" | cut -d"'" -f2)"
-          echo "UNBOUND_VERSION=$VERSION_VALUE" >> "$GITHUB_OUTPUT"
-
       - name: Set buildvars
         id: vars
         run: |
@@ -104,7 +95,6 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
-            UNBOUND_VERSION=${{ steps.upstream.outputs.UNBOUND_VERSION }}
             OPENSSL_QUIC_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
             NGTCP2_VERSION=${{ steps.vars.outputs.NGTCP2_VERSION }}
             IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
