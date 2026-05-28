@@ -1,4 +1,4 @@
-6# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
+# Alpine Linux Based DNSSEC Validating Recursive Unbound DNS Resolver Docker Image
 
 <details>
   <summary>Build status (click to expand)</summary><br>
