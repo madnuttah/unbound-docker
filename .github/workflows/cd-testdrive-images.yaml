@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
-    steps: 
+    steps:
       - name: Harden Runner
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
         with:
@@ -48,68 +48,42 @@ jobs:
               ;;
           esac
 
-
       - name: Login to Docker Hub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull image
-        run: docker pull "$IMAGE_TAG" || true
+        run: docker pull "$IMAGE_TAG"
 
-      # - name: Test Unbound config
-        # run: |
-          # if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            # timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG" || true
-          # else
-            # timeout 30s docker run --rm --entrypoint unbound-checkconf "$IMAGE_TAG"
-          # fi
+      - name: Start container
+        run: |
+          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
+            docker run -d --name unbound-dns -p 8853:8853/udp "$IMAGE_TAG"
+          else
+            docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG"
+          fi
+
+      - name: Wait for Unbound readiness
+        run: |
+          for i in {1..20}; do
+            if docker logs unbound-dns 2>&1 | grep -q "ready to serve"; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs unbound-dns
+          exit 1
 
       - name: DNS test
         run: |
           if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            timeout 30s docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG" || true
-            sleep 4
-            timeout 10s docker exec unbound-dns drill cloudflare.com A || true
-            docker rm -f unbound-dns || true
+            timeout 10s docker exec unbound-dns drill @127.0.0.1 -p 8853 cloudflare.com A
           else
-            timeout 30s docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG"
-            sleep 4
-            timeout 10s docker exec unbound-dns drill cloudflare.com A
-            docker rm -f unbound-dns
+            timeout 10s docker exec unbound-dns drill @127.0.0.1 -p 5335 cloudflare.com A
           fi
 
-      # - name: DNSSEC validation test
-        # run: |
-          # timeout 30s docker run -d --name unbound-dnssec -p 5353:53/udp "$IMAGE_TAG"
-          # sleep 4
-
-          # if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            # timeout 10s docker exec unbound-dnssec drill -D cloudflare.com A > quic_dnssec_ok.out
-            # if ! grep -q "ad;" quic_dnssec_ok.out; then
-              # docker rm -f unbound-dnssec
-              # exit 1
-            # fi
-            # timeout 10s docker exec unbound-dnssec drill -D cloudflare.com DNSKEY > quic_dnskey.out
-            # if ! grep -q "DNSKEY" quic_dnskey.out; then
-              # docker rm -f unbound-dnssec
-              # exit 1
-            # fi
-            # docker rm -f unbound-dnssec
-            # exit 0
-          # fi
-
-          # timeout 10s docker exec unbound-dnssec drill -D dnssec-failed.org A > dnssec_fail.out
-          # if ! grep -q "SERVFAIL" dnssec_fail.out; then
-            # docker rm -f unbound-dnssec
-            # exit 1
-          # fi
-
-          # timeout 10s docker exec unbound-dnssec drill -D cloudflare.com A > dnssec_ok.out
-          # if ! grep -q "ad;" dnssec_ok.out; then
-            # docker rm -f unbound-dnssec
-            # exit 1
-          # fi
-
-          # docker rm -f unbound-dnssec
+      - name: Cleanup
+        if: always()
+        run: docker rm -f unbound-dns || true
