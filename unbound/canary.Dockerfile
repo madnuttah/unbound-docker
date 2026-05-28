@@ -65,6 +65,9 @@ RUN set -xe; \
     --enable-tfo-client \
     --enable-pie \
     --enable-relro-now && \
+  VERSION_LINE=$(grep '^PACKAGE_VERSION=' configure) && \
+  UNBOUND_VERSION=$(echo "$VERSION_LINE" | cut -d"'" -f2) && \
+  echo "$UNBOUND_VERSION" > /tmp/UNBOUND_VERSION && \
   make -j$(nproc) && \
   make install && \
   apk del --no-cache .build-deps && \
@@ -188,13 +191,15 @@ WORKDIR /
 
 FROM scratch AS unbound
 
+COPY --from=buildenv /tmp/UNBOUND_VERSION /tmp/UNBOUND_VERSION
+
 ARG IMAGE_BUILD_DATE \
   UNBOUND_VERSION \
   OPENSSL_BUILDENV_VERSION \
   UNBOUND_UID
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
-  UNBOUND_VERSION="${UNBOUND_VERSION}" \
+  UNBOUND_VERSION="$(cat /tmp/UNBOUND_VERSION)" \
   OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
