@@ -62,16 +62,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Fetch upstream Unbound version
-        id: upstream
-        run: |
-          git clone https://github.com/NLnetLabs/unbound.git unbound-upstream
-          cd unbound-upstream
-          git checkout "${{ needs.check-update.outputs.UNBOUND_GIT_SHA }}"
-          VERSION_LINE="$(grep '^PACKAGE_VERSION=' configure)"
-          VERSION_VALUE="$(echo "$VERSION_LINE" | cut -d"'" -f2)"
-          echo "UNBOUND_VERSION=$VERSION_VALUE" >> "$GITHUB_OUTPUT"
-
       - name: Set buildvars
         id: vars
         run: |
@@ -134,7 +124,6 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
-            UNBOUND_VERSION=${{ steps.upstream.outputs.UNBOUND_VERSION }}
             OPENSSL_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}
           file: ./unbound/canary.Dockerfile
           sbom: ${{ github.event_name != 'pull_request' }}
