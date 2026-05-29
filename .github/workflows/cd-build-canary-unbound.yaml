@@ -66,9 +66,15 @@ jobs:
         id: vars
         run: |
           echo "IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
-          echo "UNBOUND_VERSION=$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> "$GITHUB_OUTPUT"
-          source buildvars
-          echo "OPENSSL_BUILDENV_VERSION=$OPENSSL_BUILDENV_VERSION" >> "$GITHUB_OUTPUT"
+
+          echo "UNBOUND_VERSION=$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure \
+            | awk -F= '/^version=/ { print $2 }')" >> "$GITHUB_OUTPUT"
+
+          echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases \
+            | jq -r '[.[] | select(.prerelease == false)][0].name')" >> "$GITHUB_OUTPUT"
+
+          echo OPENSSL_QUIC_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases \
+            | jq -r '[.[] | select(.prerelease == false)][0].name')-quic" >> "$GITHUB_OUTPUT"
 
       - name: Import GPG key
         id: IMPORT_GPG
@@ -110,14 +116,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: Login to GHCR
-      #   if: github.event_name != 'pull_request'
-      #   uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         with:
@@ -132,14 +130,11 @@ jobs:
           provenance: ${{ github.event_name != 'pull_request' }}
           cache-from: |
             type=registry,ref=madnuttah/unbound:buildcache-canary
-          #  type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary
           cache-to: |
             type=registry,ref=madnuttah/unbound:buildcache-canary,mode=max
-          #  type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-canary,mode=max
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary
-          #  ${{ env.GHCR_SLUG }}:canary
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
