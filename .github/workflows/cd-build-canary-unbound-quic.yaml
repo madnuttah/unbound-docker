@@ -55,6 +55,7 @@ jobs:
         id: vars
         run: |
           echo "IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+          echo "UNBOUND_VERSION=$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure | awk -F= '/^version=/ { print $2 }')" >> "$GITHUB_OUTPUT"
           source buildvars
           echo "OPENSSL_QUIC_BUILDENV_VERSION=$OPENSSL_QUIC_BUILDENV_VERSION" >> "$GITHUB_OUTPUT"
           echo "NGTCP2_VERSION=$NGTCP2_VERSION" >> "$GITHUB_OUTPUT"
@@ -98,6 +99,7 @@ jobs:
             OPENSSL_QUIC_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
             NGTCP2_VERSION=${{ steps.vars.outputs.NGTCP2_VERSION }}
             IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
+            UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}
           file: ./unbound/canary_quic.Dockerfile
           push: true
           sbom: true
