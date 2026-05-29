@@ -194,24 +194,20 @@ WORKDIR /
 
 FROM scratch AS unbound
 
-COPY --from=buildenv /tmp/UNBOUND_VERSION /tmp/UNBOUND_VERSION
-
 ARG IMAGE_BUILD_DATE \
-  OPENSSL_QUIC_BUILDENV_VERSION \
-  UNBOUND_UID \
-  NGTCP2_VERSION
+  UNBOUND_VERSION \
+  OPENSSL_BUILDENV_VERSION \
+  UNBOUND_UID
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
-  UNBOUND_VERSION="$(cat /tmp/UNBOUND_VERSION)" \
-  OPENSSL_QUIC_BUILDENV_VERSION="${OPENSSL_QUIC_BUILDENV_VERSION}" \
-  NGTCP2_VERSION="${NGTCP2_VERSION}" \
+  UNBOUND_VERSION="${UNBOUND_VERSION}" \
+  OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
   PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
 
-
 LABEL org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.created="${IMAGE_BUILD_DATE}" \
-  org.opencontainers.image.version="${UNBOUND_VERSION} (canary+quic)" \
+  org.opencontainers.image.version="${UNBOUND_VERSION} (canary-QUIC)" \
   org.opencontainers.image.description="Unbound is a validating, recursive, and caching DNS resolver." \
   org.opencontainers.image.summary="This distroless Unbound Docker image is based on Alpine Linux with focus on security, privacy, performance and a small image size. And with Pi-hole in mind." \
   org.opencontainers.image.base.name="madnuttah/unbound" \
