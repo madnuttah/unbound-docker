@@ -126,6 +126,7 @@ jobs:
           build-args: |
             IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
             OPENSSL_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}
+            UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}
           file: ./unbound/canary.Dockerfile
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
