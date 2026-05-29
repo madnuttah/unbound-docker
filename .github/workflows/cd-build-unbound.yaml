@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       SUBVERSION:
-        description: "Subversion number (N) for tag <version>-N[-quic]"
+        description: "Manual build version"
         required: false
         default: "0"
 
