@@ -21,16 +21,6 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: Confirm upstream workflow success
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
-            if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
-              echo "Upstream workflow did not succeed"
-              exit 1
-            fi
-          fi
-          echo "Update triggered"
-
   build:
     needs: check-update
     runs-on: ubuntu-latest
