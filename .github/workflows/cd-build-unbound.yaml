@@ -2,12 +2,6 @@ name: CD Build Distroless Unbound Docker Image
 
 on:
   workflow_dispatch:
-    inputs:
-      SUBVERSION:
-        description: "Manual build version"
-        required: false
-        default: "0"
-
   workflow_run:
     workflows: [CD Check NLnet Labs Unbound Release]
     types:
@@ -30,7 +24,6 @@ jobs:
       UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
       UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
       OPENSSL_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_BUILDENV_VERSION }}
-      SUBVERSION: ${{ steps.set_subversion.outputs.SUBVERSION }}
 
     steps:
       - name: Harden Runner
@@ -54,15 +47,6 @@ jobs:
           cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
           cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
           cat buildvars | grep OPENSSL_BUILDENV_VERSION >> $GITHUB_OUTPUT
-
-      - name: Determine subversion
-        id: set_subversion
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "SUBVERSION=${{ github.event.inputs.SUBVERSION }}" >> $GITHUB_OUTPUT
-          else
-            echo "SUBVERSION=0" >> $GITHUB_OUTPUT
-          fi
 
   build:
     runs-on: ubuntu-latest
@@ -92,10 +76,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+#      - name: Login to GHCR
+#        if: github.event_name != 'pull_request'
+#        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+#        with:
+#          registry: ghcr.io
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         env:
           DOCKERHUB_SLUG: "madnuttah/unbound"
+#          GHCR_SLUG: "ghcr.io/madnuttah/unbound"
         with:
           platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
           builder: ${{ steps.buildx.outputs.name }}
@@ -111,9 +104,12 @@ jobs:
           provenance: ${{ github.event_name != 'pull_request' }}
           cache-from: |
             type=registry,ref=madnuttah/unbound:buildcache
+#            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache
           cache-to: |
             type=registry,ref=madnuttah/unbound:buildcache,mode=max
+#            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache,mode=max
           tags: |
-            madnuttah/unbound:${{ needs.buildvars.outputs.UNBOUND_VERSION }}-${{ needs.buildvars.outputs.SUBVERSION }}
-            madnuttah/unbound:${{ needs.buildvars.outputs.UNBOUND_VERSION }}-${{ needs.buildvars.outputs.SUBVERSION }}-quic
-            madnuttah/unbound:latest
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+            ${{ env.DOCKERHUB_SLUG }}:latest
+#            ${{ env.GHCR_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+#            ${{ env.GHCR_SLUG }}:latest
