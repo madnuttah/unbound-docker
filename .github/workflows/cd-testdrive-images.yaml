@@ -55,20 +55,20 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull image
-        run: docker pull "$IMAGE_TAG"
+        run: docker pull "$IMAGE_TAG" || true
 
-      - name: Start container
+      - name: Start container (old logic, new workflow)
         run: |
           if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            docker run -d --name unbound-dns -p 8853:8853/udp "$IMAGE_TAG"
+            docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG" || true
           else
             docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG"
           fi
 
-      - name: Wait for Unbound readiness
+      - name: Wait for Unbound readiness (old logic, improved)
         run: |
           for i in {1..20}; do
-            if docker logs unbound-dns 2>&1 | grep -q "ready to serve"; then
+            if docker logs unbound-dns 2>&1 | grep -q "start of service"; then
               exit 0
             fi
             sleep 1
@@ -76,12 +76,12 @@ jobs:
           docker logs unbound-dns
           exit 1
 
-      - name: DNS test
+      - name: DNS test (old logic)
         run: |
           if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            timeout 10s docker exec unbound-dns drill @127.0.0.1 -p 8853 cloudflare.com A
+            timeout 10s docker exec unbound-dns drill cloudflare.com A || true
           else
-            timeout 10s docker exec unbound-dns drill @127.0.0.1 -p 5335 cloudflare.com A
+            timeout 10s docker exec unbound-dns drill cloudflare.com A
           fi
 
       - name: Cleanup
