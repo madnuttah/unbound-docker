@@ -2,11 +2,11 @@ name: CD Tag And Release
 
 on:
   workflow_dispatch:
-#  workflow_run:
-#    workflows:
-#      - "CD Build Distroless Unbound Docker Image"
- #   types:
- #     - completed
+  workflow_run:
+    workflows:
+      - "CD Build Distroless Unbound Docker Image"
+    types:
+      - completed
 
 permissions:
   contents: write
