@@ -50,7 +50,7 @@ jobs:
             | awk -F= '/^version=/ { print $2 }')" >> "$GITHUB_OUTPUT"
 
           echo OPENSSL_QUIC_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases \
-            | jq -r '[.[] | select(.prerelease == false)][0].name')-quic" >> "$GITHUB_OUTPUT"
+            | jq -r '[.[] | select(.prerelease == false)][0].name')" >> "$GITHUB_OUTPUT"
 
           echo NGTCP2_VERSION="$(curl -s https://api.github.com/repos/madnuttah/ngtcp2-buildenv/releases \
             | jq -r '[.[] | select(.prerelease == false)][0].name')" >> "$GITHUB_OUTPUT"
