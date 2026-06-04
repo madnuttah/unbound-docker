@@ -33,10 +33,6 @@
       "matchManagers": ["github-actions"],
       "pinDigests": true,
       "automerge": true
-    },
-    {
-      "matchManagers": ["dockerfile"],
-      "enabled": false
     }
   ]
 }
