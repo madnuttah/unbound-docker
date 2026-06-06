@@ -84,10 +84,13 @@ RUN set -xe; \
   echo "${ROOT_ZONE_MD5} */usr/local/unbound/iana.d/root.zone" | md5sum -c - && \
   GNUPGHOME="$(mktemp -d)" && \
   export GNUPGHOME && \
-  gpg --no-tty --keyserver hkps://keys.openpgp.org --recv-keys "$INTERNIC_PGP" && \
+  ( gpg --no-tty --keyserver hkps://keyserver.ubuntu.com --recv-keys "$INTERNIC_PGP" \
+    || gpg --no-tty --keyserver hkps://pgp.surf.nl --recv-keys "$INTERNIC_PGP" ) && \
   gpg --verify /usr/local/unbound/iana.d/root.hints.sig /usr/local/unbound/iana.d/root.hints && \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
-  /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true
+  /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true && \
+  pkill -9 gpg-agent && \
+  pkill -9 dirmngr
 
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
