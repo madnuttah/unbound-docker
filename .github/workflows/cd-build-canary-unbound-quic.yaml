@@ -92,10 +92,6 @@ jobs:
           push: true
           sbom: true
           provenance: true
-          cache-from: |
-            type=registry,ref=madnuttah/unbound:buildcache-canary-quic
-          cache-to: |
-            type=registry,ref=madnuttah/unbound:buildcache-canary-quic,mode=max
           tags: |
             ${{ env.DOCKERHUB_SLUG }}:canary-quic
 
