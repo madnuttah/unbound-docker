@@ -1,0 +1,4 @@
+*.md
+!README.md
+!.dockerignore
+!LICENSE

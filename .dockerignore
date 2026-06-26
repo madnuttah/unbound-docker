@@ -1,0 +1,6 @@
+.github/
+/unbound/doc/
+/versions/*.txt
+.gitignore
+LICENSE
+*.md
