@@ -1,0 +1,172 @@
+name: CD Increment Unbound Subversions
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  bump-sub:
+    if: github.actor == 'renovate[bot]'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411
+        with:
+          egress-policy: audit
+                    
+      - name: Checkout Repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: true
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Import GPG key
+        id: IMPORT_GPG
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: false
+          git_push_gpgsign: false
+          trust_level: 5
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.x'
+
+      - name: Process Subversion Logic
+        run: |
+          import re
+          import os
+          import sys
+          import subprocess
+
+          labels = "${{ join(github.event.pull_request.labels.*.name, ',') }}".split(',')
+          
+          def modify_subversion(filepath, reset=False):
+              """Modify subversion inside 'unbound=X.Y.Z-N[-quic]'."""
+              if not os.path.exists(filepath):
+                  print(f"File not found: {filepath}")
+                  return False
+
+              with open(filepath, 'r') as f:
+                  content = f.read().strip()
+
+              match = re.search(r'unbound=(\d+\.\d+\.\d+)-(\d+)(-quic)?', content)
+              if not match:
+                  print(f"No version pattern found in {filepath}")
+                  return False
+
+              base = match.group(1)
+              old_sub = int(match.group(2))
+              suffix = match.group(3) or ""
+
+              new_sub = 0 if reset else old_sub + 1
+
+              if new_sub == old_sub:
+                  print(f"{filepath} already at sub={new_sub}. No change.")
+                  return False
+
+              new_version = f"unbound={base}-{new_sub}{suffix}"
+
+              with open(filepath, 'w') as f:
+                  f.write(new_version + "\n")
+
+              print(f"Updated {filepath}: {base}-{old_sub}{suffix} → {base}-{new_sub}{suffix}")
+              return True
+
+          def get_changed_files():
+              """Get files changed compared to main branch base SHA."""
+              try:
+                  # Use precise PR merge base target to prevent missing refs on synchronize events
+                  target_sha = "${{ github.event.pull_request.base.sha }}"
+                  result = subprocess.run(
+                      ["git", "diff", "--name-only", target_sha],
+                      capture_output=True,
+                      text=True,
+                      check=False
+                  )
+                  return result.stdout.strip().split('\n') if result.stdout.strip() else []
+              except Exception as e:
+                  print(f"Warning: Could not get changed files: {e}")
+                  return []
+
+          changed = False
+          changed_files = get_changed_files()
+
+          unbound_changed = "versions/unbound.txt" in changed_files
+          openssl_changed = "versions/openssl-buildenv.txt" in changed_files
+          openssl_quic_changed = "versions/openssl-quic-buildenv.txt" in changed_files
+          
+          print(f"Changed files: {changed_files}")
+
+          if unbound_changed:
+              print("Unbound core changed -> resetting docker subversions to 0")
+              if modify_subversion('versions/unbound-docker-image.txt', reset=True):
+                  changed = True
+              if modify_subversion('versions/unbound-quic-docker-image.txt', reset=True):
+                  changed = True
+     
+          if openssl_changed or 'bump-openssl-subversion' in labels:
+              print("Processing OpenSSL buildenv bump (+1)")
+              if modify_subversion('versions/openssl-buildenv.txt', reset=False):
+                  changed = True
+          
+          if openssl_quic_changed or 'bump-quic-subversion' in labels:
+              print("Processing OpenSSL QUIC buildenv bump (+1)")
+              if modify_subversion('versions/openssl-quic-buildenv.txt', reset=False):
+                  changed = True
+
+          if not changed:
+              expected_change = unbound_changed or openssl_changed or openssl_quic_changed or any(l in labels for l in ['bump-openssl-subversion', 'bump-quic-subversion'])
+              
+              if expected_change:
+                  print("::error::Expected to bump subversion for a relevant file or label, but no changes were made. Failing pipeline.")
+                  sys.exit(1)
+              else:
+                  print("PR does not affect Unbound or OpenSSL versions. Skipping commit step.")
+                  with open(os.environ['GITHUB_ENV'], 'a') as f:
+                      f.write("HAS_CHANGES=false\n")
+                  sys.exit(0)
+
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write("HAS_CHANGES=true\n")
+        shell: python
+
+      - name: Export PR branch
+        env:
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: echo "PR_BRANCH=$PR_BRANCH" >> "$GITHUB_ENV"
+
+      - name: Commit and Push Changes
+        if: env.HAS_CHANGES == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          
+          # Restored the stripped out URL structure safely
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@://github.com{{ github.repository }}.git"
+          
+          git config --local user.name "${{ steps.IMPORT_GPG.outputs.name }}"
+          git config --local user.email "${{ steps.IMPORT_GPG.outputs.email }}"
+          git add versions/*.txt
+          
+          if git diff --staged --quiet; then
+            echo "No real differences to commit."
+          else
+            git commit -m "fix: auto-manage unbound subversion"
+            git push origin HEAD:"$PR_BRANCH"
+          fi

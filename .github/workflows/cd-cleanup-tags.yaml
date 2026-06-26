@@ -1,0 +1,125 @@
+name: CD Cleanup Dockerhub Tags
+
+on:
+  workflow_run:
+    workflows:
+      - "CD Tag And Release"
+    types:
+      - completed
+  workflow_dispatch:
+
+env:
+  DOCKERHUB_SLUG: "madnuttah/unbound-docker-dev"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  cleanup-tags:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
+
+    runs-on: ubuntu-latest
+
+    env:
+      DELETE_SUFFIXES: "-386 -amd64 -armv6 -armv7 -arm64 -ppc64le -s390x -riscv64"
+      DRY_RUN: "false"
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            auth.docker.io:443
+            github.com:443
+            hub.docker.com:443
+            registry-1.docker.io:443
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get Docker Hub JWT
+        id: auth
+        run: |
+          token=$(curl -s -X POST https://hub.docker.com/v2/users/login/ \
+            -H "Content-Type: application/json" \
+            -d "{\"username\":\"${{ secrets.DOCKERHUB_USERNAME }}\",\"password\":\"${{ secrets.DOCKERHUB_TOKEN }}\"}" \
+            | jq -r .token)
+          echo "DOCKERHUB_TOKEN_JWT=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Cleanup Tags
+        env:
+          REPO: ${{ env.DOCKERHUB_SLUG }}
+          SUFFIXES: ${{ env.DELETE_SUFFIXES }}
+          DRY_RUN: ${{ env.DRY_RUN }}
+          JWT: ${{ steps.auth.outputs.DOCKERHUB_TOKEN_JWT }}
+        run: |
+          set -euo pipefail
+
+          is_final_tag() {
+            tag="$1"
+            for s in $SUFFIXES; do
+              if [[ "$tag" == *"$s" ]]; then
+                return 1
+              fi
+            done
+            return 0
+          }
+
+          should_delete() {          
+            local tag="$1"          
+
+            if [[ "$tag" == *"buildcache"* ]]; then          
+              return 1       
+            fi          
+
+            for s in $SUFFIXES; do          
+              if [[ "$tag" == *"$s" ]]; then          
+                return 0     
+              fi          
+            done          
+            return 1     
+          }
+
+          delete_tag() {
+            tag="$1"
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "[DRY-RUN] $tag"
+              return 0
+            fi
+            curl -s -X DELETE \
+              -H "Authorization: JWT $JWT" \
+              "https://hub.docker.com/v2/repositories/${REPO}/tags/${tag}/" >/dev/null
+            echo "deleted: $tag"
+          }
+
+          page="https://hub.docker.com/v2/repositories/${REPO}/tags?page_size=100"
+          while [ -n "$page" ] && [ "$page" != "null" ]; do
+            body=$(curl -s "$page")
+            page=$(echo "$body" | jq -r '.next')
+            echo "$body" | jq -r '.results[].name' | while read -r tag; do
+              if should_delete "$tag"; then
+                delete_tag "$tag"
+              else
+                echo "skip: $tag"
+              fi
+            done
+          done
+
+          echo "cleanup done."

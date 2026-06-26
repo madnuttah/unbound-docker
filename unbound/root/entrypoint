@@ -1,28 +1,35 @@
 #!/bin/sh
 
-DISABLE_SET_PERMS=${DISABLE_SET_PERMS:-false}
-UNBOUND_UID=${UNBOUND_UID:-1000}
-UNBOUND_GID=${UNBOUND_GID:-1000}
+set -eu
 
-unbound_root=/usr/local/unbound
+DISABLE_SET_PERMS="${DISABLE_SET_PERMS:-false}"
+UNBOUND_UID="${UNBOUND_UID:-1000}"
+UNBOUND_GID="${UNBOUND_GID:-1000}"
 
-disable_set_perms=$DISABLE_SET_PERMS
-if $disable_set_perms; then
-  command="exec"
+unbound_root="/usr/local/unbound"
+
+if [ "$DISABLE_SET_PERMS" = "true" ]; then
+    command="exec"
 else
-  set_perms=0
-  if [ $(id -u _unbound) -ne $UNBOUND_UID ]; then
-    usermod -o -u $UNBOUND_UID _unbound
-    set_perms=1
-  fi
-  if [ $(id -g _unbound) -ne $UNBOUND_GID ]; then
-    groupmod -o -g $UNBOUND_GID _unbound
-    set_perms=1
-  fi
-  if [ $set_perms -eq 1 ]; then
-    chown -R $UNBOUND_UID:$UNBOUND_GID $unbound_root >/dev/null 2>&1
-  fi
-  command="exec su-exec $UNBOUND_UID:$UNBOUND_GID"
+    set_perms=0
+
+    current_uid=$(id -u _unbound 2>/dev/null) || current_uid=""
+    if [ "$current_uid" != "$UNBOUND_UID" ]; then
+        usermod -o -u "$UNBOUND_UID" _unbound 2>/dev/null || true
+        set_perms=1
+    fi
+
+    current_gid=$(id -g _unbound 2>/dev/null) || current_gid=""
+    if [ "$current_gid" != "$UNBOUND_GID" ]; then
+        groupmod -o -g "$UNBOUND_GID" _unbound 2>/dev/null || true
+        set_perms=1
+    fi
+
+    if [ "$set_perms" -eq 1 ]; then
+        chown -R "$UNBOUND_UID:$UNBOUND_GID" "$unbound_root" 2>/dev/null || true
+    fi
+
+    command="exec su-exec $UNBOUND_UID:$UNBOUND_GID"
 fi
 
-$command $unbound_root/sbin/unbound.sh $disable_set_perms
+$command "$unbound_root/sbin/unbound.sh" "$DISABLE_SET_PERMS"

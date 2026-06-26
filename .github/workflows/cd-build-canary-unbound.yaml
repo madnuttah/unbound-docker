@@ -1,157 +1,183 @@
-name: CD Build Canary Distroless Unbound Docker Image
+name: CD Build Canary Unbound Docker Image
 
 on:
-  schedule:
-    - cron: "0 19 * * mon-fri"
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "versions/unbound-git-sha.txt"
 
-permissions: {}
+permissions:
+  actions: read
+  contents: read
+  packages: write
+  id-token: write
 
 jobs:
 
-  check-update:
+  buildvars:
     runs-on: ubuntu-latest
     outputs:
-      UNBOUND_GIT_SHA: ${{ steps.check.outputs.UNBOUND_GIT_SHA }}
+      IMAGE_BUILD_DATE: "${{ steps.vars.outputs.IMAGE_BUILD_DATE }}"
+      OPENSSL_BUILDENV_VERSION: "${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}"
+      UNBOUND_VERSION: "${{ steps.vars.outputs.UNBOUND_VERSION }}"
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            nlnetlabs.nl:443
+            raw.githubusercontent.com:443
 
-      - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-
-      - name: Check for update
-        id: check
-        run: |
-          UNBOUND_GIT_SHA="$(git ls-remote https://github.com/NLnetLabs/unbound.git HEAD | cut -f1)"
-          if [[ -z "$UNBOUND_GIT_SHA" ]]; then
-            echo "Failed to fetch remote SHA"
-            exit 1
-          fi
-
-          CURRENT_SHA="$(cat unbound_git_sha 2>/dev/null || echo '')"
-
-          if [[ "$CURRENT_SHA" = "$UNBOUND_GIT_SHA" ]]; then
-            echo "No update — SHA unchanged"
-            exit 1
-          fi
-
-          echo "UNBOUND_GIT_SHA=$UNBOUND_GIT_SHA" >> "$GITHUB_OUTPUT"
-
-  build:
-    needs: check-update
-    runs-on: ubuntu-latest
-
-    env:
-      DOCKERHUB_SLUG: "madnuttah/unbound"
-      GHCR_SLUG: "ghcr.io/madnuttah/unbound"
-
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
-        with:
-          egress-policy: audit
-
-      - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           persist-credentials: false
-
+          fetch-depth: 0
+          
       - name: Set buildvars
         id: vars
         run: |
-          echo "IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
 
-          echo "UNBOUND_VERSION=$(curl -s https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure \
-            | awk -F= '/^version=/ { print $2 }')" >> "$GITHUB_OUTPUT"
+          IMAGE_BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "IMAGE_BUILD_DATE=$IMAGE_BUILD_DATE" >> "$GITHUB_OUTPUT"
 
-          echo OPENSSL_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases \
-            | jq -r '[.[] | select(.prerelease == false)][0].name')" >> "$GITHUB_OUTPUT"
+          UNBOUND_VERSION="$(
+            curl -fsSL https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure \
+            | awk -F= '/^version=/ { print $2 }'
+          )"
+          echo "UNBOUND_VERSION=$UNBOUND_VERSION" >> "$GITHUB_OUTPUT"
 
-          echo OPENSSL_QUIC_BUILDENV_VERSION="$(curl -s https://api.github.com/repos/madnuttah/openssl-buildenv/releases \
-            | jq -r '[.[] | select(.prerelease == false)][0].name')-quic" >> "$GITHUB_OUTPUT"
+          RESP="$(curl -fsSL https://api.github.com/repos/madnuttah/openssl-buildenv/releases)"
+          echo "$RESP" | jq empty
 
-      - name: Import GPG key
-        id: IMPORT_GPG
-        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd
-        with:
-          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_push_gpgsign: false
-          trust_level: 5
+          OPENSSL_BUILDENV_VERSION="$(
+            echo "$RESP" |
+            jq -r '
+              map(select(.prerelease == false and (.name | endswith("-quic") | not)))
+              | first
+              | .name
+            '
+          )"
 
-      - name: Push unbound_git_sha to repository
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
-          GIT_AUTHOR_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
-          GIT_AUTHOR_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
-          GIT_COMMITTER_NAME: ${{ steps.IMPORT_GPG.outputs.name }}
-          GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
-          NEW_SHA: ${{ needs.check-update.outputs.UNBOUND_GIT_SHA }}
+          echo "OPENSSL_BUILDENV_VERSION=$OPENSSL_BUILDENV_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Show build variables
         run: |
-          git remote set-url origin "https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          echo "$NEW_SHA" > unbound_git_sha
-          git add unbound_git_sha
-          git commit -m "Updated unbound_git_sha" || true
-          git push origin main || true
+          echo "IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}"
+          echo "UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}"
+          echo "OPENSSL_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}"
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
+  build:
+    needs: buildvars
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
 
-      - name: Set up Docker Buildx
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+          - arch: arm64
+            platform: linux/arm64
+          - arch: 386
+            platform: linux/386
+          - arch: armv6
+            platform: linux/arm/v6
+          - arch: armv7
+            platform: linux/arm/v7
+          - arch: ppc64le
+            platform: linux/ppc64le
+          - arch: s390x
+            platform: linux/s390x
+          - arch: riscv64
+            platform: linux/riscv64
+    
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    env:
+      DOCKERHUB_SLUG: "madnuttah/unbound"
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            auth.docker.io:443
+            dl-cdn.alpinelinux.org:443
+            github.com:443
+            keyserver.ubuntu.com:443
+            pgp.surf.nl:443
+            production.cloudfront.docker.com:443
+            registry-1.docker.io:443
+            www.internic.net:443
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3
+
+      - uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
         id: buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
 
-      - name: Login to Dockerhub
+      - uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
-      - name: Build and push
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
+      - name: Build and push arch image
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
         with:
-          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
-          builder: ${{ steps.buildx.outputs.name }}
-          build-args: |
-            IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}
-            OPENSSL_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}
-            UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}
+          context: .
+          builder: "${{ steps.buildx.outputs.name }}"
           file: ./unbound/canary.Dockerfile
-          sbom: ${{ github.event_name != 'pull_request' }}
-          provenance: ${{ github.event_name != 'pull_request' }}
-          push: ${{ github.event_name != 'pull_request' }}
+
+          platforms: ${{ matrix.platform }}
+          push: true
+
+          sbom: false
+          provenance: false
+
+          build-args: |
+            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
+            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:canary
+            ${{ env.DOCKERHUB_SLUG }}:canary-${{ matrix.arch }}
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-        if: ${{ github.event_name != 'pull_request' }}
+  upload-pipeline-metadata:
+    needs: [buildvars, build]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          image-ref: ${{ env.DOCKERHUB_SLUG }}:canary
-          exit-code: "1"
-          ignore-unfixed: false
-          scan-type: image
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
-          format: "table"
+          egress-policy: block
+          allowed-endpoints: >+
+      
+      - name: Create Isolated Metadata
+        run: |
+          mkdir -p metadata-payload
+          printf "%s" "${{ needs.buildvars.outputs.UNBOUND_VERSION }}" > metadata-payload/version.txt
+          printf "canary" > metadata-payload/variant.txt
 
-      - name: Docker Scout CVEs
-        uses: docker/scout-action@cd72f264beff1cd72735de31148b9d3244a0234a
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Upload Metadata Artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          command: cves
-          image: ${{ env.DOCKERHUB_SLUG }}:canary
-          only-fixed: true
-          only-severities: critical,high
-          write-comment: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          exit-code: false
+          name: unbound-build-metadata
+          path: metadata-payload/
+          retention-days: 1

@@ -21,8 +21,11 @@ ENV UNBOUND_VERSION="${UNBOUND_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
   UNBOUND_GID="${UNBOUND_GID}"
 
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 WORKDIR /tmp/src
 
+# hadolint ignore=DL3018
 RUN set -xe; \
   addgroup -S -g "${UNBOUND_GID}" _unbound && \
   adduser -S -H -h /usr/local/unbound -g _unbound -u "${UNBOUND_UID}" -D -G _unbound _unbound && \
@@ -45,14 +48,16 @@ RUN set -xe; \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}" -o unbound.tar.gz && \
   curl -sSL "${UNBOUND_DOWNLOAD_URL}.asc" -o unbound.tar.gz.asc && \
   echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
-  GNUPGHOME="$(mktemp -d)" && \
-  export GNUPGHOME && \
+  GNUPGHOME="$(mktemp -d)" && export GNUPGHOME && \
   curl -sSL https://nlnetlabs.nl/downloads/keys/releases-g2.asc -o "${GNUPGHOME}/releases-g2.asc" && \
   gpg --import "${GNUPGHOME}/releases-g2.asc" && \
   gpg --batch --verify unbound.tar.gz.asc unbound.tar.gz && \
   tar -xzf unbound.tar.gz && \
-  rm unbound.tar.gz && \
-  cd "unbound-${UNBOUND_VERSION}" && \
+  rm unbound.tar.gz
+
+WORKDIR /tmp/src/unbound-${UNBOUND_VERSION}
+
+RUN set -xe; \
   ./configure \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
@@ -82,7 +87,7 @@ RUN set -xe; \
   make -j"$(nproc)" && \
   make install && \
   apk del --no-cache .build-deps && \
-  mkdir -p "/usr/local/unbound/iana.d/" && \
+  mkdir -p /usr/local/unbound/iana.d && \
   curl -sSL https://www.internic.net/domain/named.cache -o /usr/local/unbound/iana.d/root.hints && \
   curl -sSL https://www.internic.net/domain/named.cache.md5 -o /usr/local/unbound/iana.d/root.hints.md5 && \
   curl -sSL https://www.internic.net/domain/named.cache.sig -o /usr/local/unbound/iana.d/root.hints.sig && \
@@ -106,8 +111,9 @@ RUN set -xe; \
 COPY ./unbound/root/*.sh \
   /usr/local/unbound/sbin/
 
-COPY ./unbound/root/entrypoint /
+COPY ./unbound/root/entrypoint /entrypoint
 
+# hadolint ignore=DL3018
 RUN set -xe; \
   apk --update --no-cache add \
     ca-certificates \
@@ -129,7 +135,9 @@ RUN set -xe; \
     "/usr/local/unbound/log.d/" && \
   touch /usr/local/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound /usr/local/unbound/ && \
-  ln -s /dev/random /dev/urandom /dev/null /usr/local/unbound/unbound.d/ && \
+  ln -s /dev/random /usr/local/unbound/unbound.d/random && \
+  ln -s /dev/urandom /usr/local/unbound/unbound.d/urandom && \
+  ln -s /dev/null /usr/local/unbound/unbound.d/null && \
   chown -Rh _unbound:_unbound \
     /usr/local/unbound/unbound.d/random \
     /usr/local/unbound/unbound.d/null \
@@ -150,8 +158,8 @@ RUN set -xe; \
   strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
 
 COPY ./unbound/root/usr/local/unbound/unbound.conf \
-  /usr/local/unbound/unbound.conf
-
+ /usr/local/unbound/unbound.conf
+        
 FROM scratch AS stage
 
 COPY --from=buildenv /usr/local/unbound/ \
@@ -214,10 +222,10 @@ ARG UNBOUND_VERSION \
   UNBOUND_UID
 
 ENV IMAGE_BUILD_DATE="${IMAGE_BUILD_DATE}" \
-  UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_DOCKER_IMAGE_VERSION}"-quic \
+  UNBOUND_DOCKER_IMAGE_VERSION="${UNBOUND_DOCKER_IMAGE_VERSION}-quic" \
   OPENSSL_QUIC_BUILDENV_VERSION="${OPENSSL_QUIC_BUILDENV_VERSION}" \
   UNBOUND_UID="${UNBOUND_UID}" \
-  PATH=/usr/local/unbound/unbound.d/sbin:"$PATH"
+  PATH=/usr/local/unbound/unbound.d/sbin:$PATH
 
 LABEL org.opencontainers.image.title="madnuttah/unbound" \
   org.opencontainers.image.created="${IMAGE_BUILD_DATE}" \

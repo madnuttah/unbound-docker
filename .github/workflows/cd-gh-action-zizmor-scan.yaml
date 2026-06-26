@@ -1,27 +1,73 @@
 name: CD GitHub Actions Security Analysis with zizmor
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
   pull_request:
     branches: ["**"]
-
-permissions:
-  actions: read
-  contents: read
-
 
 jobs:
   zizmor:
     name: Run zizmor
     runs-on: ubuntu-latest
     permissions:
-      security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
+      actions: read
+      contents: read
+      security-events: write
     steps:
-      - name: Checkout repository
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            ghcr.io:443
+            github.com:443
+            pkg-containers.githubusercontent.com:443
+          
+      - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          persist-credentials: false
+          fetch-depth: 0
+          clean: true
+          ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
       - name: Run zizmor 🌈
         uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
+
+
+# name: CD GitHub Actions Security Analysis with zizmor
+
+# on:
+  # push:
+    # branches: ["main"]
+  # pull_request:
+    # branches: ["**"]
+
+# permissions:
+  # actions: read
+  # contents: read
+
+
+# jobs:
+  # zizmor:
+    # name: Run zizmor
+    # runs-on: ubuntu-latest
+    # permissions:
+      # security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
+    # steps:
+      # # - name: Checkout repository
+        # # uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        # # with:
+          # # persist-credentials: false
+          # # token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Checkout
+        # uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        # with:
+          # fetch-depth: 0
+          # clean: true
+          # ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
+
+      # - name: Run zizmor 🌈
+        # uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6

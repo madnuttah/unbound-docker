@@ -8,13 +8,16 @@ FROM madnuttah/openssl-buildenv:"${OPENSSL_BUILDENV_VERSION}" AS buildenv
 
 ARG UNBOUND_UID \
   UNBOUND_GID
-
+  
 ENV INTERNIC_PGP="F0CB1A326BDF3F3EFA3A01FA937BB869E3A238C5" \
   UNBOUND_UID="${UNBOUND_UID}" \
   UNBOUND_GID="${UNBOUND_GID}"
 
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 WORKDIR /tmp/src
 
+# hadolint ignore=DL3018
 RUN set -xe; \
   addgroup -S -g "${UNBOUND_GID}" _unbound && \
   adduser -S -H -h /usr/local/unbound -g _unbound -u "${UNBOUND_UID}" -D -G _unbound _unbound && \
@@ -38,8 +41,11 @@ RUN set -xe; \
     flex \
     bison \
     apk-tools && \
-  git clone "https://github.com/NLnetLabs/unbound" && \
-  cd unbound && \
+  git clone "https://github.com/NLnetLabs/unbound"
+
+WORKDIR /tmp/src/unbound
+
+RUN set -xe; \
   ./configure \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
@@ -68,7 +74,7 @@ RUN set -xe; \
   VERSION_LINE=$(grep '^PACKAGE_VERSION=' configure) && \
   UNBOUND_VERSION=$(echo "$VERSION_LINE" | cut -d"'" -f2) && \
   echo "$UNBOUND_VERSION" > /tmp/UNBOUND_VERSION && \
-  make -j$(nproc) && \
+  make -j"$(nproc)" && \
   make install && \
   apk del --no-cache .build-deps && \
   mkdir -p "/usr/local/unbound/iana.d/" && \
@@ -97,6 +103,7 @@ COPY ./unbound/root/*.sh \
 
 COPY ./unbound/root/entrypoint /
 
+# hadolint ignore=DL3018
 RUN set -xe; \
   apk --update --no-cache add \
     ca-certificates \
@@ -119,7 +126,9 @@ RUN set -xe; \
     "/usr/local/unbound/log.d/" && \
   touch /usr/local/unbound/log.d/unbound.log && \
   chown -R _unbound:_unbound /usr/local/unbound/ && \
-  ln -s /dev/random /dev/urandom /dev/null /usr/local/unbound/unbound.d/ && \
+  ln -s /dev/random /usr/local/unbound/unbound.d/random && \
+  ln -s /dev/urandom /usr/local/unbound/unbound.d/urandom && \
+  ln -s /dev/null /usr/local/unbound/unbound.d/null && \
   chown -Rh _unbound:_unbound \
     /usr/local/unbound/unbound.d/random \
     /usr/local/unbound/unbound.d/null \
@@ -133,15 +142,15 @@ RUN set -xe; \
     /usr/local/unbound/iana.d/root.zone.* \
     /usr/local/unbound/unbound.d/include \
     /usr/local/unbound/unbound.d/lib && \
-  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
-  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
-  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf && \
-  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
-  strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host
-  
+    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound && \
+    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-anchor && \
+    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-checkconf  && \
+    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-control && \
+    strip --strip-all /usr/local/unbound/unbound.d/sbin/unbound-host 
+
 COPY ./unbound/root/usr/local/unbound/unbound.conf \
   /usr/local/unbound/unbound.conf
-
+        
 FROM scratch AS stage
 
 COPY --from=buildenv /usr/local/unbound/ \

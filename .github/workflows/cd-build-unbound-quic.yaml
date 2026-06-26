@@ -1,115 +1,202 @@
-name: CD Build Distroless Unbound QUIC Docker Image
+name: CD Build Unbound QUIC Docker Image
 
 on:
-  workflow_run:
-    workflows: [CD Build Distroless Unbound Docker Image]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+    paths:
+      - "versions/unbound.txt"
+      - "versions/openssl-quic-buildenv.txt"
   workflow_dispatch:
 
-permissions: {}
+concurrency:
+  group: cd-build-unbound-quic
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+  packages: write
+  id-token: write
 
 jobs:
+
   buildvars:
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
+    if: success() && (github.actor == 'renovate[bot]' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     outputs:
-      IMAGE_BUILD_DATE: ${{ steps.SET_DATE.outputs.IMAGE_BUILD_DATE }}
-      UNBOUND_DOCKER_IMAGE_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
-      UNBOUND_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_VERSION }}
-      UNBOUND_SHA256: ${{ steps.IMPORT_BUILDVARS.outputs.UNBOUND_SHA256 }}
-      NGTCP2_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.NGTCP2_VERSION }}
-      OPENSSL_QUIC_BUILDENV_VERSION: ${{ steps.IMPORT_BUILDVARS.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+      IMAGE_BUILD_DATE: "${{ steps.vars.outputs.IMAGE_BUILD_DATE }}"
+      UNBOUND_VERSION: "${{ steps.vars.outputs.UNBOUND_VERSION }}"
+      UNBOUND_SHA256: "${{ steps.vars.outputs.UNBOUND_SHA256 }}"
+      OPENSSL_QUIC_BUILDENV_VERSION: "${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}"
+      UNBOUND_QUIC_IMAGE_VERSION: "${{ steps.vars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}"
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          egress-policy: audit
-          
-      - name: Checkout source
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+            nlnetlabs.nl:443
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           persist-credentials: false
+          fetch-depth: 0
 
-      - name: Set IMAGE_BUILD_DATE
-        id: SET_DATE
-        run: echo "IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_OUTPUT
-
-      - name: Import build variables from buildvars file
-        id: IMPORT_BUILDVARS
+      - name: Load versions and fetch SHA256
+        id: vars
         run: |
-          cat buildvars | grep UNBOUND_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_SHA256 >> $GITHUB_OUTPUT
-          cat buildvars | grep UNBOUND_DOCKER_IMAGE_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep NGTCP2_VERSION >> $GITHUB_OUTPUT
-          cat buildvars | grep OPENSSL_QUIC_BUILDENV_VERSION >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          UNBOUND_VERSION="$(cat versions/unbound.txt)"
+
+          SHA_URL="https://nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz.sha256"
+          if ! curl --fail -sL "$SHA_URL" >/dev/null; then
+            printf "ERROR: SHA256 file not found for %s\n" "$UNBOUND_VERSION" >&2
+            exit 1
+          fi
+
+          UNBOUND_SHA256="$(curl -sL "$SHA_URL" | awk '{print $1}')"
+
+          OPENSSL_QUIC_BUILDENV_VERSION="$(grep '^OPENSSL_QUIC_BUILDENV_VERSION=' versions/openssl-quic-buildenv.txt | cut -d= -f2)"
+
+          UNBOUND_SUB="$(
+            sed -n 's/^unbound=[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}-\([0-9]\+\)$/\1/p' \
+              versions/unbound-quic-docker-image.txt
+          )"
+          
+          UNBOUND_QUIC_IMAGE_VERSION="${UNBOUND_VERSION}-${UNBOUND_SUB}"
+
+          {
+            echo "IMAGE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            echo "UNBOUND_VERSION=${UNBOUND_VERSION}"
+            echo "UNBOUND_SHA256=${UNBOUND_SHA256}"
+            echo "OPENSSL_QUIC_BUILDENV_VERSION=${OPENSSL_QUIC_BUILDENV_VERSION}"
+            echo "UNBOUND_QUIC_IMAGE_VERSION=${UNBOUND_QUIC_IMAGE_VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Show build variables
+        run: |
+          echo "IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}"
+          echo "UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}"
+          echo "UNBOUND_SHA256=${{ steps.vars.outputs.UNBOUND_SHA256 }}"
+          echo "OPENSSL_QUIC_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}"
+          echo "UNBOUND_QUIC_IMAGE_VERSION=${{ steps.vars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}"
 
   build:
-    runs-on: ubuntu-latest
+    if: github.actor == 'renovate[bot]' || github.event_name == 'workflow_dispatch'
     needs: buildvars
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+          - arch: arm64
+            platform: linux/arm64
+          - arch: 386
+            platform: linux/386
+          - arch: armv6
+            platform: linux/arm/v6
+          - arch: armv7
+            platform: linux/arm/v7
+          - arch: ppc64le
+            platform: linux/ppc64le
+          - arch: s390x
+            platform: linux/s390x
+          - arch: riscv64
+            platform: linux/riscv64
+
+    env:
+      DOCKERHUB_SLUG: "madnuttah/unbound"
+
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            auth.docker.io:443
+            dl-cdn.alpinelinux.org:443
+            github.com:443
+            keyserver.ubuntu.com:443
+            nlnetlabs.nl:443
+            pgp.surf.nl:443
+            production.cloudfront.docker.com:443
+            registry-1.docker.io:443
+            www.internic.net:443
+            www.nlnetlabs.nl:443
 
-      - name: Checkout source
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           persist-credentials: false
+          fetch-depth: 0
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4
+      - uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3
 
-      - name: Set up Docker Buildx
+      - uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
         id: buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
 
-      - name: Login to Dockerhub
+      - uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
-#      - name: Login to GHCR
-#        if: github.event_name != 'pull_request'
-#        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
-#        with:
-#          registry: ghcr.io
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push QUIC image
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7
-        env:
-          DOCKERHUB_SLUG: "madnuttah/unbound"
-#          GHCR_SLUG: "ghcr.io/madnuttah/unbound"
+      - name: Build and push QUIC arch image
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
         with:
-          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/riscv64
-          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          builder: "${{ steps.buildx.outputs.name }}"
+          file: "unbound/release_quic.Dockerfile"
+
+          platforms: ${{ matrix.platform }}
+          push: true
+
+          sbom: false
+          provenance: false
+
           build-args: |
             IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
             UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
             UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
-            UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}
+            UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}
             OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
-            NGTCP2_VERSION=${{ needs.buildvars.outputs.NGTCP2_VERSION }}
-          file: ./unbound/release_quic.Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          sbom: ${{ github.event_name != 'pull_request' }}
-          provenance: ${{ github.event_name != 'pull_request' }}
 
           cache-from: |
-            type=registry,ref=madnuttah/unbound:buildcache-quic
- #           type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic
+            type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-quic-${{ matrix.arch }}
+
           cache-to: |
-            type=registry,ref=madnuttah/unbound:buildcache-quic,mode=max
-#            type=registry,ref=ghcr.io/madnuttah/unbound:buildcache-quic,mode=max
+            type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-quic-${{ matrix.arch }},mode=max
 
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
-            ${{ env.DOCKERHUB_SLUG }}:latest-quic
-#            ${{ env.GHCR_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_DOCKER_IMAGE_VERSION }}-quic
-#            ${{ env.GHCR_SLUG }}:latest-quic
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-quic-${{ matrix.arch }}
+
+  upload-pipeline-metadata:
+    needs: [buildvars, build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >+
+          
+      - name: Create Isolated Metadata
+        run: |
+          mkdir -p metadata-payload
+          printf "%s" "${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}" > metadata-payload/version.txt
+          printf "stable-quic" > metadata-payload/variant.txt
+
+      - name: Upload Metadata Artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: unbound-build-metadata
+          path: metadata-payload/
+          retention-days: 1

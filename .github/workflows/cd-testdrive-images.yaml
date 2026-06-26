@@ -3,47 +3,90 @@ name: CD Testdrive Unbound Docker Images
 on:
   workflow_run:
     workflows:
-      - "CD Build Canary Distroless Unbound Docker Image"
-      - "CD Build Canary Distroless Unbound QUIC Docker Image"
-      - "CD Build Distroless Unbound Docker Image"
-      - "CD Build Distroless Unbound QUIC Docker Image"
+      - CD Build Unbound Docker Image
+      - CD Build Unbound QUIC Docker Image
+      - CD Build Canary Unbound Docker Image
+      - CD Build Canary Unbound QUIC Docker Image
     types:
       - completed
 
 permissions:
   actions: read
+  checks: write
   contents: read
 
 jobs:
   test-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event.workflow_run.conclusion == 'success'
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            auth.docker.io:443
+            production.cloudfront.docker.com:443
+            registry-1.docker.io:443
+
+      - name: Download metadata artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: unbound-build-metadata
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: metadata
+
+      - name: Ensure metadata exists
+        run: |
+          if [ ! -f metadata/variant.txt ]; then
+            echo "No metadata artifact found for this workflow run."
+            exit 1
+          fi
+          
+      - name: Show metadata used for this run
+        run: |
+          echo "=== METADATA DEBUG ==="
+          echo "Triggered by workflow run: ${{ github.event.workflow_run.id }}"
+          echo "Upstream workflow name: ${{ github.event.workflow_run.name }}"
+          echo "Upstream workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo
+          echo "variant.txt:"
+          cat metadata/variant.txt || echo "(missing)"
+          echo
+          echo "version.txt:"
+          cat metadata/version.txt || echo "(missing)"
+          echo "======================"
+
+      - name: Detect variant
+        run: |
+          VARIANT="$(cat metadata/variant.txt)"
+          echo "VARIANT=$VARIANT" >> "$GITHUB_ENV"
+
+      - name: Read version from metadata
+        run: |
+          VERSION="$(cat metadata/version.txt)"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Determine image tag
-        id: tag
-        env:
-          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
         run: |
-          case "$WORKFLOW_NAME" in
-            "CD Build Canary Distroless Unbound Docker Image")
-              echo "IMAGE_TAG=madnuttah/unbound:canary" >> "$GITHUB_ENV"
-              ;;
-            "CD Build Canary Distroless Unbound QUIC Docker Image")
-              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> "$GITHUB_ENV"
-              ;;
-            "CD Build Distroless Unbound QUIC Docker Image")
-              echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> "$GITHUB_ENV"
-              ;;
-            "CD Build Distroless Unbound Docker Image")
+          case "$VARIANT" in
+            stable)
               echo "IMAGE_TAG=madnuttah/unbound:latest" >> "$GITHUB_ENV"
               ;;
+            stable-quic)
+              echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> "$GITHUB_ENV"
+              ;;
+            canary)
+              echo "IMAGE_TAG=madnuttah/unbound:canary" >> "$GITHUB_ENV"
+              ;;
+            canary-quic)
+              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> "$GITHUB_ENV"
+              ;;
             *)
+              echo "Unknown variant: $VARIANT"
               exit 1
               ;;
           esac
@@ -57,7 +100,7 @@ jobs:
       - name: Pull image
         run: docker pull "$IMAGE_TAG" || true
 
-      - name: Start container (old logic, new workflow)
+      - name: Start container
         run: |
           if [[ "$IMAGE_TAG" == *"-quic" ]]; then
             docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG" || true
@@ -65,9 +108,9 @@ jobs:
             docker run -d --name unbound-dns -p 5335:5335/udp "$IMAGE_TAG"
           fi
 
-      - name: Wait for Unbound readiness (old logic, improved)
+      - name: Wait for Unbound readiness
         run: |
-          for i in {1..20}; do
+          for _ in {1..20}; do
             if docker logs unbound-dns 2>&1 | grep -q "start of service"; then
               exit 0
             fi
@@ -76,14 +119,24 @@ jobs:
           docker logs unbound-dns
           exit 1
 
-      - name: DNS test (old logic)
+      - name: DNS test
         run: |
-          if [[ "$IMAGE_TAG" == *"-quic" ]]; then
-            timeout 10s docker exec unbound-dns drill cloudflare.com A || true
-          else
-            timeout 10s docker exec unbound-dns drill cloudflare.com A
-          fi
+          timeout 10s docker exec unbound-dns drill cloudflare.com A || true
 
       - name: Cleanup
         if: always()
         run: docker rm -f unbound-dns || true
+
+      - name: Re-upload metadata for Publish Workflow
+        run: |
+          set -euo pipefail
+          mkdir -p metadata-payload
+          printf "%s" "$VARIANT" > metadata-payload/variant.txt
+          printf "%s" "$VERSION" > metadata-payload/version.txt
+
+      - name: Upload metadata artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: unbound-build-metadata
+          path: metadata-payload/
+          retention-days: 1

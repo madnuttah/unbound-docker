@@ -10,14 +10,25 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
     steps:
+      # - name: Checkout
+        # uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        # with:
+          # persist-credentials: false
+          # token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          persist-credentials: false
-
+            token: ${{ github.token }}
+            
       - name: actionlint
         uses: docker://rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
         continue-on-error: false

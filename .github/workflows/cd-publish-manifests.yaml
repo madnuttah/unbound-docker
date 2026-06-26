@@ -1,0 +1,172 @@
+name: CD Publish Unbound Manifests
+
+on:
+  workflow_run:
+    workflows:
+      - CD Testdrive Unbound Docker Images
+    types:
+      - completed
+
+permissions:
+  actions: read
+  checks: write
+  contents: read
+  id-token: write
+  attestations: write
+  packages: write
+
+env:
+  DOCKERHUB_SLUG: "madnuttah/unbound"
+
+jobs:
+  publish-manifests:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            auth.docker.io:443
+            fulcio.sigstore.dev:443
+            production.cloudfront.docker.com:443
+            registry-1.docker.io:443
+            rekor.sigstore.dev:443
+
+      - name: Download metadata artifact natively
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: unbound-build-metadata
+          path: metadata
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.BOT_GITHUB_TOKEN }}
+
+      - name: Ensure metadata exists
+        run: |
+          if [ ! -f metadata/variant.txt ]; then
+            echo "No metadata artifact found for this workflow run."
+            exit 1
+          fi
+          
+      - name: Show metadata used for this run
+        run: |
+          echo "=== METADATA DEBUG ==="
+          echo "Triggered by workflow run: ${{ github.event.workflow_run.id }}"
+          echo "Upstream workflow name: ${{ github.event.workflow_run.name }}"
+          echo "Upstream workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo
+          echo "variant.txt:"
+          cat metadata/variant.txt || echo "(missing)"
+          echo
+          echo "version.txt:"
+          cat metadata/version.txt || echo "(missing)"
+          echo "======================"
+
+      - name: Read variant and version
+        run: |
+          set -euo pipefail
+          echo "VARIANT=$(cat metadata/variant.txt)" >> "$GITHUB_ENV"
+          echo "VERSION=$(cat metadata/version.txt)" >> "$GITHUB_ENV"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
+        
+      - name: Log in to Docker Hub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Create manifest
+        id: manifest
+        shell: bash
+        env:
+          DOCKERHUB_SLUG: ${{ env.DOCKERHUB_SLUG }}
+        run: |
+          set -euo pipefail
+          
+          METADATA_FILE="manifest-metadata.json"
+
+          case "$VARIANT" in
+            stable)
+              docker buildx imagetools create --metadata-file "$METADATA_FILE" \
+                -t "${DOCKERHUB_SLUG}:${VERSION}" \
+                -t "${DOCKERHUB_SLUG}:latest" \
+                "${DOCKERHUB_SLUG}:${VERSION}-amd64" \
+                "${DOCKERHUB_SLUG}:${VERSION}-arm64" \
+                "${DOCKERHUB_SLUG}:${VERSION}-386" \
+                "${DOCKERHUB_SLUG}:${VERSION}-armv6" \
+                "${DOCKERHUB_SLUG}:${VERSION}-armv7" \
+                "${DOCKERHUB_SLUG}:${VERSION}-ppc64le" \
+                "${DOCKERHUB_SLUG}:${VERSION}-s390x" \
+                "${DOCKERHUB_SLUG}:${VERSION}-riscv64"
+              ;;
+
+            stable-quic)
+              docker buildx imagetools create --metadata-file "$METADATA_FILE" \
+                -t "${DOCKERHUB_SLUG}:${VERSION}-quic" \
+                -t "${DOCKERHUB_SLUG}:latest-quic" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-amd64" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-arm64" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-386" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-armv6" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-armv7" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-ppc64le" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-s390x" \
+                "${DOCKERHUB_SLUG}:${VERSION}-quic-riscv64"
+              ;;
+
+            canary)
+              docker buildx imagetools create --metadata-file "$METADATA_FILE" \
+                -t "${DOCKERHUB_SLUG}:canary" \
+                "${DOCKERHUB_SLUG}:canary-amd64" \
+                "${DOCKERHUB_SLUG}:canary-arm64" \
+                "${DOCKERHUB_SLUG}:canary-386" \
+                "${DOCKERHUB_SLUG}:canary-armv6" \
+                "${DOCKERHUB_SLUG}:canary-armv7" \
+                "${DOCKERHUB_SLUG}:canary-ppc64le" \
+                "${DOCKERHUB_SLUG}:canary-s390x" \
+                "${DOCKERHUB_SLUG}:canary-riscv64"
+              ;;
+
+            canary-quic)
+              docker buildx imagetools create --metadata-file "$METADATA_FILE" \
+                -t "${DOCKERHUB_SLUG}:canary-quic" \
+                "${DOCKERHUB_SLUG}:canary-quic-amd64" \
+                "${DOCKERHUB_SLUG}:canary-quic-arm64" \
+                "${DOCKERHUB_SLUG}:canary-quic-386" \
+                "${DOCKERHUB_SLUG}:canary-quic-armv6" \
+                "${DOCKERHUB_SLUG}:canary-quic-armv7" \
+                "${DOCKERHUB_SLUG}:canary-quic-ppc64le" \
+                "${DOCKERHUB_SLUG}:canary-quic-s390x" \
+                "${DOCKERHUB_SLUG}:canary-quic-riscv64"
+              ;;
+            *)
+              echo "Unknown variant: $VARIANT" >&2
+              exit 1
+              ;;
+          esac
+
+          MANIFEST_DIGEST=$(jq -r '.["containerimage.descriptor"].digest' "$METADATA_FILE")
+          echo "DIGEST=$MANIFEST_DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Generate SLSA Build Provenance
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26
+        continue-on-error: true
+        with:
+          subject-name: index.docker.io/${{ env.DOCKERHUB_SLUG }}
+          subject-digest: ${{ steps.manifest.outputs.DIGEST }}
+          push-to-registry: true
+
+      - name: Re-upload metadata for Tag and Release Workflow
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: unbound-build-metadata
+          path: metadata
+

@@ -1,0 +1,69 @@
+name: CD Check Canary Update
+
+on:
+  schedule:
+    - cron: "0 19 * * mon-fri"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Import GPG key
+        id: IMPORT_GPG
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: false
+          git_push_gpgsign: false
+          trust_level: 5
+
+      - name: Check HEAD SHA and update checkpoint
+        run: |
+          set -euo pipefail
+          
+          REMOTE_SHA="$(git ls-remote "https://github.com/NLnetLabs/unbound.git" HEAD | cut -f1)" || exit 1
+          
+          if [ -z "$REMOTE_SHA" ]; then
+            echo "ERROR: Could not fetch remote HEAD SHA" >&2
+            exit 1
+          fi
+
+          CURRENT_SHA="$(cat "versions/unbound-git-sha.txt" 2>/dev/null || echo '')"
+
+          if [ "$CURRENT_SHA" = "$REMOTE_SHA" ]; then
+            echo "No changes detected in upstream HEAD. Skipping build."
+            exit 0
+          fi
+
+          echo "HEAD SHA changed. Updating checkpoint and triggering builds."
+          printf '%s\n' "$REMOTE_SHA" > "versions/unbound-git-sha.txt"
+          
+          git config --local user.name "${{ steps.IMPORT_GPG.outputs.name }}"
+          git config --local user.email "${{ steps.IMPORT_GPG.outputs.email }}"
+
+          git remote set-url origin "https://x-access-token:${{ secrets.BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+
+          git add "versions/unbound-git-sha.txt"
+          git commit -m "chore: checkpoint canary build git sha"
+          git push
