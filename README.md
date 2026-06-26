@@ -3,7 +3,6 @@
 <details>
   <summary>Build status (click to expand)</summary><br>
 
-[![CD Check NLnet Labs Unbound release](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-check-unbound-release.yaml?branch=main&label=CD%20NLnet%20Labs%20Unbound%20Release&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-check-unbound-release.yaml)
 [![CD Build Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound.yaml)
 [![CD Build QUIC Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-unbound-quic.yaml?branch=main&label=CD%20madnuttah/unbound%20quic%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-unbound-quic.yaml)
 [![CD Build Canary Docker Image](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-build-canary-unbound.yaml?branch=main&label=CD%20madnuttah/unbound%20canary%20build%20status&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-build-canary-unbound.yaml)
@@ -16,6 +15,7 @@
 
 
 [![GitHub Actions Security Analysis with zizmor](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-gh-action-zizmor-scan.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-gh-action-zizmor-scan.yaml)
+[![CodeQL Advanced](https://github.com/madnuttah/unbound-docker/actions/workflows/codeql.yml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/codeql.yml)
 [![CD Security Scan](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-security-scan.yaml?branch=main&label=CD%20security%20scan&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-security-scan.yaml)
 [![StepSecurity Harden Runner](https://img.shields.io/badge/Secured%20by-StepSecurity-blue?style=flat-square)](https://github.com/step-security/harden-runner)
 
