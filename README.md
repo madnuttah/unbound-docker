@@ -17,9 +17,9 @@
 [![GitHub Actions Security Analysis with zizmor](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-gh-action-zizmor-scan.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-gh-action-zizmor-scan.yaml)
 [![CodeQL Advanced](https://github.com/madnuttah/unbound-docker/actions/workflows/codeql.yml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/codeql.yml)
 [![CD Security Scan](https://img.shields.io/github/actions/workflow/status/madnuttah/unbound-docker/cd-security-scan.yaml?branch=main&label=Security%20Scan&style=flat-square)](https://github.com/madnuttah/unbound-docker/blob/main/.github/workflows/cd-security-scan.yaml)
-[![StepSecurity Harden Runner](https://img.shields.io/badge/Secured%20by-StepSecurity-blue?style=flat-square)](https://github.com/step-security/harden-runner)
 [![Lint GitHub Actions](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-github-actions-linting.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-github-actions-linting.yaml)
 [![Lint Dockerfiles](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-dockerfiles-linting.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-dockerfiles-linting.yaml)
+[![StepSecurity Harden Runner](https://img.shields.io/badge/Secured%20by-StepSecurity-blue?style=flat-square)](https://github.com/step-security/harden-runner)
 
 This repository provides a lightweight Alpine Linux based Docker image running [Unbound](https://unbound.net), an open source high performance DNS resolver developed by the people at [NLnet Labs](https://nlnetlabs.nl). The image is a secure single layer distroless scratch build that follows best practice principles and is suitable for professional and personal use alike.
 
