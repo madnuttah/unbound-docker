@@ -48,7 +48,7 @@
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "madnuttah/openssl-buildenv",
       "extractVersionTemplate": "^v?(?<version>.*)$",
-      "versioningTemplate": "loose"
+      "versioningTemplate": "node"
     },
 
     {
@@ -62,7 +62,7 @@
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "madnuttah/openssl-buildenv",
       "extractVersionTemplate": "^v?(?<version>.*)$",
-      "versioningTemplate": "loose"
+      "versioningTemplate": "node"
     }
   ],
 
