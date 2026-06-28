@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   bump-sub:
-    if: github.actor == 'renovate[bot]'
+    if: startsWith(github.event.pull_request.head.ref, 'renovate/')
     
     runs-on: ubuntu-latest
 
@@ -90,7 +90,6 @@ jobs:
           def get_changed_files():
               """Get files changed compared to main branch base SHA."""
               try:
-                  # Use precise PR merge base target to prevent missing refs on synchronize events
                   target_sha = "${{ github.event.pull_request.base.sha }}"
                   result = subprocess.run(
                       ["git", "diff", "--name-only", target_sha],
@@ -157,7 +156,6 @@ jobs:
         run: |
           set -euo pipefail
           
-          # Restored the stripped out URL structure safely
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@://github.com{{ github.repository }}.git"
           
           git config --local user.name "${{ steps.IMPORT_GPG.outputs.name }}"
