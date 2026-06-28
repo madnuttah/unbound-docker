@@ -43,11 +43,11 @@
         "(^|/)versions/openssl-buildenv\\.txt$"
       ],
       "matchStrings": [
-        "(?:OPENSSL_BUILDENV_VERSION=|openssl=)(?<currentValue>[0-9A-Za-z._-]+)"
+        "OPENSSL_BUILDENV_VERSION=(?<currentValue>[0-9A-Za-z._-]+)"
       ],
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "madnuttah/openssl-buildenv",
-      "extractVersionTemplate": "^(?<version>.*)$",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
       "versioningTemplate": "loose"
     },
 
@@ -57,11 +57,11 @@
         "(^|/)versions/openssl-quic-buildenv\\.txt$"
       ],
       "matchStrings": [
-        "(?:OPENSSL_QUIC_BUILDENV_VERSION=|openssl=)(?<currentValue>[0-9A-Za-z._-]+)"
+        "OPENSSL_QUIC_BUILDENV_VERSION=(?<currentValue>[0-9A-Za-z._-]+)"
       ],
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "madnuttah/openssl-buildenv",
-      "extractVersionTemplate": "^(?<version>.*)$",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
       "versioningTemplate": "loose"
     }
   ],
