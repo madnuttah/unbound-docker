@@ -127,6 +127,13 @@ jobs:
             git push origin "${RELEASE_TAG}"
           fi
 
+          BRANCH_NAME="${VERSION}"
+
+          if ! git rev-parse --verify "origin/${BRANCH_NAME}" >/dev/null 2>&1; then
+            git checkout -b "${BRANCH_NAME}" "${RELEASE_TAG}"
+            git push --set-upstream origin "${BRANCH_NAME}"
+          fi
+
           PREV_TAG="$(git tag --sort=-v:refname | grep -v "^${RELEASE_TAG}$" | head -n 1 || true)"
 
           CURRENT="$(git log "${PREV_TAG}..${RELEASE_TAG}" --format="%aN|%aE" | sort -u || true)"
@@ -158,38 +165,42 @@ jobs:
 
           OPENSSL_VERSION="$(curl -fsSL https://raw.githubusercontent.com/madnuttah/openssl-buildenv/refs/heads/main/versions/openssl-buildenv.txt)"
           OPENSSL_QUIC_VERSION="$(curl -fsSL https://raw.githubusercontent.com/madnuttah/openssl-buildenv/refs/heads/main/versions/openssl-quic-buildenv.txt)"
-          NGHTTP3_VERSION="$(curl -fsSL https://raw.githubusercontent.com/madnuttah/openssl-buildenv/refs/heads/main/versions/nghttp3.txt)"
-          NGTCP2_VERSION="$(curl -fsSL https://raw.githubusercontent.com/madnuttah/openssl-buildenv/refs/heads/main/versions/ngtcp2.txt)"
-
-          OPENSSL_CHANGELOG="https://github.com/openssl/openssl/releases/tag/openssl-${OPENSSL_VERSION}"
-          OPENSSL_QUIC_CHANGELOG="https://github.com/openssl/openssl/releases/tag/openssl-${OPENSSL_QUIC_VERSION}"
-          NGHTTP3_CHANGELOG="https://github.com/ngtcp2/nghttp3/releases/tag/v${NGHTTP3_VERSION}"
-          NGTCP2_CHANGELOG="https://github.com/ngtcp2/ngtcp2/releases/tag/v${NGTCP2_VERSION}"
           UNBOUND_CHANGELOG="https://github.com/NLnetLabs/unbound/releases/tag/release-${VERSION}"
 
-          if [[ "$VARIANT" == "stable" ]]; then
-            NEW_NOTES="$(printf '## Default build\n* OpenSSL buildenv: %s\n\nOpenSSL release notes: %s\nUnbound changelog: %s\n\n' \
-              "$OPENSSL_VERSION" "$OPENSSL_CHANGELOG" "$UNBOUND_CHANGELOG")"
-          else
-            UPDATED_DEPS=""
-            PREV_NGHTTP3="$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-quic$' | head -n 1 | sed 's/^v//;s/-quic$//' || true)"
-            PREV_NGTCP2="$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-quic$' | head -n 1 | sed 's/^v//;s/-quic$//' || true)"
+          rm -f RELEASE_NOTES.md
+          touch RELEASE_NOTES.md
 
-            if [[ "$NGHTTP3_VERSION" != "$PREV_NGHTTP3" ]]; then
-              UPDATED_DEPS="$(printf '%s* nghttp3 updated to %s (%s)\n' "$UPDATED_DEPS" "$NGHTTP3_VERSION" "$NGHTTP3_CHANGELOG")"
-            fi
-            if [[ "$NGTCP2_VERSION" != "$PREV_NGTCP2" ]]; then
-              UPDATED_DEPS="$(printf '%s* ngtcp2 updated to %s (%s)\n' "$UPDATED_DEPS" "$NGTCP2_VERSION" "$NGTCP2_CHANGELOG")"
+          {
+            printf "%s\n" "${VERSION}"
+
+            if [[ "$VARIANT" == "stable-quic" ]]; then
+              printf "Unbound QUIC\n\n"
+            else
+              printf "Unbound\n\n"
             fi
 
-            NEW_NOTES="$(printf '## QUIC build\n* OpenSSL QUIC buildenv: %s\n%s\nOpenSSL QUIC release notes: %s\nUnbound changelog: %s\n\n' \
-              "$OPENSSL_QUIC_VERSION" "$UPDATED_DEPS" "$OPENSSL_QUIC_CHANGELOG" "$UNBOUND_CHANGELOG")"
-          fi
+            printf "What's new:\n\n"
 
-          RELEASE_NAME="${VERSION}"
+            printf "Unbound %s\n" "${VERSION}"
+            printf "Release notes:\n"
+            printf "%s\n\n" "${UNBOUND_CHANGELOG}"
 
-          FINAL_NOTES="$(printf '%s%s' "$NEW_NOTES" "$NEW_CONTRIB_SECTION")"
+            if [ "${OPENSSL_VERSION}" != "${PREV_TAG}" ]; then
+              printf "OpenSSL Buildenv %s\n" "${OPENSSL_VERSION}"
+              printf "Release notes:\n"
+              printf "https://github.com/madnuttah/openssl-buildenv/releases/tag/v%s\n\n" "${OPENSSL_VERSION}"
+            fi
+
+            if [ "${OPENSSL_QUIC_VERSION}" != "${PREV_TAG}" ]; then
+              printf "OpenSSL QUIC Buildenv %s\n" "${OPENSSL_QUIC_VERSION}"
+              printf "Release notes:\n"
+              printf "https://github.com/madnuttah/openssl-buildenv/releases/tag/v%s\n\n" "${OPENSSL_QUIC_VERSION}"
+            fi
+
+            printf "%s" "${NEW_CONTRIB_SECTION}"
+          } >> RELEASE_NOTES.md
 
           gh release create "v${VERSION}" \
-            -t "${RELEASE_NAME}" \
-            -n "${FINAL_NOTES}"
+            -t "${VERSION}" \
+            -F RELEASE_NOTES.md \
+            --latest
