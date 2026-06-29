@@ -112,7 +112,7 @@ jobs:
               RELEASE_TAG="v${VERSION}"
               ;;
             stable-quic)
-              RELEASE_TAG="v${VERSION}-quic"
+              RELEASE_TAG="v${VERSION}"
               ;;
             *)
               echo "Unknown or unhandled variant: $VARIANT" >&2
