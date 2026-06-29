@@ -1,1 +1,1 @@
-unbound=1.25.1-6-quic
+unbound=1.25.1-7-quic
