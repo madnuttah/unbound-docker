@@ -110,7 +110,7 @@ jobs:
 
             stable-quic)
               docker buildx imagetools create --metadata-file "$METADATA_FILE" \
-                -t "${DOCKERHUB_SLUG}:${VERSION}-quic" \
+                -t "${DOCKERHUB_SLUG}:${VERSION}" \
                 -t "${DOCKERHUB_SLUG}:latest-quic" \
                 "${DOCKERHUB_SLUG}:${VERSION}-amd64" \
                 "${DOCKERHUB_SLUG}:${VERSION}-arm64" \
