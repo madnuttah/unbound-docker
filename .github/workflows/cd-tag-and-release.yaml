@@ -163,31 +163,33 @@ jobs:
 
           OPENSSL_CHANGELOG="https://github.com/openssl/openssl/releases/tag/openssl-${OPENSSL_VERSION}"
           OPENSSL_QUIC_CHANGELOG="https://github.com/openssl/openssl/releases/tag/openssl-${OPENSSL_QUIC_VERSION}"
+          NGHTTP3_CHANGELOG="https://github.com/ngtcp2/nghttp3/releases/tag/v${NGHTTP3_VERSION}"
+          NGTCP2_CHANGELOG="https://github.com/ngtcp2/ngtcp2/releases/tag/v${NGTCP2_VERSION}"
           UNBOUND_CHANGELOG="https://github.com/NLnetLabs/unbound/releases/tag/release-${VERSION}"
 
           if [[ "$VARIANT" == "stable" ]]; then
             NEW_NOTES="$(printf '## Default build\n* OpenSSL buildenv: %s\n\nOpenSSL release notes: %s\nUnbound changelog: %s\n\n' \
               "$OPENSSL_VERSION" "$OPENSSL_CHANGELOG" "$UNBOUND_CHANGELOG")"
           else
-            NEW_NOTES="$(printf '## QUIC build\n* OpenSSL QUIC buildenv: %s\n* nghttp3: %s\n* ngtcp2: %s\n\nOpenSSL QUIC release notes: %s\nUnbound changelog: %s\n\n' \
-              "$OPENSSL_QUIC_VERSION" "$NGHTTP3_VERSION" "$NGTCP2_VERSION" "$OPENSSL_QUIC_CHANGELOG" "$UNBOUND_CHANGELOG")"
+            UPDATED_DEPS=""
+            PREV_NGHTTP3="$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-quic$' | head -n 1 | sed 's/^v//;s/-quic$//' || true)"
+            PREV_NGTCP2="$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-quic$' | head -n 1 | sed 's/^v//;s/-quic$//' || true)"
+
+            if [[ "$NGHTTP3_VERSION" != "$PREV_NGHTTP3" ]]; then
+              UPDATED_DEPS="$(printf '%s* nghttp3 updated to %s (%s)\n' "$UPDATED_DEPS" "$NGHTTP3_VERSION" "$NGHTTP3_CHANGELOG")"
+            fi
+            if [[ "$NGTCP2_VERSION" != "$PREV_NGTCP2" ]]; then
+              UPDATED_DEPS="$(printf '%s* ngtcp2 updated to %s (%s)\n' "$UPDATED_DEPS" "$NGTCP2_VERSION" "$NGTCP2_CHANGELOG")"
+            fi
+
+            NEW_NOTES="$(printf '## QUIC build\n* OpenSSL QUIC buildenv: %s\n%s\nOpenSSL QUIC release notes: %s\nUnbound changelog: %s\n\n' \
+              "$OPENSSL_QUIC_VERSION" "$UPDATED_DEPS" "$OPENSSL_QUIC_CHANGELOG" "$UNBOUND_CHANGELOG")"
           fi
 
           RELEASE_NAME="${VERSION}"
 
-          EXISTING_RELEASE="$(gh release view "v${VERSION}" --json body --jq .body || true)"
+          FINAL_NOTES="$(printf '%s%s' "$NEW_NOTES" "$NEW_CONTRIB_SECTION")"
 
-          if [[ "$VARIANT" == "stable" ]]; then
-            FINAL_NOTES="$(printf '## %s <madnuttah-bot>\n\n%s%s' \
-              "$(date '+%Y-%m-%d')" "$NEW_NOTES" "$NEW_CONTRIB_SECTION")"
-
-            gh release create "v${VERSION}" \
-              -t "${RELEASE_NAME}" \
-              -n "${FINAL_NOTES}" \
-              --latest
-          else
-            UPDATED_NOTES="$(printf '%s\n%s%s' "$EXISTING_RELEASE" "$NEW_NOTES" "$NEW_CONTRIB_SECTION")"
-
-            gh release edit "v${VERSION}" \
-              -n "${UPDATED_NOTES}"
-          fi
+          gh release create "v${VERSION}" \
+            -t "${RELEASE_NAME}" \
+            -n "${FINAL_NOTES}"
