@@ -175,7 +175,7 @@ jobs:
             type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-quic-${{ matrix.arch }},mode=max
 
           tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-quic-${{ matrix.arch }}
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-${{ matrix.arch }}
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
