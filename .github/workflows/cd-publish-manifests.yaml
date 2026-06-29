@@ -112,14 +112,14 @@ jobs:
               docker buildx imagetools create --metadata-file "$METADATA_FILE" \
                 -t "${DOCKERHUB_SLUG}:${VERSION}-quic" \
                 -t "${DOCKERHUB_SLUG}:latest-quic" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-amd64" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-arm64" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-386" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-armv6" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-armv7" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-ppc64le" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-s390x" \
-                "${DOCKERHUB_SLUG}:${VERSION}-quic-riscv64"
+                "${DOCKERHUB_SLUG}:${VERSION}-amd64" \
+                "${DOCKERHUB_SLUG}:${VERSION}-arm64" \
+                "${DOCKERHUB_SLUG}:${VERSION}-386" \
+                "${DOCKERHUB_SLUG}:${VERSION}-armv6" \
+                "${DOCKERHUB_SLUG}:${VERSION}-armv7" \
+                "${DOCKERHUB_SLUG}:${VERSION}-ppc64le" \
+                "${DOCKERHUB_SLUG}:${VERSION}-s390x" \
+                "${DOCKERHUB_SLUG}:${VERSION}-riscv64"
               ;;
 
             canary)
