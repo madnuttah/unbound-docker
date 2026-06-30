@@ -162,6 +162,9 @@ jobs:
           
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
           
+          echo "Fetching latest state of $PR_BRANCH..."
+          git fetch origin "$PR_BRANCH:$PR_BRANCH"
+          
           git config --local user.name "${{ steps.IMPORT_GPG.outputs.name }}"
           git config --local user.email "${{ steps.IMPORT_GPG.outputs.email }}"
           git add versions/*.txt
