@@ -15,7 +15,7 @@
     "on saturday",
     "on sunday"
   ],
-  "automergeType": "branch",
+  "automergeType": "pr",
   "automerge": true,
   "automergeStrategy": "merge-commit",
   "prConcurrentLimit": 0,
