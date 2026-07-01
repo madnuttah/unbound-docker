@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   bump-sub:
-    if: startsWith(github.actor, 'renovate')
+    if: github.event.sender.login == 'renovate[bot]'
     
     runs-on: ubuntu-latest
 
@@ -58,7 +58,7 @@ jobs:
           import subprocess
 
           labels = "${{ join(github.event.pull_request.labels.*.name, ',') }}".split(',')
-          
+
           def modify_subversion(filepath, reset=False):
               """Modify subversion inside 'unbound=X.Y.Z-N[-quic]'."""
               if not os.path.exists(filepath):
@@ -91,17 +91,55 @@ jobs:
               print(f"Updated {filepath}: {base}-{old_sub}{suffix} → {base}-{new_sub}{suffix}")
               return True
 
+          def modify_openssl(filepath, is_quic=False, reset=False):
+              """Modify OpenSSL buildenv version."""
+              if not os.path.exists(filepath):
+                  print(f"File not found: {filepath}")
+                  return False
+
+              with open(filepath, 'r') as f:
+                  content = f.read().strip()
+
+              if is_quic:
+                  match = re.search(r'OPENSSL_QUIC_BUILDENV_VERSION=(\d+\.\d+\.\d+)-(\d+)-quic', content)
+              else:
+                  match = re.search(r'OPENSSL_BUILDENV_VERSION=(\d+\.\d+\.\d+)-(\d+)', content)
+
+              if not match:
+                  print(f"No version pattern found in {filepath}")
+                  return False
+
+              base = match.group(1)
+              old_sub = int(match.group(2))
+              suffix = "-quic" if is_quic else ""
+
+              new_sub = 0 if reset else old_sub + 1
+
+              if new_sub == old_sub:
+                  print(f"{filepath} already at sub={new_sub}. No change.")
+                  return False
+
+              new_version = f"{'OPENSSL_QUIC_BUILDENV_VERSION' if is_quic else 'OPENSSL_BUILDENV_VERSION'}={base}-{new_sub}{suffix}"
+
+              with open(filepath, 'w') as f:
+                  f.write(new_version + "\n")
+
+              print(f"Updated {filepath}: {base}-{old_sub}{suffix} → {base}-{new_sub}{suffix}")
+              return True
+
           def get_changed_files():
               """Get files changed compared to main branch base SHA."""
               try:
-                  target_sha = "${{ github.event.pull_request.base.sha }}"
+                  base_ref = "${{ github.event.pull_request.base.ref }}"
+                  subprocess.run(["git", "fetch", "origin", base_ref], check=False)
                   result = subprocess.run(
-                      ["git", "diff", "--name-only", target_sha],
+                      ["git", "diff", "--name-only", f"origin/{base_ref}...HEAD"],
                       capture_output=True,
                       text=True,
                       check=False
                   )
-                  return result.stdout.strip().split('\n') if result.stdout.strip() else []
+                  files = result.stdout.strip().split('\n') if result.stdout.strip() else []
+                  return files
               except Exception as e:
                   print(f"Warning: Could not get changed files: {e}")
                   return []
@@ -112,7 +150,7 @@ jobs:
           unbound_changed = "versions/unbound.txt" in changed_files
           openssl_changed = "versions/openssl-buildenv.txt" in changed_files
           openssl_quic_changed = "versions/openssl-quic-buildenv.txt" in changed_files
-          
+
           print(f"Changed files: {changed_files}")
 
           if unbound_changed:
@@ -121,22 +159,29 @@ jobs:
                   changed = True
               if modify_subversion('versions/unbound-quic-docker-image.txt', reset=True):
                   changed = True
-     
+
           if openssl_changed or 'bump-openssl-subversion' in labels:
               print("Processing OpenSSL buildenv bump (+1)")
-              if modify_subversion('versions/openssl-buildenv.txt', reset=False):
-                  changed = True
-          
-          if openssl_quic_changed or 'bump-quic-subversion' in labels:
-              print("Processing OpenSSL QUIC buildenv bump (+1)")
-              if modify_subversion('versions/openssl-quic-buildenv.txt', reset=False):
+              if modify_openssl('versions/openssl-buildenv.txt', is_quic=False, reset=False):
                   changed = True
 
+          if openssl_quic_changed or 'bump-quic-subversion' in labels:
+              print("Processing OpenSSL QUIC buildenv bump (+1)")
+              if modify_openssl('versions/openssl-quic-buildenv.txt', is_quic=True, reset=False):
+                  changed = True
+
+          expected_change = (
+              unbound_changed or
+              openssl_changed or
+              openssl_quic_changed or
+              any(l in labels for l in ['bump-openssl-subversion', 'bump-quic-subversion'])
+          )
+
           if not changed:
-              expected_change = unbound_changed or openssl_changed or openssl_quic_changed or any(l in labels for l in ['bump-openssl-subversion', 'bump-quic-subversion'])
-              
               if expected_change:
                   print("::error::Expected to bump subversion for a relevant file or label, but no changes were made. Failing pipeline.")
+                  with open(os.environ['GITHUB_ENV'], 'a') as f:
+                      f.write("HAS_CHANGES=false\n")
                   sys.exit(1)
               else:
                   print("PR does not affect Unbound or OpenSSL versions. Skipping commit step.")
@@ -166,7 +211,7 @@ jobs:
           git config --local user.email "${{ steps.IMPORT_GPG.outputs.email }}"
           
           echo "Fetching latest state of $PR_BRANCH..."
-          git fetch origin "$PR_BRANCH:$PR_BRANCH"
+          git fetch --force origin "$PR_BRANCH:$PR_BRANCH"
           
           git add versions/*.txt
           
