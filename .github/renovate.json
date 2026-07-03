@@ -17,7 +17,6 @@
   ],
   "automergeType": "pr",
   "automerge": true,
-  "branchCleanup": true,
   "automergeStrategy": "merge-commit",
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
