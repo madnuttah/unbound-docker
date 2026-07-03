@@ -140,25 +140,40 @@ jobs:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
-      - name: Build and push QUIC Canary arch image
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
-        with:
-          context: .
-          builder: "${{ steps.buildx.outputs.name }}"
-          file: ./unbound/canary_quic.Dockerfile
+      - name: Build and push QUIC Canary image
+        run: |
+          set -euo pipefail
 
-          platforms: ${{ matrix.platform }}
-          push: true
+          MAX_ATTEMPTS=3
+          ATTEMPT=1
 
-          sbom: false
-          provenance: false
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "QUIC build attempt $ATTEMPT of $MAX_ATTEMPTS"
 
-          build-args: |
-            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
-            OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
-            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
-          tags: |
-            ${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}
+            if docker buildx build \
+              --builder "${{ steps.buildx.outputs.name }}" \
+              --file ./unbound/canary_quic.Dockerfile \
+              --platform "${{ matrix.platform }}" \
+              --push \
+              --build-arg IMAGE_BUILD_DATE="${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
+              --build-arg OPENSSL_QUIC_BUILDENV_VERSION="${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}" \
+              --build-arg UNBOUND_VERSION="${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
+              --tag "${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}" \
+              .; then
+
+              echo "QUIC build succeeded on attempt $ATTEMPT"
+              exit 0
+            fi
+
+            ATTEMPT=$((ATTEMPT + 1))
+            if [ $ATTEMPT -le $MAX_ATTEMPTS ]; then
+              echo "Retrying QUIC build in 15 seconds..."
+              sleep 15
+            fi
+          done
+
+          echo "QUIC build failed after $MAX_ATTEMPTS attempts"
+          exit 1
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
