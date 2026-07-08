@@ -18,6 +18,7 @@
 [![CodeQL Advanced](https://github.com/madnuttah/unbound-docker/actions/workflows/codeql.yml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/codeql.yml)
 [![Lint GitHub Actions](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-github-actions-linting.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-github-actions-linting.yaml)
 [![Lint Dockerfiles](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-dockerfiles-linting.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-dockerfiles-linting.yaml)
+[![CD Testdrive Unbound Docker Images](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-testdrive-images.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-testdrive-images.yaml)
 [![Security Scan](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml/badge.svg)](https://github.com/madnuttah/unbound-docker/actions/workflows/cd-security-scan.yaml)
 
 [![renovate](https://img.shields.io/badge/Maintained%20with-Renovate-blue?logo=renovatebot&style=flat-square)](https://app.renovatebot.com/dashboard)
