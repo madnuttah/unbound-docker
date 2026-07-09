@@ -39,33 +39,46 @@ jobs:
           path: metadata
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.BOT_GITHUB_TOKEN }}
-          
+
       - name: Show metadata used for this run
         run: |
-          echo "=== METADATA DEBUG ==="
-          echo "Triggered by workflow run: ${{ github.event.workflow_run.id }}"
-          echo "Upstream workflow name: ${{ github.event.workflow_run.name }}"
-          echo "Upstream workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          set -euo pipefail
+
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          RUN_NAME="${{ github.event.workflow_run.name }}"
+          RUN_CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+
+          echo "=== METADATA ==="
+          printf 'Triggered by workflow run: %s\n' "${RUN_ID}"
+          printf 'Upstream workflow name: %s\n' "${RUN_NAME}"
+          printf 'Upstream workflow conclusion: %s\n' "${RUN_CONCLUSION}"
           echo
           echo "variant.txt:"
           cat metadata/variant.txt || echo "(missing)"
           echo
           echo "version.txt:"
           cat metadata/version.txt || echo "(missing)"
-          echo "======================"
+          echo "================="
 
       - name: Detect variant
         id: detect
         run: |
+          set -euo pipefail
+
           if [ ! -f metadata/variant.txt ]; then
             echo "No metadata artifact found for this workflow run."
             exit 1
           fi
           
-          VARIANT="$(cat metadata/variant.txt)"
-          echo "VARIANT=$VARIANT" >> "$GITHUB_ENV"
+          VARIANT="$(tr -d '\n\r' < metadata/variant.txt)"
+
+          {
+            echo "VARIANT<<EOF"
+            printf '%s\n' "${VARIANT}"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
           
-          if [[ "$VARIANT" == canary* ]]; then
+          if [[ "${VARIANT}" == canary* ]]; then
             echo "IS_CANARY=true" >> "$GITHUB_OUTPUT"
           else
             echo "IS_CANARY=false" >> "$GITHUB_OUTPUT"
@@ -105,7 +118,7 @@ jobs:
 
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
 
-          VERSION="$(cat metadata/version.txt)"
+          VERSION="$(tr -d '\n\r' < metadata/version.txt)"
 
           case "$VARIANT" in
             stable)
