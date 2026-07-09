@@ -66,7 +66,7 @@ jobs:
           cat metadata/version.txt || echo "(missing)"
           echo "================="
 
-      - name: Detect variant
+      - name: Read variant from metadata
         run: |
           set -euo pipefail
           VARIANT="$(tr -d '\n\r' < metadata/variant.txt)"

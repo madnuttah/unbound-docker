@@ -53,23 +53,58 @@ jobs:
           
       - name: Show metadata used for this run
         run: |
-          echo "=== METADATA DEBUG ==="
-          echo "Triggered by workflow run: ${{ github.event.workflow_run.id }}"
-          echo "Upstream workflow name: ${{ github.event.workflow_run.name }}"
-          echo "Upstream workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          set -euo pipefail
+
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          RUN_NAME="${{ github.event.workflow_run.name }}"
+          RUN_CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+
+          echo "=== METADATA ==="
+          printf 'Triggered by workflow run: %s\n' "${RUN_ID}"
+          printf 'Upstream workflow name: %s\n' "${RUN_NAME}"
+          printf 'Upstream workflow conclusion: %s\n' "${RUN_CONCLUSION}"
           echo
           echo "variant.txt:"
           cat metadata/variant.txt || echo "(missing)"
           echo
           echo "version.txt:"
           cat metadata/version.txt || echo "(missing)"
-          echo "======================"
+          echo "================="
 
-      - name: Read variant and version
+      - name: Read variant from metadata
         run: |
           set -euo pipefail
-          echo "VARIANT=$(cat metadata/variant.txt)" >> "$GITHUB_ENV"
-          echo "VERSION=$(cat metadata/version.txt)" >> "$GITHUB_ENV"
+          VARIANT="$(tr -d '\n\r' < metadata/variant.txt)"
+
+          case "${VARIANT}" in
+            stable|stable-quic|canary|canary-quic)
+              {
+                echo "VARIANT<<EOF"
+                printf '%s\n' "${VARIANT}"
+                echo "EOF"
+              } >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "Invalid variant metadata value: ${VARIANT}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Read version from metadata
+        run: |
+          set -euo pipefail
+
+          if [ ! -f metadata/version.txt ]; then
+            echo "Missing version metadata file." >&2
+            exit 1
+          fi
+
+          VERSION="$(tr -d '\n\r' < metadata/version.txt)"
+          {
+            echo "VERSION<<EOF"
+            printf '%s\n' "${VERSION}"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3
