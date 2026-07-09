@@ -48,27 +48,36 @@ jobs:
           
       - name: Show metadata used for this run
         run: |
-          echo "=== METADATA DEBUG ==="
-          echo "Triggered by workflow run: ${{ github.event.workflow_run.id }}"
-          echo "Upstream workflow name: ${{ github.event.workflow_run.name }}"
-          echo "Upstream workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          set -euo pipefail
+
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          RUN_NAME="${{ github.event.workflow_run.name }}"
+          RUN_CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+
+          echo "=== METADATA ==="
+          printf 'Triggered by workflow run: %s\n' "${RUN_ID}"
+          printf 'Upstream workflow name: %s\n' "${RUN_NAME}"
+          printf 'Upstream workflow conclusion: %s\n' "${RUN_CONCLUSION}"
           echo
           echo "variant.txt:"
           cat metadata/variant.txt || echo "(missing)"
           echo
           echo "version.txt:"
           cat metadata/version.txt || echo "(missing)"
-          echo "======================"
+          echo "================="
 
       - name: Detect variant
         run: |
           set -euo pipefail
-
           VARIANT="$(tr -d '\n\r' < metadata/variant.txt)"
 
           case "${VARIANT}" in
             stable|stable-quic|canary|canary-quic)
-              printf 'VARIANT=%s\n' "${VARIANT}" >> "${GITHUB_ENV}"
+              {
+                echo "VARIANT<<EOF"
+                printf '%s\n' "${VARIANT}"
+                echo "EOF"
+              } >> "$GITHUB_ENV"
               ;;
             *)
               echo "Invalid variant metadata value: ${VARIANT}" >&2
@@ -86,22 +95,42 @@ jobs:
           fi
 
           VERSION="$(tr -d '\n\r' < metadata/version.txt)"
-          printf 'VERSION=%s\n' "${VERSION}" >> "${GITHUB_ENV}"
+          {
+            echo "VERSION<<EOF"
+            printf '%s\n' "${VERSION}"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
 
       - name: Determine image tag
         run: |
           case "$VARIANT" in
             stable)
-              echo "IMAGE_TAG=madnuttah/unbound:latest" >> "$GITHUB_ENV"
+              {
+                echo "IMAGE_TAG<<EOF"
+                echo "madnuttah/unbound:latest"
+                echo "EOF"
+              } >> "$GITHUB_ENV"
               ;;
             stable-quic)
-              echo "IMAGE_TAG=madnuttah/unbound:latest-quic" >> "$GITHUB_ENV"
+              {
+                echo "IMAGE_TAG<<EOF"
+                echo "madnuttah/unbound:latest-quic"
+                echo "EOF"
+              } >> "$GITHUB_ENV"
               ;;
             canary)
-              echo "IMAGE_TAG=madnuttah/unbound:canary" >> "$GITHUB_ENV"
+              {
+                echo "IMAGE_TAG<<EOF"
+                echo "madnuttah/unbound:canary"
+                echo "EOF"
+              } >> "$GITHUB_ENV"
               ;;
             canary-quic)
-              echo "IMAGE_TAG=madnuttah/unbound:canary-quic" >> "$GITHUB_ENV"
+              {
+                echo "IMAGE_TAG<<EOF"
+                echo "madnuttah/unbound:canary-quic"
+                echo "EOF"
+              } >> "$GITHUB_ENV"
               ;;
             *)
               echo "Unknown variant: $VARIANT"
