@@ -62,13 +62,31 @@ jobs:
 
       - name: Detect variant
         run: |
-          VARIANT="$(cat metadata/variant.txt)"
-          echo "VARIANT=$VARIANT" >> "$GITHUB_ENV"
+          set -euo pipefail
+
+          VARIANT="$(tr -d '\n\r' < metadata/variant.txt)"
+
+          case "${VARIANT}" in
+            stable|stable-quic|canary|canary-quic)
+              printf 'VARIANT=%s\n' "${VARIANT}" >> "${GITHUB_ENV}"
+              ;;
+            *)
+              echo "Invalid variant metadata value: ${VARIANT}" >&2
+              exit 1
+              ;;
+          esac
 
       - name: Read version from metadata
         run: |
-          VERSION="$(cat metadata/version.txt)"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          set -euo pipefail
+
+          if [ ! -f metadata/version.txt ]; then
+            echo "Missing version metadata file." >&2
+            exit 1
+          fi
+
+          VERSION="$(tr -d '\n\r' < metadata/version.txt)"
+          printf 'VERSION=%s\n' "${VERSION}" >> "${GITHUB_ENV}"
 
       - name: Determine image tag
         run: |
