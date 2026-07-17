@@ -22,6 +22,7 @@
 
 [![Maintenance](https://img.shields.io/maintenance/yes/2026?style=flat-square)](https://github.com/madnuttah/unbound-docker/)
 [![Commit Activity](https://img.shields.io/github/commit-activity/y/madnuttah/unbound-docker/main?style=flat-square)](https://github.com/madnuttah/unbound-docker/commits/main)
+[![Contibutors](https://img.shields.io/github/contributors-anon/madnuttah/unbound-docker?style=flat-square&color=007EC6)](https://github.com/madnuttah/unbound-docker/graphs/contributors)
 [![Forks](https://img.shields.io/github/forks/madnuttah/unbound-docker?style=flat-square "Forks")](https://github.com/madnuttah/unbound-docker/network/members)
 [![Stars](https://img.shields.io/github/stars/madnuttah/unbound-docker?style=flat-square "Stars")](https://github.com/madnuttah/unbound-docker/stargazers)
 [![Issues](https://img.shields.io/github/issues/madnuttah/unbound-docker?style=flat-square "Issues")](https://github.com/madnuttah/unbound-docker/issues)
