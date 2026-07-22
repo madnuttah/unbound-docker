@@ -1,11 +1,11 @@
 name: CD Cleanup Dockerhub Tags
 
 on:
-  workflow_run:
-    workflows:
-      - "CD Tag And Release"
-    types:
-      - completed
+#  workflow_run:
+#    workflows:
+#      - "CD Tag And Release"
+#    types:
+#      - completed
   workflow_dispatch:
 
 env:
