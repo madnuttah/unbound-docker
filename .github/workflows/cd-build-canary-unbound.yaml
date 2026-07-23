@@ -168,7 +168,7 @@ jobs:
 
             echo "Starting Canary build..."
             if docker buildx build \
-              --builder "$CURRENT_BUILDER" \ \
+              --builder "$CURRENT_BUILDER" \
               --file ./unbound/canary.Dockerfile \
               --platform "${{ matrix.platform }}" \
               --push \
