@@ -146,12 +146,31 @@ jobs:
 
           MAX_ATTEMPTS=3
           ATTEMPT=1
+          BASE_BUILDER_NAME="buildx-retry-${{ github.run_id }}-${{ matrix.arch }}"
 
           while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
-            echo "QUIC build attempt $ATTEMPT of $MAX_ATTEMPTS"
+            CURRENT_BUILDER="${BASE_BUILDER_NAME}-v${ATTEMPT}"
 
+            echo "=== Build attempt $ATTEMPT of $MAX_ATTEMPTS ==="
+            echo "Using builder: $CURRENT_BUILDER"
+
+            if [ $ATTEMPT -gt 1 ]; then
+              echo "Cleaning up previous builder state..."
+              docker buildx inspect "$CURRENT_BUILDER" >/dev/null 2>&1 && docker buildx rm "$CURRENT_BUILDER" || true
+            fi
+
+            echo "Creating fresh builder instance: $CURRENT_BUILDER"
+            if ! docker buildx create \
+              --name "$CURRENT_BUILDER" \
+              --driver docker-container \
+              --use; then
+              echo "Failed to create builder $CURRENT_BUILDER"
+              exit 1
+            fi
+
+            echo "Starting Canary QUIC build..."
             if docker buildx build \
-              --builder "${{ steps.buildx.outputs.name }}" \
+              --builder "$CURRENT_BUILDER" \
               --file ./unbound/canary_quic.Dockerfile \
               --platform "${{ matrix.platform }}" \
               --push \
@@ -160,19 +179,24 @@ jobs:
               --build-arg UNBOUND_VERSION="${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
               --tag "${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}" \
               .; then
-
-              echo "QUIC build succeeded on attempt $ATTEMPT"
+              
+              echo "Canary QUIC Build succeeded on attempt $ATTEMPT"
+              docker buildx rm "$CURRENT_BUILDER" || true
               exit 0
             fi
 
+            echo "Canary QUIC build failed on attempt $ATTEMPT."
+            
+            docker buildx rm "$CURRENT_BUILDER" || true
+
             ATTEMPT=$((ATTEMPT + 1))
             if [ $ATTEMPT -le $MAX_ATTEMPTS ]; then
-              echo "Retrying QUIC build in 15 seconds..."
-              sleep 15
+              echo "Retrying in 30 seconds..."
+              sleep 30
             fi
           done
 
-          echo "QUIC build failed after $MAX_ATTEMPTS attempts"
+          echo "Canary QUIC build failed after $MAX_ATTEMPTS attempts"
           exit 1
 
   upload-pipeline-metadata:
