@@ -80,6 +80,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         include:
           - arch: amd64
@@ -139,63 +140,24 @@ jobs:
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
         
       - name: Build and push Canary image
-        run: |
-          set -euo pipefail
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
+        with:
+          context: .
+          builder: "${{ steps.buildx.outputs.name }}"
+          file: ./unbound/canary.Dockerfile
 
-          MAX_ATTEMPTS=3
-          ATTEMPT=1
-          BASE_BUILDER_NAME="buildx-retry-${{ github.run_id }}-${{ matrix.arch }}"
+          platforms: ${{ matrix.platform }}
+          push: true
 
-          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
-            CURRENT_BUILDER="${BASE_BUILDER_NAME}-v${ATTEMPT}"
+          sbom: false
+          provenance: false
 
-            echo "=== Build attempt $ATTEMPT of $MAX_ATTEMPTS ==="
-            echo "Using builder: $CURRENT_BUILDER"
-
-            if [ $ATTEMPT -gt 1 ]; then
-              echo "Cleaning up previous builder state..."
-              docker buildx inspect "$CURRENT_BUILDER" >/dev/null 2>&1 && docker buildx rm "$CURRENT_BUILDER" || true
-            fi
-
-            echo "Creating fresh builder instance: $CURRENT_BUILDER"
-            if ! docker buildx create \
-              --name "$CURRENT_BUILDER" \
-              --driver docker-container \
-              --use; then
-              echo "Failed to create builder $CURRENT_BUILDER"
-              exit 1
-            fi
-
-            echo "Starting Canary build..."
-            if docker buildx build \
-              --builder "$CURRENT_BUILDER" \
-              --file ./unbound/canary.Dockerfile \
-              --platform "${{ matrix.platform }}" \
-              --push \
-              --build-arg IMAGE_BUILD_DATE="${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
-              --build-arg OPENSSL_BUILDENV_VERSION="${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}" \
-              --build-arg UNBOUND_VERSION="${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
-              --tag "${{ env.DOCKERHUB_SLUG }}:canary-${{ matrix.arch }}" \
-              .; then
-              
-              echo "Canary build succeeded on attempt $ATTEMPT"
-              docker buildx rm "$CURRENT_BUILDER" || true
-              exit 0
-            fi
-
-            echo "Canary build failed on attempt $ATTEMPT."
-            
-            docker buildx rm "$CURRENT_BUILDER" || true
-
-            ATTEMPT=$((ATTEMPT + 1))
-            if [ $ATTEMPT -le $MAX_ATTEMPTS ]; then
-              echo "Retrying in 30 seconds..."
-              sleep 30
-            fi
-          done
-
-          echo "Canary build failed after $MAX_ATTEMPTS attempts"
-          exit 1
+          build-args: |
+            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
+            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
+          tags: |
+            ${{ env.DOCKERHUB_SLUG }}:canary-${{ matrix.arch }}
 
   upload-pipeline-metadata:
     needs: [buildvars, build]

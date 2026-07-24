@@ -94,6 +94,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         include:
           - arch: amd64
@@ -149,44 +150,34 @@ jobs:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
-      - name: Build and push image
-        run: |
-          set -euo pipefail
+      - name: Build and push Unbound image
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
+        with:
+          context: .
+          builder: "${{ steps.buildx.outputs.name }}"
+          file: "unbound/release.Dockerfile"
 
-          MAX_ATTEMPTS=3
-          ATTEMPT=1
+          platforms: ${{ matrix.platform }}
+          push: true
 
-          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
-            echo "Build attempt $ATTEMPT of $MAX_ATTEMPTS"
+          sbom: false
+          provenance: false
 
-            if docker buildx build \
-              --builder "${{ steps.buildx.outputs.name }}" \
-              --file unbound/release.Dockerfile \
-              --platform "${{ matrix.platform }}" \
-              --push \
-              --build-arg IMAGE_BUILD_DATE="${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
-              --build-arg UNBOUND_VERSION="${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
-              --build-arg UNBOUND_SHA256="${{ needs.buildvars.outputs.UNBOUND_SHA256 }}" \
-              --build-arg UNBOUND_DOCKER_IMAGE_VERSION="${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}" \
-              --build-arg OPENSSL_BUILDENV_VERSION="${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}" \
-              --cache-from "type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-${{ matrix.arch }}" \
-              --cache-to "type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-${{ matrix.arch }},mode=max" \
-              --tag "${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}-${{ matrix.arch }}" \
-              .; then
+          build-args: |
+            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
+            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
+            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
+            UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}
+            OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}
 
-              echo "Build succeeded on attempt $ATTEMPT"
-              exit 0
-            fi
+          cache-from: |
+            type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-${{ matrix.arch }}
 
-            ATTEMPT=$((ATTEMPT + 1))
-            if [ $ATTEMPT -le $MAX_ATTEMPTS ]; then
-              echo "Retrying in 15 seconds..."
-              sleep 15
-            fi
-          done
+          cache-to: |
+            type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-${{ matrix.arch }},mode=max
 
-          echo "Build failed after $MAX_ATTEMPTS attempts"
-          exit 1
+          tags: |
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}-${{ matrix.arch }}
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
