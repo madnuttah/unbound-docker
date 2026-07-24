@@ -93,11 +93,11 @@ The image supports DNSSEC, DNSCrypt, DNSTap, DNS64, DNS over TLS, DNS over HTTPS
 All builds are produced through continuous delivery pipelines and optimized per architecture. The pipelines run on StepSecurity hardened runners to ensure a controlled and tamper resistant build environment. CodeQL is used to analyze the codebase for security issues on every change, and Renovate keeps all dependencies, toolchains, and build components current without manual intervention while striving to provide completely reproducible builds throughout the whole toolchain. This combination provides consistent behavior across platforms, reduces supply chain risk, and avoids the performance penalties that occur when relying on generic binaries. The result is a resolver that is predictable, secure, and efficient, with a minimal footprint and a clear operational model.
 
 > [!NOTE]
-> We're not manually building release candidates of Unbound anymore, instead there are automated canary and canary-quic builds which will be created from the most recent NLnet Labs Unbound GitHub commit at 20:00 UTC, respectively 22:00 UTC from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound. The quic image will be built right after the canary image on success.
+> We're not manually building release candidates of Unbound anymore, instead there are automated canary and canary-quic builds which will be created from the most recent NLnet Labs Unbound GitHub commit from Monday to Friday if you want to ride on the bleeding edge of the development of Unbound.
 
 ## Installation
 
-Distroless production and canary/canary-quic multiarch-builds for Linux-based 386, arm/v6, arm/v7, arm64 or amd64, riscv64, ppc64le, s 390x platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
+Distroless production and canary multiarch-builds as well as their QUIC variants for Linux-based 386, arm/v6, arm/v7, arm64 or amd64, riscv64, ppc64le, s390x platforms are available on [Docker Hub](https://hub.docker.com/r/madnuttah/unbound).
 
 ## How to use this Image
 
