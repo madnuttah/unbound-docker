@@ -14,10 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  actions: read
   contents: read
   packages: write
-  id-token: write
 
 jobs:
 
@@ -140,43 +138,56 @@ jobs:
 
       - uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3
 
-      - uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
-        id: buildx
-
       - uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         if: github.event_name != 'pull_request'
         with:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
-      - name: Build and push QUIC image
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
-        with:
-          context: .
-          builder: "${{ steps.buildx.outputs.name }}"
-          file: "unbound/release_quic.Dockerfile"
+      - name: Build and push Unbound QUIC image
+        run: |
+          set -euo pipefail
 
-          platforms: ${{ matrix.platform }}
-          push: true
+          BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
 
-          sbom: false
-          provenance: false
+          echo ">>> Creating builder: ${BUILDER_NAME}"
+          if ! docker buildx create \
+            --name "${BUILDER_NAME}" \
+            --driver docker-container \
+            --bootstrap \
+            --use; then
+            echo "ERROR: Failed to create buildx builder for ${BUILDER_NAME}"
+            exit 1
+          fi
 
-          build-args: |
-            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
-            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
-            UNBOUND_SHA256=${{ needs.buildvars.outputs.UNBOUND_SHA256 }}
-            UNBOUND_DOCKER_IMAGE_VERSION=${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}
-            OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
+          echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          cache-from: |
-            type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-quic-${{ matrix.arch }}
+          if ! docker buildx build \
+            --builder "${BUILDER_NAME}" \
+            --file unbound/release_quic.Dockerfile \
+            --platform "${{ matrix.platform }}" \
+            --push \
+            --build-arg IMAGE_BUILD_DATE="${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
+            --build-arg UNBOUND_VERSION="${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
+            --build-arg UNBOUND_SHA256="${{ needs.buildvars.outputs.UNBOUND_SHA256 }}" \
+            --build-arg UNBOUND_DOCKER_IMAGE_VERSION="${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}" \
+            --build-arg OPENSSL_QUIC_BUILDENV_VERSION="${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}" \
+            --tag "${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-${{ matrix.arch }}" \
+            --provenance=false \
+            --sbom=false \
+            .; then
+            
+            BUILD_STATUS=$?
+            echo "ERROR: Build failed for ${{ matrix.platform }}"
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit "${BUILD_STATUS}"
+          fi
 
-          cache-to: |
-            type=registry,ref=${{ env.DOCKERHUB_SLUG }}:buildcache-quic-${{ matrix.arch }},mode=max
+          echo ">>> Build succeeded for ${{ matrix.platform }}"
 
-          tags: |
-            ${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-quic-${{ matrix.arch }}
+          docker buildx rm "${BUILDER_NAME}" || true
+
+          echo ">>> Cleanup complete"       
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
