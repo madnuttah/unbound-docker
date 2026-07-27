@@ -80,7 +80,6 @@
       "matchManagers": ["custom.regex"],
       "separateMinorPatch": false,
       "automerge": true,
-      "automergeType": "branch"
     },
     {
       "matchManagers": ["custom.regex"],
