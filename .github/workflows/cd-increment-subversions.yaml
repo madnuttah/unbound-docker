@@ -211,7 +211,7 @@ jobs:
           git config --local user.email "${{ steps.IMPORT_GPG.outputs.email }}"
           
           echo "Fetching latest state of $PR_BRANCH..."
-          git fetch --force origin "$PR_BRANCH:$PR_BRANCH"
+          git fetch --force origin "$PR_BRANCH"
           
           git add versions/*.txt
           
