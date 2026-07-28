@@ -21,7 +21,7 @@ jobs:
 
     env:
       DELETE_SUFFIXES: "-386 -amd64 -armv6 -armv7 -arm64 -ppc64le -s390x -riscv64"
-      DRY_RUN: "false"
+      DRY_RUN: "true"
 
     steps:
       - name: Harden Runner
@@ -67,13 +67,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          should_delete() {          
+          should_delete() {
             local tag="$1"
-            for s in $SUFFIXES; do
-              if [[ "$tag" == *"$s" ]]; then
-                return 0
-              fi
-            done
+            if [[ "$tag" =~ -(quic-)?(386|amd64|armv6|armv7|arm64|ppc64le|s390x|riscv64)$ ]]; then
+              return 0
+            fi
             return 1
           }
 
