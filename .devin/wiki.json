@@ -1,0 +1,60 @@
+{
+  "repo_notes": "This repository is a high-security, distroless Unbound DNS resolver with a highly automated, reproducible CI/CD pipeline. Key focus areas: 1) The multi-stage build process using custom OpenSSL build environments (madnuttah/openssl-buildenv) for QUIC and standard variants. 2) The rigorous security model: StepSecurity hardened runners, egress policy blocking, GPG-signed commits/tags, SHA256/PGP verification of all upstream sources (Unbound, Root Hints, Root Zone), and a distroless scratch final image running as non-root. 3) The automated maintenance strategy using Renovate with custom regex managers for version tracking and automated subversion bumping. 4) The four distinct image variants: stable, stable-quic, canary, and canary-quic. The wiki must explain how the build pipeline ensures supply chain security and reproducibility.",
+  "pages": [
+    {
+      "title": "Build Pipeline & Reproducibility",
+      "sources": [
+        "cd-build-unbound.yaml",
+        "cd-build-unbound-quic.yaml",
+        "cd-build-canary-unbound.yaml",
+        "cd-build-canary-unbound-quic.yaml",
+        "release.Dockerfile",
+        "release_quic.Dockerfile",
+        "canary.Dockerfile",
+        "canary_quic.Dockerfile"
+      ],
+      "focus": "Explain the multi-stage build process: 1) Using madnuttah/openssl-buildenv as the builder. 2) Fetching and verifying Unbound source via SHA256 and PGP. 3) Compiling with architecture-specific optimizations (ngtcp2, nghttp2, libevent). 4) The 'distroless scratch' final stage that only includes necessary binaries and libraries. 5) How the pipeline handles the four variants (stable, quic, canary, canary-quic) and manages version metadata artifacts."
+    },
+    {
+      "title": "Security Architecture & Supply Chain",
+      "sources": [
+        "cd-github-actions-linting.yaml",
+        "cd-opensff-scorecard.yaml",
+        "cd-gh-action-zizmor-scan.yaml",
+        "cd-security-scan.yaml",
+        "codeql.yml"
+      ],
+      "focus": "Detail the defense-in-depth strategy: 1) StepSecurity hardening (egress-policy: block) on all runners. 2) Automated security scanning (Trivy, Docker Scout, zizmor, CodeQL, OpenSSF Scorecard). 3) Cryptographic verification of every upstream artifact (Unbound tarballs, Root Hints, Root Zone) using GPG and MD5/SHA256 checksums. 4) GPG signing of all git commits and tags via the bot. 5) The non-root user (_unbound) and minimal attack surface of the final image."
+    },
+    {
+      "title": "Automated Version Management (Renovate)",
+      "sources": [
+        "renovate.json",
+        "cd-increment-subversions.yaml",
+        "cd-check-canary-update.yaml"
+      ],
+      "focus": "Explain the custom Renovate configuration: 1) How custom regex managers track Unbound and OpenSSL buildenv versions. 2) The automated logic in 'cd-increment-subversions.yaml' that bumps Docker image subversions when upstream versions change. 3) The canary update checker that monitors upstream HEAD SHA and triggers builds. 4) How automerge and digest pinning maintain stability."
+    },
+    {
+      "title": "Image Variants & Release Strategy",
+      "sources": [
+        "cd-tag-and-release.yaml",
+        "cd-publish-manifests.yaml",
+        "cd-cleanup-tags.yaml",
+        "cd-testdrive-images.yaml"
+      ],
+      "focus": "Describe the release lifecycle: 1) The difference between Stable (released versions) and Canary (master branch) builds. 2) The QUIC vs. Standard variants. 3) The 'Testdrive' phase where images are pulled and validated before manifest publication. 4) How manifests are created and signed (SLSA provenance). 5) The automated cleanup of architecture-specific tags after manifest creation."
+    },
+    {
+      "title": "Configuration & Deployment",
+      "sources": [
+        "docker-compose-madnuttah.yaml",
+        "docker-compose-macvlan.yaml",
+        "docker-compose-bridge.yaml",
+        "docker-compose-snippet.yaml",
+        "doc/README.md"
+      ],
+      "focus": "Guide users on deployment: 1) The recommended MACVLAN + Bridge network setup for isolation and host access. 2) How to configure the modular config system (conf.d, zones.d). 3) Redis CacheDB integration for performance. 4) Environment variables for healthchecks and stats. 5) The minimal compose example for quick testing."
+    }
+  ]
+}
