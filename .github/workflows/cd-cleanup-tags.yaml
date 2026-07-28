@@ -14,6 +14,9 @@ permissions:
 
 jobs:
   cleanup-tags:
+    
+    if: github.event_name == 'workflow_dispatch'
+   
     runs-on: ubuntu-latest
 
     env:
@@ -94,10 +97,11 @@ jobs:
           page="https://hub.docker.com/v2/repositories/${REPO}/tags?page_size=100"
           count=0
           
-          while [ -n "$page" ] && [ "$page" != "null" ]; do
+          while [ -n "$page" ]; do
             body=$(curl -s "$page")
+
             page=$(echo "$body" | jq -r '.next // empty')
-            
+
             while read -r tag; do
               [ -z "$tag" ] && continue
               
