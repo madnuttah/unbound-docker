@@ -105,7 +105,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
-      - name: Push tag and upload/update release
+      - name: Push tag and upload release
         if: ${{ steps.detect.outputs.IS_CANARY != 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -115,105 +115,119 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
           set -euo pipefail
-
+          
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
 
           VERSION="$(tr -d '\n\r' < metadata/version.txt)"
-
-          case "$VARIANT" in
-            stable)
-              RELEASE_TAG="v${VERSION}"
-              ;;
-            stable-quic)
-              RELEASE_TAG="v${VERSION}"
-              ;;
-            *)
-              echo "Unknown or unhandled variant: $VARIANT" >&2
-              exit 1
-              ;;
-          esac
-
-          git fetch --tags --quiet
-
-          if ! git show-ref --tags --verify --quiet "refs/tags/${RELEASE_TAG}"; then
-            git tag -a "${RELEASE_TAG}" -m "${RELEASE_TAG}"
-            git push origin "${RELEASE_TAG}"
-          fi
-
-          BRANCH_NAME="${VERSION}"
-
-          if ! git rev-parse --verify "origin/${BRANCH_NAME}" >/dev/null 2>&1; then
-            git checkout -b "${BRANCH_NAME}" "${RELEASE_TAG}"
-            git push --set-upstream origin "${BRANCH_NAME}"
-          fi
-
+          RELEASE_TAG="v${VERSION}"
+          TODAY=$(date -u +"%Y-%m-%d")
+          
           PREV_TAG="$(git tag --sort=-v:refname | grep -v "^${RELEASE_TAG}$" | head -n 1 || true)"
 
-          CURRENT="$(git log "${PREV_TAG}..${RELEASE_TAG}" --format="%aN|%aE" | sort -u || true)"
-          ALL_PREVIOUS="$(git log --format="%aN|%aE" "${PREV_TAG}" --all | sort -u || true)"
-
-          FILTERED_CURRENT="$(printf '%s\n' "$CURRENT" | while IFS='|' read -r NAME EMAIL; do
-            LOWER="$(printf '%s' "$NAME" | tr '[:upper:]' '[:lower:]')"
-            case "$LOWER" in
-              *github-actions*|*madnuttah-bot*|*dependabot*)
-                continue
-                ;;
-            esac
-            printf '%s|%s\n' "$NAME" "$EMAIL"
-          done)"
-
-          NEW_CONTRIB="$(printf '%s\n' "$FILTERED_CURRENT" | while IFS='|' read -r NAME EMAIL; do
-            if ! printf '%s\n' "$ALL_PREVIOUS" | grep -q "|$EMAIL$"; then
-              printf '%s|%s\n' "$NAME" "$EMAIL"
-            fi
-          done)"
-
-          NEW_CONTRIB_SECTION=""
-          if [ -n "$NEW_CONTRIB" ]; then
-            NEW_CONTRIB_MD="$(printf '%s\n' "$NEW_CONTRIB" | while IFS='|' read -r NAME EMAIL; do
-              printf -- "- %s\n" "$NAME"
-            done)"
-            NEW_CONTRIB_SECTION="$(printf '## New contributors\n%s\n\n' "$NEW_CONTRIB_MD")"
+          OLD_UNBOUND="none"
+          OLD_OPENSSL="none"
+          OLD_OPENSSL_QUIC="none"
+          
+          if [ -n "${PREV_TAG:-}" ]; then
+            OLD_UNBOUND=$(git show "${PREV_TAG}:versions/unbound.txt" 2>/dev/null | tr -d '\n\r' || echo "none")
+            OLD_OPENSSL=$(git show "${PREV_TAG}:versions/openssl-buildenv.txt" 2>/dev/null | grep "OPENSSL_BUILDENV_VERSION" | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
+            OLD_OPENSSL_QUIC=$(git show "${PREV_TAG}:versions/openssl-quic-buildenv.txt" 2>/dev/null | grep "OPENSSL_QUIC_BUILDENV_VERSION" | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
+            
+            [ -z "${OLD_UNBOUND}" ] && OLD_UNBOUND="none"
+            [ -z "${OLD_OPENSSL}" ] && OLD_OPENSSL="none"
+            [ -z "${OLD_OPENSSL_QUIC}" ] && OLD_OPENSSL_QUIC="none"
           fi
 
-          OPENSSL_VERSION="$(curl -fsSL https://raw.githubusercontent.com/madnuttah/openssl-buildenv/refs/heads/main/versions/openssl-buildenv.txt)"
-          OPENSSL_QUIC_VERSION="$(curl -fsSL https://raw.githubusercontent.com/madnuttah/openssl-buildenv/refs/heads/main/versions/openssl-quic-buildenv.txt)"
-          UNBOUND_CHANGELOG="https://github.com/NLnetLabs/unbound/releases/tag/release-${VERSION}"
+          CURRENT_UNBOUND=$(tr -d '\n\r' < versions/unbound.txt 2>/dev/null || echo "none")
+          CURRENT_OPENSSL=$(grep "OPENSSL_BUILDENV_VERSION" versions/openssl-buildenv.txt 2>/dev/null | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
+          CURRENT_OPENSSL_QUIC=$(grep "OPENSSL_QUIC_BUILDENV_VERSION" versions/openssl-quic-buildenv.txt 2>/dev/null | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
+          
+          [ -z "${CURRENT_UNBOUND}" ] && CURRENT_UNBOUND="none"
+          [ -z "${CURRENT_OPENSSL}" ] && CURRENT_OPENSSL="none"
+          [ -z "${CURRENT_OPENSSL_QUIC}" ] && CURRENT_OPENSSL_QUIC="none"
 
           rm -f RELEASE_NOTES.md
-          touch RELEASE_NOTES.md
-
+          
           {
-            printf "%s\n" "${VERSION}"
+            printf "## %s <madnuttah-bot>\n" "${TODAY}"
+            printf "\n"
+            printf "### What's changed:\n\n"
 
-            if [[ "$VARIANT" == "stable-quic" ]]; then
-              printf "Unbound QUIC\n\n"
-            else
-              printf "Unbound\n\n"
+            if [ "${CURRENT_UNBOUND}" != "${OLD_UNBOUND}" ] && [ "${CURRENT_UNBOUND}" != "none" ]; then
+              printf "* Updated NLnet Labs Unbound to %s\n" "${CURRENT_UNBOUND}"
+              printf "**Changelog:** https://github.com/NLnetLabs/unbound/releases/tag/release-%s\n\n" "${CURRENT_UNBOUND}"
             fi
 
-            printf "What's new:\n\n"
-
-            printf "Unbound %s\n" "${VERSION}"
-            printf "Release notes:\n"
-            printf "%s\n\n" "${UNBOUND_CHANGELOG}"
-
-            if [ "${OPENSSL_VERSION}" != "${PREV_TAG}" ]; then
-              printf "OpenSSL Buildenv %s\n" "${OPENSSL_VERSION}"
-              printf "Release notes:\n"
-              printf "https://github.com/madnuttah/openssl-buildenv/releases/tag/v%s\n\n" "${OPENSSL_VERSION}"
+            if [ "${CURRENT_OPENSSL}" != "${OLD_OPENSSL}" ] && [ "${CURRENT_OPENSSL}" != "none" ]; then
+              printf "* Updated OpenSSL Buildenv to %s\n" "${CURRENT_OPENSSL}"
+              printf "**Changelog:** https://github.com/madnuttah/openssl-buildenv/releases/tag/v%s\n\n" "${CURRENT_OPENSSL}"
             fi
 
-            if [ "${OPENSSL_QUIC_VERSION}" != "${PREV_TAG}" ]; then
-              printf "OpenSSL QUIC Buildenv %s\n" "${OPENSSL_QUIC_VERSION}"
-              printf "Release notes:\n"
-              printf "https://github.com/madnuttah/openssl-buildenv/releases/tag/v%s\n\n" "${OPENSSL_QUIC_VERSION}"
+            if [ "${CURRENT_OPENSSL_QUIC}" != "${OLD_OPENSSL_QUIC}" ] && [ "${CURRENT_OPENSSL_QUIC}" != "none" ]; then
+              printf "* Updated OpenSSL+QUIC build environment to %s\n" "${CURRENT_OPENSSL_QUIC}"
+              printf "**Changelog:** https://github.com/madnuttah/openssl-buildenv/releases/tag/v%s\n\n" "${CURRENT_OPENSSL_QUIC}"
             fi
 
-            printf "%s" "${NEW_CONTRIB_SECTION}"
+            if [ "${CURRENT_UNBOUND}" = "${OLD_UNBOUND}" ] && [ "${CURRENT_OPENSSL}" = "${OLD_OPENSSL}" ] && [ "${CURRENT_OPENSSL_QUIC}" = "${OLD_OPENSSL_QUIC}" ]; then
+              printf "* No component updates in this release.\n\n"
+            fi
+
+            if [ -n "${PREV_TAG:-}" ]; then
+              EXISTING_EMAILS=$(git log "${PREV_TAG}" --format='%ae' 2>/dev/null | sort -u || true)
+              
+              BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+              
+              PRS_JSON=$(gh pr list --base "${BRANCH}" --state merged --json author,number,headRefName,mergedAt --limit 200 2>/dev/null || echo "[]")
+              
+              TMP_FILE="/tmp/new_contribs_$$.txt"
+              rm -f "${TMP_FILE}"
+              touch "${TMP_FILE}"
+
+              if [ "$(echo "${PRS_JSON}" | jq -r '. | length')" -gt 0 ]; then
+                echo "${PRS_JSON}" | jq -c '.[]' | while read -r pr; do
+                  PR_NUM=$(echo "${pr}" | jq -r '.number')
+                  AUTHOR_LOGIN=$(echo "${pr}" | jq -r '.author.login')
+                  
+                  if [[ "${AUTHOR_LOGIN}" == *"github-actions"* ]] || \
+                     [[ "${AUTHOR_LOGIN}" == *"madnuttah-bot"* ]] || \
+                     [[ "${AUTHOR_LOGIN}" == *"dependabot"* ]] || \
+                     [[ "${AUTHOR_LOGIN}" == *"renovate[bot]" ]]; then
+                    continue
+                  fi
+
+                  AUTHOR_EMAIL=$(gh api "repos/${GITHUB_REPOSITORY}/contributors" --jq ".[] | select(.login == \"${AUTHOR_LOGIN}\") | .email" 2>/dev/null || echo "")
+                  
+                  if [ -z "${AUTHOR_EMAIL:-}" ]; then
+                    MERGE_COMMIT=$(gh pr view "${PR_NUM}" --json mergeCommit --jq '.mergeCommit.oid' 2>/dev/null || echo "")
+                    if [ -n "${MERGE_COMMIT:-}" ]; then
+                      AUTHOR_EMAIL=$(git log -1 --format='%ae' "${MERGE_COMMIT}" 2>/dev/null || echo "")
+                    fi
+                  fi
+
+                  IS_NEW=true
+                  if [ -n "${AUTHOR_EMAIL:-}" ]; then
+                    if echo "${EXISTING_EMAILS}" | grep -q "^${AUTHOR_EMAIL}$"; then
+                      IS_NEW=false
+                    fi
+                  fi
+
+                  if [ "${IS_NEW}" = true ]; then
+                    printf "* [%s](https://github.com/%s) made their first contribution in #%s\n" "${AUTHOR_LOGIN}" "${AUTHOR_LOGIN}" "${PR_NUM}" >> "${TMP_FILE}"
+                  fi
+                done
+              fi
+
+              if [ -s "${TMP_FILE}" ]; then
+                printf "\n### New contributors\n\n"
+                cat "${TMP_FILE}"
+                printf "\n"
+              fi
+              rm -f "${TMP_FILE}"
+            fi
+
           } >> RELEASE_NOTES.md
 
-          gh release create "v${VERSION}" \
+          gh release create "${RELEASE_TAG}" \
             -t "${VERSION}" \
             -F RELEASE_NOTES.md \
             --latest
