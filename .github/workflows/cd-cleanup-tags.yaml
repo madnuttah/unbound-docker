@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKERHUB_SLUG: "madnuttah/unbound-docker"
+  DOCKERHUB_SLUG: "madnuttah/unbound"
 
 permissions:
   actions: read
