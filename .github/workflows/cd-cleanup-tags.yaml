@@ -1,15 +1,12 @@
 name: CD Cleanup Dockerhub Tags
 
 on:
-#  workflow_run:
-#    workflows:
-#      - "CD Tag And Release"
-#    types:
-#      - completed
+  schedule:
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 env:
-  DOCKERHUB_SLUG: "madnuttah/unbound-docker-dev"
+  DOCKERHUB_SLUG: "madnuttah/unbound-docker"
 
 permissions:
   actions: read
@@ -17,15 +14,6 @@ permissions:
 
 jobs:
   cleanup-tags:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (
-        github.event_name == 'workflow_run' &&
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.event == 'push' &&
-        github.event.workflow_run.head_branch == 'main'
-      )
-
     runs-on: ubuntu-latest
 
     env:
@@ -61,6 +49,10 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"username\":\"${{ secrets.DOCKERHUB_USERNAME }}\",\"password\":\"${{ secrets.DOCKERHUB_TOKEN }}\"}" \
             | jq -r .token)
+          if [ -z "$token" ]; then
+            echo "Failed to retrieve JWT token"
+            exit 1
+          fi
           echo "DOCKERHUB_TOKEN_JWT=$token" >> "$GITHUB_OUTPUT"
 
       - name: Cleanup Tags
@@ -72,54 +64,50 @@ jobs:
         run: |
           set -euo pipefail
 
-          is_final_tag() {
-            tag="$1"
+          should_delete() {          
+            local tag="$1"
             for s in $SUFFIXES; do
               if [[ "$tag" == *"$s" ]]; then
-                return 1
+                return 0
               fi
             done
-            return 0
-          }
-
-          should_delete() {          
-            local tag="$1"          
-
-            if [[ "$tag" == *"buildcache"* ]]; then          
-              return 1       
-            fi          
-
-            for s in $SUFFIXES; do          
-              if [[ "$tag" == *"$s" ]]; then          
-                return 0     
-              fi          
-            done          
-            return 1     
+            return 1
           }
 
           delete_tag() {
-            tag="$1"
+            local tag="$1"
             if [ "$DRY_RUN" = "true" ]; then
-              echo "[DRY-RUN] $tag"
+              echo "[DRY-RUN] Would delete: $tag"
               return 0
             fi
-            curl -s -X DELETE \
+
+            echo "Deleting tag: $tag"
+            if ! curl -s -X DELETE \
               -H "Authorization: JWT $JWT" \
-              "https://hub.docker.com/v2/repositories/${REPO}/tags/${tag}/" >/dev/null
-            echo "deleted: $tag"
+              "https://hub.docker.com/v2/repositories/${REPO}/tags/${tag}/" >/dev/null; then
+              echo "ERROR: Failed to delete tag $tag"
+              return 1
+            fi
+            echo "Successfully deleted: $tag"
           }
 
           page="https://hub.docker.com/v2/repositories/${REPO}/tags?page_size=100"
+          count=0
+          
           while [ -n "$page" ] && [ "$page" != "null" ]; do
             body=$(curl -s "$page")
-            page=$(echo "$body" | jq -r '.next')
-            echo "$body" | jq -r '.results // [] | .[].name' | while read -r tag; do
+            page=$(echo "$body" | jq -r '.next // empty')
+            
+            while read -r tag; do
+              [ -z "$tag" ] && continue
+              
               if should_delete "$tag"; then
-                delete_tag "$tag"
+                delete_tag "$tag" || true
+                ((count++))
               else
-                echo "skip: $tag"
+                echo "Skipping: $tag"
               fi
-            done
+            done < <(echo "$body" | jq -r '.results // [] | .[].name // empty')
           done
 
-          echo "cleanup done."
+          echo "Cleanup complete. Total tags processed: $count"
