@@ -14,14 +14,12 @@ permissions:
 
 jobs:
   cleanup-tags:
-    
     if: github.event_name == 'workflow_dispatch'
-   
     runs-on: ubuntu-latest
 
     env:
       DELETE_SUFFIXES: "-386 -amd64 -armv6 -armv7 -arm64 -ppc64le -s390x -riscv64"
-      DRY_RUN: "true"
+      DRY_RUN: "false"
 
     steps:
       - name: Harden Runner
@@ -97,7 +95,6 @@ jobs:
           
           while [ -n "$page" ]; do
             body=$(curl -s "$page")
-
             page=$(echo "$body" | jq -r '.next // empty')
 
             while read -r tag; do
@@ -105,7 +102,7 @@ jobs:
               
               if should_delete "$tag"; then
                 delete_tag "$tag" || true
-                ((count++))
+                : $((count++))
               else
                 echo "Skipping: $tag"
               fi
