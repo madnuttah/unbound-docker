@@ -47,10 +47,10 @@ jobs:
           echo "Max allowed attempts: ${MAX_RETRIES}"
 
           if [ "${CURRENT_ATTEMPT}" -ge "${MAX_RETRIES}" ]; then
-            echo "will_retry=false" >> $GITHUB_OUTPUT
+            echo "will_retry=false" >> "$GITHUB_OUTPUT"
             echo "reason=Max retries (${MAX_RETRIES}) reached."
           else
-            echo "will_retry=true" >> $GITHUB_OUTPUT
+            echo "will_retry=true" >> "$GITHUB_OUTPUT"
             echo "reason=Attempt ${CURRENT_ATTEMPT} < ${MAX_RETRIES}. Proceeding with rerun."
           fi
         env:
