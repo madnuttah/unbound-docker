@@ -54,7 +54,7 @@ jobs:
             echo "reason=Attempt ${CURRENT_ATTEMPT} < ${MAX_RETRIES}. Proceeding with rerun."
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - name: Trigger Rerun of Failed Jobs
         if: steps.check_attempts.outputs.will_retry == 'true'
