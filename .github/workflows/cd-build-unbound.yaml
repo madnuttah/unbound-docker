@@ -88,11 +88,10 @@ jobs:
     if: github.actor == 'renovate[bot]' || github.event_name == 'workflow_dispatch'
     needs: buildvars
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 90
 
     strategy:
       fail-fast: false
-      max-parallel: 4
       matrix:
         include:
           - arch: amd64
