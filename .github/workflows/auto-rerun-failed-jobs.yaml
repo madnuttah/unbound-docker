@@ -1,4 +1,4 @@
-name: Auto-Rerun Failed Matrix Jobs
+name: CD Auto-Rerun Failed Matrix Jobs
 
 on:
   workflow_run:
