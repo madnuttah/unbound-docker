@@ -63,6 +63,9 @@ jobs:
 
           RUN_ID="${{ github.event.workflow_run.id }}"
           REPO="${{ github.repository }}"
+          
+          echo "Waiting 15 seconds for runner state to stabilize..."
+          sleep 15
 
           echo "Triggering rerun for failed jobs..."
 
