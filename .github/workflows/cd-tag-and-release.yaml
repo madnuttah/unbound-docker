@@ -16,7 +16,7 @@ jobs:
   tag_and_release:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    
+
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411
@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          
+
       - name: Download metadata artifact natively
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
@@ -53,9 +53,11 @@ jobs:
           printf 'Upstream workflow name: %s\n' "${RUN_NAME}"
           printf 'Upstream workflow conclusion: %s\n' "${RUN_CONCLUSION}"
           echo
+
           echo "variant.txt:"
           cat metadata/variant.txt || echo "(missing)"
           echo
+
           echo "version.txt:"
           cat metadata/version.txt || echo "(missing)"
           echo "================="
@@ -69,7 +71,7 @@ jobs:
             echo "No metadata artifact found for this workflow run."
             exit 1
           fi
-          
+
           VARIANT="$(tr -d '\n\r' < metadata/variant.txt)"
 
           {
@@ -77,7 +79,7 @@ jobs:
             printf '%s\n' "${VARIANT}"
             echo "EOF"
           } >> "$GITHUB_ENV"
-          
+
           if [[ "${VARIANT}" == canary* ]]; then
             echo "IS_CANARY=true" >> "$GITHUB_OUTPUT"
           else
@@ -105,7 +107,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
-      - name: Push tag and upload release
+      - name: Parse Version and Create Branch and Release
         if: ${{ steps.detect.outputs.IS_CANARY != 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -115,24 +117,42 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ steps.IMPORT_GPG.outputs.email }}
         run: |
           set -euo pipefail
-          
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
 
-          VERSION="$(tr -d '\n\r' < metadata/version.txt)"
-          RELEASE_TAG="v${VERSION}"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
+
+          if [[ "${VARIANT}" == *quic* ]]; then
+            VERSION_FILE="versions/unbound-quic-docker-image.txt"
+          else
+            VERSION_FILE="versions/unbound-docker-image.txt"
+          fi
+
+          VERSION=$(grep -oP '(?<=unbound=).*' "${VERSION_FILE}" | tr -d '\n\r')
+
+          if [[ -z "${VERSION}" ]]; then
+            echo "Error: Could not parse version from ${VERSION_FILE}"
+            exit 1
+          fi
+
+          echo "Parsed Version: ${VERSION}"
+
+          TAG_NAME="v${VERSION}"
+          BRANCH_NAME="${VERSION}"
           TODAY=$(date -u +"%Y-%m-%d")
-          
-          PREV_TAG="$(git tag --sort=-v:refname | grep -v "^${RELEASE_TAG}$" | head -n 1 || true)"
+
+          echo "Creating Tag: ${TAG_NAME}"
+          echo "Creating Branch: ${BRANCH_NAME}"
+
+          PREV_TAG="$(git tag --sort=-v:refname | grep -v "^${TAG_NAME}$" | head -n 1 || true)"
 
           OLD_UNBOUND="none"
           OLD_OPENSSL="none"
           OLD_OPENSSL_QUIC="none"
-          
+
           if [ -n "${PREV_TAG:-}" ]; then
             OLD_UNBOUND=$(git show "${PREV_TAG}:versions/unbound.txt" 2>/dev/null | tr -d '\n\r' || echo "none")
             OLD_OPENSSL=$(git show "${PREV_TAG}:versions/openssl-buildenv.txt" 2>/dev/null | grep "OPENSSL_BUILDENV_VERSION" | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
             OLD_OPENSSL_QUIC=$(git show "${PREV_TAG}:versions/openssl-quic-buildenv.txt" 2>/dev/null | grep "OPENSSL_QUIC_BUILDENV_VERSION" | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
-            
+
             [ -z "${OLD_UNBOUND}" ] && OLD_UNBOUND="none"
             [ -z "${OLD_OPENSSL}" ] && OLD_OPENSSL="none"
             [ -z "${OLD_OPENSSL_QUIC}" ] && OLD_OPENSSL_QUIC="none"
@@ -141,13 +161,13 @@ jobs:
           CURRENT_UNBOUND=$(tr -d '\n\r' < versions/unbound.txt 2>/dev/null || echo "none")
           CURRENT_OPENSSL=$(grep "OPENSSL_BUILDENV_VERSION" versions/openssl-buildenv.txt 2>/dev/null | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
           CURRENT_OPENSSL_QUIC=$(grep "OPENSSL_QUIC_BUILDENV_VERSION" versions/openssl-quic-buildenv.txt 2>/dev/null | cut -d'=' -f2 | tr -d '\n\r' || echo "none")
-          
+
           [ -z "${CURRENT_UNBOUND}" ] && CURRENT_UNBOUND="none"
           [ -z "${CURRENT_OPENSSL}" ] && CURRENT_OPENSSL="none"
           [ -z "${CURRENT_OPENSSL_QUIC}" ] && CURRENT_OPENSSL_QUIC="none"
 
           rm -f RELEASE_NOTES.md
-          
+
           {
             printf "## %s <madnuttah-bot>\n" "${TODAY}"
             printf "\n"
@@ -174,11 +194,11 @@ jobs:
 
             if [ -n "${PREV_TAG:-}" ]; then
               EXISTING_EMAILS=$(git log "${PREV_TAG}" --format='%ae' 2>/dev/null | sort -u || true)
-              
+
               BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
-              
+
               PRS_JSON=$(gh pr list --base "${BRANCH}" --state merged --json author,number,headRefName,mergedAt --limit 200 2>/dev/null || echo "[]")
-              
+
               TMP_FILE="/tmp/new_contribs_$$.txt"
               rm -f "${TMP_FILE}"
               touch "${TMP_FILE}"
@@ -187,7 +207,7 @@ jobs:
                 echo "${PRS_JSON}" | jq -c '.[]' | while read -r pr; do
                   PR_NUM=$(echo "${pr}" | jq -r '.number')
                   AUTHOR_LOGIN=$(echo "${pr}" | jq -r '.author.login')
-                  
+
                   if [[ "${AUTHOR_LOGIN}" == *"github-actions"* ]] || \
                      [[ "${AUTHOR_LOGIN}" == *"madnuttah-bot"* ]] || \
                      [[ "${AUTHOR_LOGIN}" == *"dependabot"* ]] || \
@@ -195,8 +215,8 @@ jobs:
                     continue
                   fi
 
-                  AUTHOR_EMAIL=$(gh api "repos/${GITHUB_REPOSITORY}/contributors" --jq ".[] | select(.login == \"${AUTHOR_LOGIN}\") | .email" 2>/dev/null || echo "")
-                  
+                  AUTHOR_EMAIL=$(gh api "repos/${{ github.repository }}/contributors" --jq ".[] | select(.login == \"${AUTHOR_LOGIN}\") | .email" 2>/dev/null || echo "")
+
                   if [ -z "${AUTHOR_EMAIL:-}" ]; then
                     MERGE_COMMIT=$(gh pr view "${PR_NUM}" --json mergeCommit --jq '.mergeCommit.oid' 2>/dev/null || echo "")
                     if [ -n "${MERGE_COMMIT:-}" ]; then
@@ -227,7 +247,17 @@ jobs:
 
           } >> RELEASE_NOTES.md
 
-          gh release create "${RELEASE_TAG}" \
+          if ! git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            git tag -s "${TAG_NAME}" -m "Release ${TAG_NAME}"
+            git push origin "${TAG_NAME}"
+          fi
+
+          if ! git rev-parse --verify "origin/${BRANCH_NAME}" >/dev/null 2>&1; then
+            git checkout -b "${BRANCH_NAME}" "${TAG_NAME}"
+            git push --set-upstream origin "${BRANCH_NAME}"
+          fi
+
+          gh release create "${TAG_NAME}" \
             -t "${VERSION}" \
             -F RELEASE_NOTES.md \
             --latest
