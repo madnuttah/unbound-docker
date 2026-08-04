@@ -22,7 +22,6 @@
   "prHourlyLimit": 0,
   "rebaseWhen": "behind-base-branch",
   "pruneStaleBranches": true,
-  "prStaleOnUpdate": true,
 
   "customManagers": [
     {
