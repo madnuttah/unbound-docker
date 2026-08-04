@@ -46,7 +46,7 @@ jobs:
           trust_level: 5
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        uses: setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.x'
 
@@ -59,8 +59,17 @@ jobs:
 
           labels = "${{ join(github.event.pull_request.labels.*.name, ',') }}".split(',')
 
-          def modify_subversion(filepath, reset=False):
-              """Modify subversion inside 'unbound=X.Y.Z-N[-quic]'."""
+          new_unbound_version = ""
+          if os.path.exists("versions/unbound.txt"):
+              with open("versions/unbound.txt", "r") as f:
+                  new_unbound_version = f.read().strip()
+              print(f"Target Unbound version from unbound.txt: {new_unbound_version}")
+          else:
+              print("ERROR: versions/unbound.txt not found")
+              sys.exit(1)
+
+          def update_docker_image_file(filepath, target_version):
+              """Update the docker image file to the target version and reset subversion to 0."""
               if not os.path.exists(filepath):
                   print(f"File not found: {filepath}")
                   return False
@@ -70,25 +79,21 @@ jobs:
 
               match = re.search(r'unbound=(\d+\.\d+\.\d+)-(\d+)(-quic)?', content)
               if not match:
-                  print(f"No version pattern found in {filepath}")
+                  print(f"ERROR: No version pattern found in {filepath}")
                   return False
 
-              base = match.group(1)
+              old_base = match.group(1)
               old_sub = int(match.group(2))
               suffix = match.group(3) or ""
 
-              new_sub = 0 if reset else old_sub + 1
-
-              if new_sub == old_sub:
-                  print(f"{filepath} already at sub={new_sub}. No change.")
-                  return False
-
-              new_version = f"unbound={base}-{new_sub}{suffix}"
+              new_sub = 0
+              
+              new_version = f"unbound={target_version}-{new_sub}{suffix}"
 
               with open(filepath, 'w') as f:
                   f.write(new_version + "\n")
 
-              print(f"Updated {filepath}: {base}-{old_sub}{suffix} → {base}-{new_sub}{suffix}")
+              print(f"Updated {filepath}: {old_base}-{old_sub}{suffix} -> {new_version}")
               return True
 
           def modify_openssl(filepath, is_quic=False, reset=False):
@@ -124,7 +129,7 @@ jobs:
               with open(filepath, 'w') as f:
                   f.write(new_version + "\n")
 
-              print(f"Updated {filepath}: {base}-{old_sub}{suffix} → {base}-{new_sub}{suffix}")
+              print(f"Updated {filepath}: {base}-{old_sub}{suffix} -> {base}-{new_sub}{suffix}")
               return True
 
           def get_changed_files():
@@ -154,10 +159,10 @@ jobs:
           print(f"Changed files: {changed_files}")
 
           if unbound_changed:
-              print("Unbound core changed -> resetting docker subversions to 0")
-              if modify_subversion('versions/unbound-docker-image.txt', reset=True):
+              print(f"Unbound core changed -> syncing docker image files to {new_unbound_version} and resetting subversions to 0")
+              if update_docker_image_file('versions/unbound-docker-image.txt', new_unbound_version):
                   changed = True
-              if modify_subversion('versions/unbound-quic-docker-image.txt', reset=True):
+              if update_docker_image_file('versions/unbound-quic-docker-image.txt', new_unbound_version):
                   changed = True
 
           if openssl_changed or 'bump-openssl-subversion' in labels:

@@ -57,8 +57,7 @@
 ## What is Unbound
 
 > _Unbound is a validating, recursive, caching DNS resolver._
-> _It is designed to be fast and lean and incorporates modern features based on open standards. 
-Late 2019, Unbound has been rigorously audited, which means that the code base is more resilient than ever._
+> _It is designed to be fast and lean and incorporates modern features based on open standards._
 
 Source: [unbound.net](https://unbound.net/)
 

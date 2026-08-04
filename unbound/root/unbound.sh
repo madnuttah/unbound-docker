@@ -19,6 +19,13 @@ echo -e "╔══════════════════════�
 ╚═════════════════════════════════════════════════════╝
 "
 
+UNBOUND_VERSION="${UNBOUND_VERSION:-unknown}"
+OPENSSL_BUILDENV_VERSION="${OPENSSL_BUILDENV_VERSION:-unknown}"
+
+echo -e "Unbound Version: ${bi_blue}${UNBOUND_VERSION}${color_default}"
+echo -e "OpenSSL Build Environment: ${bi_blue}${OPENSSL_BUILDENV_VERSION}${color_default}"
+echo ""
+
 disable_set_perms=${1:-false}
 if $disable_set_perms; then
   user_color=$bi_green
