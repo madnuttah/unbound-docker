@@ -138,6 +138,8 @@ jobs:
           set -euo pipefail
 
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
+          IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-${{ matrix.arch }}"
+          MAX_PUSH_RETRIES=3
 
           echo ">>> Creating builder: ${BUILDER_NAME}"
           if ! docker buildx create \
@@ -159,18 +161,45 @@ jobs:
             --build-arg "IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
             --build-arg "OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}" \
             --build-arg "UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
-            --tag "${{ env.DOCKERHUB_SLUG }}:canary-${{ matrix.arch }}" \
+            --tag "${IMAGE_TAG}" \
             --provenance=false \
             --sbom=false \
             .; then
             
             BUILD_STATUS=$?
             echo "ERROR: Build failed for ${{ matrix.platform }}"
+            echo ">>> Diagnostics after build failure:"
+            docker buildx du || true
+            docker ps -a || true
+            docker logs "$(docker ps -a | grep buildkit | awk '{print $1}')" 2>&1 || true
             docker buildx rm "${BUILDER_NAME}" || true
             exit "${BUILD_STATUS}"
           fi
 
           echo ">>> Build succeeded for ${{ matrix.platform }}"
+
+          echo ">>> Verifying image was pushed to registry..."
+          VERIFY_RETRIES=0
+          IMAGE_FOUND=false
+
+          while [ ${VERIFY_RETRIES} -lt ${MAX_PUSH_RETRIES} ]; do
+            if docker buildx imagetools inspect "${IMAGE_TAG}" &>/dev/null; then
+              echo "Image verified on registry: ${IMAGE_TAG}"
+              IMAGE_FOUND=true
+              break
+            fi
+            VERIFY_RETRIES=$((VERIFY_RETRIES + 1))
+            if [ ${VERIFY_RETRIES} -lt ${MAX_PUSH_RETRIES} ]; then
+              echo "Image not found yet, retry ${VERIFY_RETRIES}/${MAX_PUSH_RETRIES} in 5s..."
+              sleep 5
+            fi
+          done
+
+          if [ "${IMAGE_FOUND}" != "true" ]; then
+            echo "ERROR: Image push failed - image not found on registry after ${MAX_PUSH_RETRIES} attempts: ${IMAGE_TAG}"
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
 
           docker buildx rm "${BUILDER_NAME}" || true
 
@@ -189,6 +218,7 @@ jobs:
       
       - name: Create Isolated Metadata
         run: |
+          set -euo pipefail
           mkdir -p metadata-payload
           printf "%s" "${{ needs.buildvars.outputs.UNBOUND_VERSION }}" > metadata-payload/version.txt
           printf "canary" > metadata-payload/variant.txt
