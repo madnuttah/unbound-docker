@@ -140,6 +140,8 @@ jobs:
 
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
           IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}"
+          
+          BUILD_TIMEOUT=2700
 
           echo ">>> Creating builder: ${BUILDER_NAME}"
           if ! docker buildx create \
@@ -153,7 +155,7 @@ jobs:
 
           echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          BUILD_OUTPUT=$(docker buildx build \
+          BUILD_OUTPUT=$(timeout "${BUILD_TIMEOUT}" docker buildx build \
             --builder "${BUILDER_NAME}" \
             --file ./unbound/canary_quic.Dockerfile \
             --platform "${{ matrix.platform }}" \
@@ -168,10 +170,18 @@ jobs:
 
           BUILD_EXIT_CODE=${BUILD_EXIT_CODE:-0}
 
+          if [ "${BUILD_EXIT_CODE}" -eq 124 ]; then
+            echo "ERROR: Build timed out after ${BUILD_TIMEOUT} seconds for ${{ matrix.platform }}"
+            echo ">>> This indicates the build process hung or was stuck on a network request."
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
+
           echo "$BUILD_OUTPUT"
 
           if [ "${BUILD_EXIT_CODE}" -ne 0 ]; then
             echo "ERROR: Build command failed with exit code ${BUILD_EXIT_CODE}"
+            echo "$BUILD_OUTPUT" | tail -n 50
             docker buildx rm "${BUILDER_NAME}" || true
             exit 1
           fi

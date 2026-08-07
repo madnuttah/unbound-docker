@@ -88,7 +88,7 @@ jobs:
     needs: buildvars
     runs-on: ubuntu-latest
     timeout-minutes: 90
-
+    
     strategy:
       fail-fast: false
       matrix:
@@ -150,6 +150,8 @@ jobs:
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
           IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-${{ matrix.arch }}"
 
+          BUILD_TIMEOUT=2700
+
           echo ">>> Creating builder: ${BUILDER_NAME}"
           if ! docker buildx create \
             --name "${BUILDER_NAME}" \
@@ -162,7 +164,7 @@ jobs:
 
           echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          BUILD_OUTPUT=$(docker buildx build \
+          BUILD_OUTPUT=$(timeout "${BUILD_TIMEOUT}" docker buildx build \
             --builder "${BUILDER_NAME}" \
             --file unbound/release_quic.Dockerfile \
             --platform "${{ matrix.platform }}" \
@@ -179,10 +181,18 @@ jobs:
 
           BUILD_EXIT_CODE=${BUILD_EXIT_CODE:-0}
 
+          if [ "${BUILD_EXIT_CODE}" -eq 124 ]; then
+            echo "ERROR: Build timed out after ${BUILD_TIMEOUT} seconds for ${{ matrix.platform }}"
+            echo ">>> This indicates the build process hung or was stuck on a network request."
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
+
           echo "$BUILD_OUTPUT"
 
           if [ "${BUILD_EXIT_CODE}" -ne 0 ]; then
             echo "ERROR: Build command failed with exit code ${BUILD_EXIT_CODE}"
+            echo "$BUILD_OUTPUT" | tail -n 50
             docker buildx rm "${BUILDER_NAME}" || true
             exit 1
           fi
@@ -203,7 +213,7 @@ jobs:
 
           echo "Image verified on registry: ${IMAGE_TAG}"
           echo ">>> Build and push succeeded for ${{ matrix.platform }}"
-          docker buildx rm "${BUILDER_NAME}" || true     
+          docker buildx rm "${BUILDER_NAME}" || true
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
@@ -214,10 +224,17 @@ jobs:
         uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: block
-          allowed-endpoints: >+
-          
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            actions.githubusercontent.com:443
+            registry-1.docker.io:443
+            auth.docker.io:443
+            production.cloudfront.docker.com:443
+
       - name: Create Isolated Metadata
         run: |
+          set -euo pipefail
           mkdir -p metadata-payload
           printf "%s" "${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}" > metadata-payload/version.txt
           printf "stable-quic" > metadata-payload/variant.txt
