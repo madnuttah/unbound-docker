@@ -18,7 +18,6 @@ permissions:
   packages: write
 
 jobs:
-
   buildvars:
     if: success() && (github.actor == 'renovate[bot]' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
@@ -143,12 +142,13 @@ jobs:
         with:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
-          
+
       - name: Build and push Unbound image
         run: |
           set -euo pipefail
 
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
+          IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}-${{ matrix.arch }}"
 
           echo ">>> Creating builder: ${BUILDER_NAME}"
           if ! docker buildx create \
@@ -162,7 +162,7 @@ jobs:
 
           echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          if ! docker buildx build \
+          BUILD_OUTPUT=$(docker buildx build \
             --builder "${BUILDER_NAME}" \
             --file unbound/release.Dockerfile \
             --platform "${{ matrix.platform }}" \
@@ -172,22 +172,38 @@ jobs:
             --build-arg UNBOUND_SHA256="${{ needs.buildvars.outputs.UNBOUND_SHA256 }}" \
             --build-arg UNBOUND_DOCKER_IMAGE_VERSION="${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}" \
             --build-arg OPENSSL_BUILDENV_VERSION="${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}" \
-            --tag "${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}-${{ matrix.arch }}" \
+            --tag "${IMAGE_TAG}" \
             --provenance=false \
             --sbom=false \
-            .; then
-            
-            BUILD_STATUS=$?
-            echo "ERROR: Build failed for ${{ matrix.platform }}"
+            . 2>&1) || BUILD_EXIT_CODE=$?
+
+          BUILD_EXIT_CODE=${BUILD_EXIT_CODE:-0}
+
+          echo "$BUILD_OUTPUT"
+
+          if [ "${BUILD_EXIT_CODE}" -ne 0 ]; then
+            echo "ERROR: Build command failed with exit code ${BUILD_EXIT_CODE}"
             docker buildx rm "${BUILDER_NAME}" || true
-            exit "${BUILD_STATUS}"
+            exit 1
           fi
 
-          echo ">>> Build succeeded for ${{ matrix.platform }}"
+          if echo "$BUILD_OUTPUT" | grep -qiE "(error|failed to solve|exit code: 128|connection refused|git clone failed)"; then
+            echo "ERROR: Build log indicates failure detected (exit code 0 but logs show error). Forcing job failure."
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
 
+          echo ">>> Build command completed. Verifying push..."
+
+          if ! docker pull --quiet "${IMAGE_TAG}" &>/dev/null; then
+            echo "ERROR: Image push failed - image not found on registry: ${IMAGE_TAG}"
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
+
+          echo "Image verified on registry: ${IMAGE_TAG}"
+          echo ">>> Build and push succeeded for ${{ matrix.platform }}"
           docker buildx rm "${BUILDER_NAME}" || true
-
-          echo ">>> Cleanup complete"          
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
@@ -198,10 +214,14 @@ jobs:
         uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: block
-          allowed-endpoints: >+
-          
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            actions.githubusercontent.com:443
+
       - name: Create Isolated Metadata
         run: |
+          set -euo pipefail
           mkdir -p metadata-payload
           printf "%s" "${{ needs.buildvars.outputs.UNBOUND_IMAGE_VERSION }}" > metadata-payload/version.txt
           printf "stable" > metadata-payload/variant.txt
