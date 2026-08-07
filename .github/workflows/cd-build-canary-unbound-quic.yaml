@@ -13,7 +13,6 @@ permissions:
   packages: write
 
 jobs:
-
   buildvars:
     runs-on: ubuntu-latest
     outputs:
@@ -43,13 +42,13 @@ jobs:
           set -euo pipefail
 
           IMAGE_BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          echo "IMAGE_BUILD_DATE=$IMAGE_BUILD_DATE" >> "$GITHUB_OUTPUT"
+          echo "IMAGE_BUILD_DATE=${IMAGE_BUILD_DATE}" >> "$GITHUB_OUTPUT"
 
           UNBOUND_VERSION="$(
             curl -fsSL https://raw.githubusercontent.com/NLnetLabs/unbound/master/configure \
             | awk -F= '/^version=/ { print $2 }'
           )"
-          echo "UNBOUND_VERSION=$UNBOUND_VERSION" >> "$GITHUB_OUTPUT"
+          echo "UNBOUND_VERSION=${UNBOUND_VERSION}" >> "$GITHUB_OUTPUT"
 
           RESP="$(curl -fsSL https://api.github.com/repos/madnuttah/openssl-buildenv/releases)"
           echo "$RESP" | jq empty
@@ -63,7 +62,7 @@ jobs:
             '
           )"
 
-          echo "OPENSSL_QUIC_BUILDENV_VERSION=$OPENSSL_QUIC_BUILDENV_VERSION" >> "$GITHUB_OUTPUT"
+          echo "OPENSSL_QUIC_BUILDENV_VERSION=${OPENSSL_QUIC_BUILDENV_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Show build variables
         run: |
@@ -155,7 +154,7 @@ jobs:
 
           echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          if ! docker buildx build \
+          BUILD_OUTPUT=$(docker buildx build \
             --builder "${BUILDER_NAME}" \
             --file ./unbound/canary_quic.Dockerfile \
             --platform "${{ matrix.platform }}" \
@@ -166,23 +165,32 @@ jobs:
             --tag "${IMAGE_TAG}" \
             --provenance=false \
             --sbom=false \
-            .; then
-            
-            BUILD_STATUS=$?
-            echo "ERROR: Build failed for ${{ matrix.platform }}"
+            . 2>&1) || BUILD_EXIT_CODE=$?
+
+          BUILD_EXIT_CODE=${BUILD_EXIT_CODE:-0}
+
+          echo "$BUILD_OUTPUT"
+
+          if [ "${BUILD_EXIT_CODE}" -ne 0 ]; then
+            echo "ERROR: Build command failed with exit code ${BUILD_EXIT_CODE}"
             echo ">>> Diagnostics after build failure:"
             docker buildx du || true
             docker ps -a || true
-            docker logs "$(docker ps -a | grep buildkit | awk '{print $1}')" 2>&1 || true
             docker buildx rm "${BUILDER_NAME}" || true
-            exit "${BUILD_STATUS}"
+            exit 1
           fi
 
-          echo ">>> Build succeeded for ${{ matrix.platform }}"
+          if echo "$BUILD_OUTPUT" | grep -qiE "(error|failed to solve|exit code: 128|connection refused|git clone failed)"; then
+            echo "ERROR: Build log indicates failure detected (exit code 0 but logs show error). Forcing job failure."
+            echo ">>> Diagnostics after build failure:"
+            docker buildx du || true
+            docker ps -a || true
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
 
-          docker buildx rm "${BUILDER_NAME}" || true
+          echo ">>> Build command completed. Verifying push..."
 
-          echo ">>> Verifying image was pushed to registry..."
           VERIFY_RETRIES=0
           IMAGE_FOUND=false
 
@@ -201,10 +209,13 @@ jobs:
 
           if [ "${IMAGE_FOUND}" != "true" ]; then
             echo "ERROR: Image push failed - image not found on registry after ${MAX_PUSH_RETRIES} attempts: ${IMAGE_TAG}"
+            echo ">>> This indicates a silent push failure. Job marked as FAILED."
+            docker buildx rm "${BUILDER_NAME}" || true
             exit 1
           fi
 
-          echo ">>> Cleanup complete"
+          echo ">>> Build and push succeeded for ${{ matrix.platform }}"
+          docker buildx rm "${BUILDER_NAME}" || true
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
@@ -215,8 +226,11 @@ jobs:
         uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: block
-          allowed-endpoints: >+
-          
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            actions.githubusercontent.com:443
+
       - name: Create Isolated Metadata
         run: |
           set -euo pipefail
