@@ -150,7 +150,8 @@ jobs:
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
           IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}-${{ matrix.arch }}"
 
-          BUILD_TIMEOUT=2700
+          BUILD_TIMEOUT=3600
+          LOG_FILE="/tmp/build_output_${{ matrix.arch }}.log"
 
           echo ">>> Creating builder: ${BUILDER_NAME}"
           if ! docker buildx create \
@@ -164,7 +165,7 @@ jobs:
 
           echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          BUILD_OUTPUT=$(timeout "${BUILD_TIMEOUT}" docker buildx build \
+          if ! timeout "${BUILD_TIMEOUT}" docker buildx build \
             --builder "${BUILDER_NAME}" \
             --file unbound/release_quic.Dockerfile \
             --platform "${{ matrix.platform }}" \
@@ -177,28 +178,26 @@ jobs:
             --tag "${IMAGE_TAG}" \
             --provenance=false \
             --sbom=false \
-            . 2>&1) || BUILD_EXIT_CODE=$?
+            . 2>&1 | tee "${LOG_FILE}"; then
 
-          BUILD_EXIT_CODE=${BUILD_EXIT_CODE:-0}
+            EXIT_CODE=${PIPESTATUS[0]}
 
-          if [ "${BUILD_EXIT_CODE}" -eq 124 ]; then
-            echo "ERROR: Build timed out after ${BUILD_TIMEOUT} seconds for ${{ matrix.platform }}"
-            echo ">>> This indicates the build process hung or was stuck on a network request."
+            if [ "${EXIT_CODE}" -eq 124 ]; then
+              echo "ERROR: Build timed out after ${BUILD_TIMEOUT} seconds for ${{ matrix.platform }}"
+              echo ">>> This indicates the build process hung or was stuck on a network request."
+            else
+              echo "ERROR: Build command failed with exit code ${EXIT_CODE}"
+              echo ">>> Last 50 lines of build output:"
+              tail -n 50 "${LOG_FILE}"
+            fi
+
             docker buildx rm "${BUILDER_NAME}" || true
             exit 1
           fi
 
-          echo "$BUILD_OUTPUT"
-
-          if [ "${BUILD_EXIT_CODE}" -ne 0 ]; then
-            echo "ERROR: Build command failed with exit code ${BUILD_EXIT_CODE}"
-            echo "$BUILD_OUTPUT" | tail -n 50
-            docker buildx rm "${BUILDER_NAME}" || true
-            exit 1
-          fi
-
-          if echo "$BUILD_OUTPUT" | grep -qiE "(error|failed to solve|exit code: 128|connection refused|git clone failed)"; then
-            echo "ERROR: Build log indicates failure detected (exit code 0 but logs show error). Forcing job failure."
+          if grep -qiE "(error|failed to solve|exit code: 128|connection refused|git clone failed)" "${LOG_FILE}"; then
+            echo "ERROR: Build log indicates failure detected. Forcing job failure."
+            tail -n 50 "${LOG_FILE}"
             docker buildx rm "${BUILDER_NAME}" || true
             exit 1
           fi
