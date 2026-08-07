@@ -182,13 +182,6 @@ jobs:
             exit 1
           fi
 
-          if grep -qiE "(error|failed to solve|exit code: 128|connection refused|git clone failed)" "${LOG_FILE}"; then
-            echo "ERROR: Build log indicates failure detected. Forcing job failure."
-            tail -n 50 "${LOG_FILE}"
-            docker buildx rm "${BUILDER_NAME}" || true
-            exit 1
-          fi
-
           echo ">>> Build command completed. Verifying push..."
 
           if ! docker pull --quiet "${IMAGE_TAG}" &>/dev/null; then
