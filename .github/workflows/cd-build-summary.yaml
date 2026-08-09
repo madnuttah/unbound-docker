@@ -1,0 +1,238 @@
+name: CD Build Summary
+
+on:
+  workflow_run:
+    workflows:
+      - "CD Build Canary Unbound Docker Image"
+      - "CD Build Canary Unbound QUIC Docker Image"
+      - "CD Build Unbound Docker Image"
+      - "CD Build Unbound QUIC Docker Image"
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  statuses: read
+
+jobs:
+  create-summary:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' ||
+      github.event.workflow_run.conclusion == 'failure'
+    
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Download Build Metadata
+        uses: actions/download-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4.1.7
+        with:
+          name: unbound-build-metadata
+          path: ./metadata-payload
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Fetch Full History & Job Details
+        id: run-info
+        uses: actions/github-script@7a5f60ed49afc37a6dc3cdd405e7bef601dc5e7f # v7.0.1
+        with:
+          script: |
+            const runId = ${{ github.event.workflow_run.id }};
+            const repo = context.repo;
+            
+            const run = await github.rest.actions.getWorkflowRun({
+              owner: repo.owner,
+              repo: repo.repo,
+              run_id: runId
+            });
+            
+            core.setOutput('run_attempt', run.data.run_attempt || 1);
+
+            const allRuns = await github.rest.actions.listWorkflowRuns({
+              owner: repo.owner,
+              repo: repo.repo,
+              workflow_id: run.data.workflow_id,
+              head_sha: run.data.head_sha,
+              per_page: 100
+            });
+            
+            const attempts = allRuns.data.workflow_runs
+              .filter(r => r.head_sha === run.data.head_sha && r.path === run.data.path)
+              .sort((a, b) => (a.run_attempt || 1) - (b.run_attempt || 1));
+
+            const allJobHistory = [];
+            
+            for (const attempt of attempts) {
+              const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                owner: repo.owner,
+                repo: repo.repo,
+                run_id: attempt.id
+              });
+              
+              jobs.data.forEach(job => {
+                allJobHistory.push({
+                  attempt: attempt.run_attempt || 1,
+                  jobName: job.name,
+                  conclusion: job.conclusion,
+                  started_at: job.started_at,
+                  completed_at: job.completed_at,
+                  html_url: job.html_url
+                });
+              });
+            }
+            
+            core.setOutput('all_job_history', JSON.stringify(allJobHistory));
+            core.setOutput('total_attempts', attempts.length);
+
+      - name: Generate Report
+        id: summary
+        env:
+          JOB_HISTORY: ${{ steps.run-info.outputs.all_job_history }}
+          TOTAL_ATTEMPTS: ${{ steps.run-info.outputs.total_attempts }}
+          CURRENT_ATTEMPT: ${{ steps.run-info.outputs.run_attempt }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          WORKFLOW_ID: ${{ github.event.workflow_run.id }}
+          WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WORKFLOW_DURATION: ${{ github.event.workflow_run.run_duration }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          ACTOR: ${{ github.event.workflow_run.triggering_actor.login }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY}"
+          METADATA_DIR="./metadata-payload"
+
+          if [[ ! -f "${METADATA_DIR}/version.txt" ]] || [[ ! -f "${METADATA_DIR}/variant.txt" ]]; then
+            echo "ERROR: Metadata missing" >&2
+            exit 1
+          fi
+
+          BUILD_VERSION="$(cat "${METADATA_DIR}/version.txt")"
+          BUILD_VARIANT="$(cat "${METADATA_DIR}/variant.txt")"
+
+          if [[ -z "${BUILD_VERSION}" ]] || [[ -z "${BUILD_VARIANT}" ]]; then
+            echo "ERROR: Metadata empty" >&2
+            exit 1
+          fi
+
+          STATUS_EMOJI="✅"
+          if [[ "${WORKFLOW_CONCLUSION}" == "failure" ]]; then
+            STATUS_EMOJI="❌"
+          fi
+
+          IMAGE_TAG=""
+          case "${BUILD_VARIANT}" in
+            canary) IMAGE_TAG="canary" ;;
+            canary-quic) IMAGE_TAG="canary-quic" ;;
+            stable) IMAGE_TAG="${BUILD_VERSION}" ;;
+            stable-quic) IMAGE_TAG="${BUILD_VERSION}-quic" ;;
+            *) IMAGE_TAG="unknown" ;;
+          esac
+          
+          COMMIT_SHORT="${COMMIT_SHA:0:7}"
+
+          {
+            echo "## 🚀 Build Execution Summary"
+            echo ""
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            printf "| **Workflow** | [%s](https://github.com/%s/actions/runs/%s) |\n" "${WORKFLOW_NAME}" "${REPO}" "${WORKFLOW_ID}"
+            printf "| **Status** | %s %s |\n" "${STATUS_EMOJI}" "${WORKFLOW_CONCLUSION}"
+            printf "| **Duration** | %ss |\n" "${WORKFLOW_DURATION}"
+            printf "| **Commit** | [\`%s\`](https://github.com/%s/commit/%s) |\n" "${COMMIT_SHORT}" "${REPO}" "${COMMIT_SHA}"
+            printf "| **Triggered By** | %s |\n" "${ACTOR}"
+            printf "| **Total Attempts** | %s |\n" "${TOTAL_ATTEMPTS}"
+            echo ""
+          } >> "${SUMMARY_FILE}"
+
+          {
+            echo "### 🏗️ Architecture Run Overview"
+            echo ""
+            echo "| Architecture | Attempts | Failures | Last Failure Time | Last Failure Reason | Link to Last Failure |"
+            echo "|--------------|----------|----------|-------------------|---------------------|----------------------|"
+          } >> "${SUMMARY_FILE}"
+
+          if [[ -n "${JOB_HISTORY}" && "${JOB_HISTORY}" != "[]" ]]; then
+            TEMP_FILE=$(mktemp) || { echo "ERROR: Failed to create temp file" >&2; exit 1; }
+            trap 'rm -f "${TEMP_FILE}"' EXIT
+            
+            node -e "
+              try {
+                const history = ${JOB_HISTORY};
+                const repo = '${REPO}';
+                const currentAttempt = '${CURRENT_ATTEMPT}';
+
+                const archMap = {};
+                
+                history.forEach(job => {
+                  const match = job.jobName.match(/build \(([^)]+)\)/);
+                  if (!match) return;
+                  
+                  const arch = match[1];
+                  if (!archMap[arch]) {
+                    archMap[arch] = {
+                      name: arch,
+                      attempts: 0,
+                      failures: 0,
+                      lastFailureTime: null,
+                      lastFailureReason: 'Exit Code / Timeout',
+                      lastFailureLink: '#'
+                    };
+                  }
+                  
+                  archMap[arch].attempts++;
+                  
+                  if (job.conclusion === 'failure') {
+                    archMap[arch].failures++;
+                    const jobTime = new Date(job.completed_at);
+                    if (!archMap[arch].lastFailureTime || jobTime > new Date(archMap[arch].lastFailureTime)) {
+                      archMap[arch].lastFailureTime = job.completed_at;
+                      archMap[arch].lastFailureLink = job.html_url;
+                    }
+                  }
+                });
+                
+                const sortedArches = Object.values(archMap).sort((a, b) => b.failures - a.failures);
+                
+                sortedArches.forEach(arch => {
+                  const status = arch.failures === 0 ? '✅ Clean' : '⚠️ ' + arch.failures + ' Failed';
+                  const timeStr = arch.lastFailureTime 
+                    ? new Date(arch.lastFailureTime).toLocaleTimeString() 
+                    : '-';
+                  
+                  const linkHtml = arch.failures > 0 
+                    ? '[View]( ' + arch.lastFailureLink + ' )' 
+                    : '-';
+                  
+                  console.log('| ' + arch.name + ' | ' + arch.attempts + ' | ' + status + ' | ' + timeStr + ' | ' + arch.lastFailureReason + ' | ' + linkHtml + ' |');
+                });
+                
+              } catch (error) {
+                console.error('Error parsing job history: ' + error.message);
+                console.log('| Error parsing data | - | - | - | - | - |');
+              }
+            " > "${TEMP_FILE}"
+            
+            cat "${TEMP_FILE}" >> "${SUMMARY_FILE}"
+            rm -f "${TEMP_FILE}"
+          else
+            echo "| No job history found | - | - | - | - | - |" >> "${SUMMARY_FILE}"
+          fi
+
+          {
+            echo ""
+            echo "### 📊 Current Attempt Status (Attempt ${CURRENT_ATTEMPT})"
+            echo ""
+            echo "| Variant | Version | Image Tag | Status |"
+            echo "|---------|---------|-----------|--------|"
+            printf "| **%s** | \`%s\` | \`madnuttah/unbound:%s\` | %s |\n" "${BUILD_VARIANT}" "${BUILD_VERSION}" "${IMAGE_TAG}" "${STATUS_EMOJI}"
+            echo ""
+          } >> "${SUMMARY_FILE}"
