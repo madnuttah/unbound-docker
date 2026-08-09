@@ -32,7 +32,7 @@ jobs:
             github.com:443
 
       - name: Download Build Metadata
-        uses: actions/download-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4.1.7
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: unbound-build-metadata
           path: ./metadata-payload
