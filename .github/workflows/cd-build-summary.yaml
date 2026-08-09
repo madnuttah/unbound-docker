@@ -41,7 +41,7 @@ jobs:
 
       - name: Fetch Full History & Job Details
         id: run-info
-        uses: actions/github-script@7a5f60ed49afc37a6dc3cdd405e7bef601dc5e7f # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const runId = ${{ github.event.workflow_run.id }};
