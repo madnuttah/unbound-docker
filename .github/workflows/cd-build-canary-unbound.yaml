@@ -196,6 +196,7 @@ jobs:
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
+    if: always()
     runs-on: ubuntu-latest
 
     steps:
