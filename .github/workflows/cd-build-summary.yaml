@@ -76,7 +76,7 @@ jobs:
                 run_id: attempt.id
               });
               
-              jobs.data.forEach(job => {
+              jobs.job.forEach(job => {
                 allJobHistory.push({
                   attempt: attempt.run_attempt || 1,
                   jobName: job.name,
