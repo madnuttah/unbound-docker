@@ -50,8 +50,9 @@ jobs:
           )"
           echo "UNBOUND_VERSION=${UNBOUND_VERSION}" >> "$GITHUB_OUTPUT"
 
-          RESP="$(curl -fsSL https://api.github.com/repos/madnuttah/openssl-buildenv/releases)"
-          echo "$RESP" | jq empty
+          RESP="$(curl -fsSL \
+            -H "Authorization: Bearer ${{ secrets.BOT_GITHUB_TOKEN }}" \
+            https://api.github.com/repos/madnuttah/openssl-buildenv/releases)"
 
           OPENSSL_QUIC_BUILDENV_VERSION="$(
             echo "$RESP" |
@@ -141,7 +142,7 @@ jobs:
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
           IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}"
 
-          BUILD_TIMEOUT=3600
+          BUILD_TIMEOUT=2700
           LOG_FILE="/tmp/build_output_${{ matrix.arch }}.log"
 
           echo ">>> Creating builder: ${BUILDER_NAME}"
