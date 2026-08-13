@@ -1,14 +1,15 @@
 name: CD Build Summary
 
 on:
-  workflow_run:
-    workflows:
-      - "CD Build Canary Unbound Docker Image"
-      - "CD Build Canary Unbound QUIC Docker Image"
-      - "CD Build Unbound Docker Image"
-      - "CD Build Unbound QUIC Docker Image"
-    types:
-      - completed
+  workflow_dispatch: 
+#  workflow_run:
+#    workflows:
+#      - "CD Build Canary Unbound Docker Image"
+#      - "CD Build Canary Unbound QUIC Docker Image"
+#      - "CD Build Unbound Docker Image"
+#      - "CD Build Unbound QUIC Docker Image"
+#    types:
+#      - completed
 
 permissions:
   actions: read
@@ -18,9 +19,9 @@ permissions:
 jobs:
   create-summary:
     runs-on: ubuntu-latest
-    if: |
-      github.event.workflow_run.conclusion == 'success' ||
-      github.event.workflow_run.conclusion == 'failure'
+#    if: |
+#      github.event.workflow_run.conclusion == 'success' ||
+#      github.event.workflow_run.conclusion == 'failure'
     
     steps:
       - name: Harden Runner
