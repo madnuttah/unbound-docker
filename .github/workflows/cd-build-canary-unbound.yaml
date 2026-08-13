@@ -50,7 +50,7 @@ jobs:
           )"
           echo "UNBOUND_VERSION=${UNBOUND_VERSION}" >> "$GITHUB_OUTPUT"
 
-          RESP="$(curl -fsSL \
+          RESP="$(curl -fsSL --retry 3 --retry-delay 2 \
             -H "Authorization: Bearer ${{ secrets.BOT_GITHUB_TOKEN }}" \
             https://api.github.com/repos/madnuttah/openssl-buildenv/releases)"
 
