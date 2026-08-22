@@ -84,7 +84,7 @@ RUN set -xe; \
     --enable-tfo-client \
     --enable-pie \
     --enable-relro-now && \
-  make && \
+  make -j"$(nproc)" && \
   make install && \
   apk del --no-cache .build-deps && \
   mkdir -p /usr/local/unbound/iana.d && \

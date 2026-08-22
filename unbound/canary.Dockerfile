@@ -74,7 +74,7 @@ RUN set -xe; \
   VERSION_LINE=$(grep '^PACKAGE_VERSION=' configure) && \
   UNBOUND_VERSION=$(echo "$VERSION_LINE" | cut -d"'" -f2) && \
   echo "$UNBOUND_VERSION" > /tmp/UNBOUND_VERSION && \
-  make && \
+  make -j"$(nproc)" && \
   make install && \
   apk del --no-cache .build-deps && \
   mkdir -p "/usr/local/unbound/iana.d/" && \
