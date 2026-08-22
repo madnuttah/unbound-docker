@@ -150,10 +150,7 @@ jobs:
             --name "${BUILDER_NAME}" \
             --driver docker-container \
             --bootstrap \
-            --use \
-            --driver-opt "memory=6g" \
-            --driver-opt "memory-swap=6g" \
-            --driver-opt "cpus=1.5"; then
+            --use; then
             echo "ERROR: Failed to create buildx builder for ${BUILDER_NAME}"
             exit 1
           fi
