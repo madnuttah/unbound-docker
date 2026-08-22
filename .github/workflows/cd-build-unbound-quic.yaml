@@ -170,6 +170,7 @@ jobs:
             --file unbound/release_quic.Dockerfile \
             --platform "${{ matrix.platform }}" \
             --push \
+            --no-cache \
             --build-arg IMAGE_BUILD_DATE="${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
             --build-arg UNBOUND_VERSION="${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
             --build-arg UNBOUND_SHA256="${{ needs.buildvars.outputs.UNBOUND_SHA256 }}" \
