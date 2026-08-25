@@ -45,7 +45,7 @@ RUN set -xe; \
 WORKDIR /tmp/src/unbound
 
 RUN set -xe; \
-  ./configure \
+  CFLAGS="-O3 -flto=auto -flto-partition=balanced" ./configure \
     LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib -Wl,-rpath -Wl,/usr/local/openssl/lib" \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
