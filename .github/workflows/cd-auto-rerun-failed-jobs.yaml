@@ -39,7 +39,7 @@ jobs:
 
           RUN_ID="${{ github.event.workflow_run.id }}"
           REPO="${{ github.repository }}"
-          MAX_RETRIES=8
+          MAX_RETRIES=12
 
           CURRENT_ATTEMPT=$(gh api "/repos/${REPO}/actions/runs/${RUN_ID}" --jq '.run_attempt')
 
