@@ -46,7 +46,7 @@ RUN set -xe; \
 WORKDIR /tmp/src/unbound
 
 RUN set -xe; \
-  CFLAGS="-O3 -flto=auto -flto-partition=balanced" ./configure \
+  ./configure \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
     --with-conf-file=/usr/local/unbound/unbound.conf \
