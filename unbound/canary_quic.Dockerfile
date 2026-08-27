@@ -46,7 +46,7 @@ WORKDIR /tmp/src/unbound
 
 RUN set -xe; \
   ./configure \
-    LDFLAGS="-Wl,--no-keep-memory -Wl,-rpath -Wl,/usr/local/ngtcp2/lib -Wl,-rpath -Wl,/usr/local/openssl/lib" \
+    LDFLAGS="-Wl,-rpath -Wl,/usr/local/ngtcp2/lib -Wl,-rpath -Wl,/usr/local/openssl/lib" \
     --prefix=/usr/local/unbound/unbound.d \
     --with-run-dir=/usr/local/unbound/unbound.d \
     --with-conf-file=/usr/local/unbound/unbound.conf \
