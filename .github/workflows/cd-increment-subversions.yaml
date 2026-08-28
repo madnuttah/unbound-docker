@@ -235,40 +235,26 @@ jobs:
                       print(f"ERROR: {e}")
                       sys.exit(1)
 
-              elif openssl_changed:
-                  print(">>> OPENSSL BUILDENV CHANGED")
-                  print("Incrementing non-QUIC subversion\n")
-                  
-                  if increment_docker_image(DOCKER_IMAGE_TXT):
-                      print(f"Incremented {DOCKER_IMAGE_TXT}")
-                      changed = True
-                  else:
-                      print(f"WARNING: Failed to increment {DOCKER_IMAGE_TXT}")
-
-              elif openssl_quic_changed:
-                  print(">>> OPENSSL QUIC BUILDENV CHANGED")
-                  print("Incrementing QUIC subversion\n")
-                  
-                  if increment_docker_image(DOCKER_QUIC_IMAGE_TXT):
-                      print(f"Incremented {DOCKER_QUIC_IMAGE_TXT}")
-                      changed = True
-                  else:
-                      print(f"WARNING: Failed to increment {DOCKER_QUIC_IMAGE_TXT}")
-
-              elif openssl_changed and openssl_quic_changed:
-                  print(">>> BOTH OPENSSL BUILDENVS CHANGED")
-                  print("Incrementing both variants\n")
-                  
-                  if increment_docker_image(DOCKER_IMAGE_TXT):
-                      print(f"Incremented {DOCKER_IMAGE_TXT}")
-                      changed = True
-                  
-                  if increment_docker_image(DOCKER_QUIC_IMAGE_TXT):
-                      print(f"Incremented {DOCKER_QUIC_IMAGE_TXT}")
-                      changed = True
-              
               else:
-                  print("No relevant files changed. No action needed.")
+                  if openssl_changed:
+                      print(">>> OPENSSL BUILDENV CHANGED")
+                      print("Incrementing non-QUIC subversion\n")
+                      
+                      if increment_docker_image(DOCKER_IMAGE_TXT):
+                          print(f"Incremented {DOCKER_IMAGE_TXT}")
+                          changed = True
+                      else:
+                          print(f"WARNING: Failed to increment {DOCKER_IMAGE_TXT}")
+
+                  if openssl_quic_changed:
+                      print(">>> OPENSSL QUIC BUILDENV CHANGED")
+                      print("Incrementing QUIC subversion\n")
+                      
+                      if increment_docker_image(DOCKER_QUIC_IMAGE_TXT):
+                          print(f"Incremented {DOCKER_QUIC_IMAGE_TXT}")
+                          changed = True
+                      else:
+                          print(f"WARNING: Failed to increment {DOCKER_QUIC_IMAGE_TXT}")
               
               print("=" * 60)
               
