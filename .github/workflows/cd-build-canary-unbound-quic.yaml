@@ -71,9 +71,6 @@ jobs:
           echo "UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}"
           echo "OPENSSL_QUIC_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}"
 
-aml
-
-Copy
   build:
     needs: buildvars
     runs-on: ${{ matrix.runner }}
