@@ -1,2 +1,3 @@
-self_hosted_runner_labels:
+runner-label:
   - ubuntu-24.04-riscv
+  
