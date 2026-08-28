@@ -1,4 +1,4 @@
-name: CD Build Canary Unbound Docker Image
+name: CD Build Canary Unbound QUIC Docker Image
 
 on:
   workflow_dispatch:
@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       IMAGE_BUILD_DATE: "${{ steps.vars.outputs.IMAGE_BUILD_DATE }}"
-      OPENSSL_BUILDENV_VERSION: "${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}"
       UNBOUND_VERSION: "${{ steps.vars.outputs.UNBOUND_VERSION }}"
+      OPENSSL_QUIC_BUILDENV_VERSION: "${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}"
 
     steps:
       - name: Harden Runner
@@ -54,22 +54,22 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.BOT_GITHUB_TOKEN }}" \
             https://api.github.com/repos/madnuttah/openssl-buildenv/releases)"
 
-          OPENSSL_BUILDENV_VERSION="$(
+          OPENSSL_QUIC_BUILDENV_VERSION="$(
             echo "$RESP" |
             jq -r '
-              map(select(.prerelease == false and (.name | endswith("-quic") | not)))
+              map(select(.prerelease == false and (.name | endswith("-quic"))))
               | first
               | .name
             '
           )"
 
-          echo "OPENSSL_BUILDENV_VERSION=${OPENSSL_BUILDENV_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "OPENSSL_QUIC_BUILDENV_VERSION=${OPENSSL_QUIC_BUILDENV_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Show build variables
         run: |
           echo "IMAGE_BUILD_DATE=${{ steps.vars.outputs.IMAGE_BUILD_DATE }}"
           echo "UNBOUND_VERSION=${{ steps.vars.outputs.UNBOUND_VERSION }}"
-          echo "OPENSSL_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_BUILDENV_VERSION }}"
+          echo "OPENSSL_QUIC_BUILDENV_VERSION=${{ steps.vars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}"
 
   build:
     needs: buildvars
@@ -125,9 +125,11 @@ jobs:
             github.com:443
             keyserver.ubuntu.com:443
             pgp.surf.nl:443
+            nlnetlabs.nl:443
             production.cloudfront.docker.com:443
             registry-1.docker.io:443
             www.internic.net:443
+            www.nlnetlabs.nl:443
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
@@ -141,13 +143,13 @@ jobs:
         with:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
-
-      - name: Build and push Unbound Canary image
+          
+      - name: Build and push Unbound Canary QUIC image
         run: |
           set -euo pipefail
 
           BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
-          IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-${{ matrix.arch }}"
+          IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}"
 
           BUILD_TIMEOUT=2700
           LOG_FILE="/tmp/build_output_${{ matrix.arch }}.log"
@@ -166,12 +168,11 @@ jobs:
 
           if ! timeout "${BUILD_TIMEOUT}" docker buildx build \
             --builder "${BUILDER_NAME}" \
-            --file ./unbound/canary.Dockerfile \
+            --file ./unbound/canary_quic.Dockerfile \
             --platform "${{ matrix.platform }}" \
             --push \
-            --no-cache \
             --build-arg "IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
-            --build-arg "OPENSSL_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_BUILDENV_VERSION }}" \
+            --build-arg "OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}" \
             --build-arg "UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
             --tag "${IMAGE_TAG}" \
             --provenance=false \
@@ -225,7 +226,7 @@ jobs:
           set -euo pipefail
           mkdir -p metadata-payload
           printf "%s" "${{ needs.buildvars.outputs.UNBOUND_VERSION }}" > metadata-payload/version.txt
-          printf "canary" > metadata-payload/variant.txt
+          printf "canary-quic" > metadata-payload/variant.txt
 
       - name: Upload Metadata Artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
