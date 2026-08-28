@@ -86,28 +86,38 @@ jobs:
   build:
     if: github.actor == 'renovate[bot]' || github.event_name == 'workflow_dispatch'
     needs: buildvars
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     
     strategy:
       fail-fast: false
       matrix:
         include:
-          - arch: amd64
-            platform: linux/amd64
           - arch: arm64
             platform: linux/arm64
-          - arch: 386
-            platform: linux/386
-          - arch: armv6
-            platform: linux/arm/v6
-          - arch: armv7
-            platform: linux/arm/v7
-          - arch: ppc64le
-            platform: linux/ppc64le
-          - arch: s390x
-            platform: linux/s390x
+            runner: ubuntu-24.04-arm
+            
           - arch: riscv64
             platform: linux/riscv64
+            runner: ubuntu-24.04-riscv
+
+          - arch: amd64
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - arch: 386
+            platform: linux/386
+            runner: ubuntu-latest
+          - arch: armv6
+            platform: linux/arm/v6
+            runner: ubuntu-latest
+          - arch: armv7
+            platform: linux/arm/v7
+            runner: ubuntu-latest
+          - arch: ppc64le
+            platform: linux/ppc64le
+            runner: ubuntu-latest
+          - arch: s390x
+            platform: linux/s390x
+            runner: ubuntu-latest
 
     env:
       DOCKERHUB_SLUG: "madnuttah/unbound"
