@@ -134,85 +134,67 @@ jobs:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
           
-      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
-          
       - name: Build and push Unbound Canary QUIC image
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
-        timeout-minutes: 45
-        with:
-          context: .
-          file: ./unbound/canary_quic.Dockerfile
-          platforms: ${{ matrix.platform }}
-          push: true
-          build-args: |
-            IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}
-            OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}
-            UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}
-          tags: |
-            ${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}
+        run: |
+          set -euo pipefail
 
-      # - name: Build and push Unbound Canary QUIC image
-        # run: |
-          # set -euo pipefail
+          BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
+          IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}"
 
-          # BUILDER_NAME="isolated-builder-${{ github.run_id }}-${{ matrix.arch }}"
-          # IMAGE_TAG="${{ env.DOCKERHUB_SLUG }}:canary-quic-${{ matrix.arch }}"
+          BUILD_TIMEOUT=2700
+          LOG_FILE="/tmp/build_output_${{ matrix.arch }}.log"
 
-          # BUILD_TIMEOUT=2700
-          # LOG_FILE="/tmp/build_output_${{ matrix.arch }}.log"
+          echo ">>> Creating builder: ${BUILDER_NAME}"
+          if ! docker buildx create \
+            --name "${BUILDER_NAME}" \
+            --driver docker-container \
+            --bootstrap \
+            --use; then
+            echo "ERROR: Failed to create buildx builder for ${BUILDER_NAME}"
+            exit 1
+          fi
 
-          # echo ">>> Creating builder: ${BUILDER_NAME}"
-          # if ! docker buildx create \
-            # --name "${BUILDER_NAME}" \
-            # --driver docker-container \
-            # --bootstrap \
-            # --use; then
-            # echo "ERROR: Failed to create buildx builder for ${BUILDER_NAME}"
-            # exit 1
-          # fi
+          echo ">>> Building for platform: ${{ matrix.platform }}"
 
-          # echo ">>> Building for platform: ${{ matrix.platform }}"
+          if ! timeout "${BUILD_TIMEOUT}" docker buildx build \
+            --builder "${BUILDER_NAME}" \
+            --file ./unbound/canary_quic.Dockerfile \
+            --platform "${{ matrix.platform }}" \
+            --push \
+            --build-arg "IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
+            --build-arg "OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}" \
+            --build-arg "UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
+            --tag "${IMAGE_TAG}" \
+            --provenance=false \
+            --sbom=false \
+            . 2>&1 | tee "${LOG_FILE}"; then
 
-          # if ! timeout "${BUILD_TIMEOUT}" docker buildx build \
-            # --builder "${BUILDER_NAME}" \
-            # --file ./unbound/canary_quic.Dockerfile \
-            # --platform "${{ matrix.platform }}" \
-            # --push \
-            # --no-cache \
-            # --build-arg "IMAGE_BUILD_DATE=${{ needs.buildvars.outputs.IMAGE_BUILD_DATE }}" \
-            # --build-arg "OPENSSL_QUIC_BUILDENV_VERSION=${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}" \
-            # --build-arg "UNBOUND_VERSION=${{ needs.buildvars.outputs.UNBOUND_VERSION }}" \
-            # --tag "${IMAGE_TAG}" \
-            # --provenance=false \
-            # --sbom=false \
-            # . 2>&1 | tee "${LOG_FILE}"; then
+            EXIT_CODE=${PIPESTATUS[0]}
 
-            # EXIT_CODE=${PIPESTATUS[0]}
+            if [ "${EXIT_CODE}" -eq 124 ]; then
+              echo "ERROR: Build timed out after ${BUILD_TIMEOUT} seconds for ${{ matrix.platform }}"
+              echo ">>> This indicates the build process hung or was stuck on a network request."
+            else
+              echo "ERROR: Build command failed with exit code ${EXIT_CODE}"
+              echo ">>> Last 50 lines of build output:"
+              tail -n 50 "${LOG_FILE}"
+            fi
 
-            # if [ "${EXIT_CODE}" -eq 124 ]; then
-              # echo "ERROR: Build timed out after ${BUILD_TIMEOUT} seconds for ${{ matrix.platform }}"
-              # echo ">>> This indicates the build process hung or was stuck on a network request."
-            # else
-              # echo "ERROR: Build command failed with exit code ${EXIT_CODE}"
-              # echo ">>> Last 50 lines of build output:"
-              # tail -n 50 "${LOG_FILE}"
-            # fi
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
 
-            # docker buildx rm "${BUILDER_NAME}" || true
-            # exit 1
-          # fi
+          echo ">>> Build command completed. Verifying push..."
 
-          # echo ">>> Build command completed. Verifying push..."
+          if ! docker pull --quiet "${IMAGE_TAG}" &>/dev/null; then
+            echo "ERROR: Image push failed - image not found on registry: ${IMAGE_TAG}"
+            docker buildx rm "${BUILDER_NAME}" || true
+            exit 1
+          fi
 
-          # if ! docker pull --quiet "${IMAGE_TAG}" &>/dev/null; then
-            # echo "ERROR: Image push failed - image not found on registry: ${IMAGE_TAG}"
-            # docker buildx rm "${BUILDER_NAME}" || true
-            # exit 1
-          # fi
-
-          # echo "Image verified on registry: ${IMAGE_TAG}"
-          # echo ">>> Build and push succeeded for ${{ matrix.platform }}"
-          # docker buildx rm "${BUILDER_NAME}" || true
+          echo "Image verified on registry: ${IMAGE_TAG}"
+          echo ">>> Build and push succeeded for ${{ matrix.platform }}"
+          docker buildx rm "${BUILDER_NAME}" || true
 
   upload-pipeline-metadata:
     needs: [buildvars, build]
