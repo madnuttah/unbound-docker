@@ -34,5 +34,7 @@ jobs:
         continue-on-error: false
         with:
           args: '-ignore "label \"ubuntu-24.04-riscv\" is unknown"'
+          args: '-ignore "label \"ubuntu-26.04-riscv\" is unknown"'
+
 #        with:
 #          args: "-config-file .github/actionlint.yaml"
