@@ -73,7 +73,7 @@ jobs:
           DOCKER_IMAGE_TXT = "versions/unbound-docker-image.txt"
           DOCKER_QUIC_IMAGE_TXT = "versions/unbound-quic-docker-image.txt"
 
-          UNBOUND_PATTERN = re.compile(r'^(\d+\.\d+\.\d+)-(\d+)(-quic)?$')
+          UNBOUND_PATTERN = re.compile(r'^(\d+\.\d+\.\d+)$')
           DOCKER_PATTERN = re.compile(r'unbound=(\d+\.\d+\.\d+)-(\d+)(-quic)?$')
 
           def validate_version_file(filepath: str, required_prefix: Optional[str] = None) -> str:
@@ -99,8 +99,7 @@ jobs:
                   raise ValueError(f"Invalid unbound version format: {content}")
               
               base_version = match.group(1)
-              suffix = match.group(3)
-              return base_version, suffix
+              return base_version, None
 
           def parse_docker_version(content: str) -> Tuple[str, int, Optional[str]]:
               """Parse docker image version and extract base, subversion, and suffix."""
