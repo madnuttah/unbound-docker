@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   bump-sub:
-    if: github.event.sender.login == 'renovate[bot]'
+    if: startsWith(github.event.sender.login, 'renovate')
     runs-on: ubuntu-latest
 
     steps:
