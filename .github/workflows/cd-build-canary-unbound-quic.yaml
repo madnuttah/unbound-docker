@@ -98,7 +98,8 @@ jobs:
             
           - arch: riscv64
             platform: linux/riscv64
-            runner: ubuntu-24.04-riscv
+#            runner: ubuntu-24.04-riscv
+            runner: ubuntu-latest
             
           - arch: ppc64le
             platform: linux/ppc64le
