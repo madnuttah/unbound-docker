@@ -1,8 +1,8 @@
 name: CD Increment Unbound Subversions
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
     branches:
       - main
     paths:
@@ -10,12 +10,18 @@ on:
       - versions/openssl-buildenv.txt
       - versions/openssl-quic-buildenv.txt
 
+concurrency:
+  group: bump-subversions-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
 jobs:
   bump-sub:
-    if: startsWith(github.event.sender.login, 'renovate')
+    if: >-
+      github.event.pull_request.head.repo.fork == false &&
+      github.event.pull_request.user.login == 'renovate[bot]'
     runs-on: ubuntu-latest
 
     steps:
@@ -31,7 +37,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: true
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          repository: ${{ github.repository }}
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
@@ -51,234 +57,119 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - name: Set up Python
-        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.x'
 
-      - name: Process Subversion Logic
+      - name: Update generated image metadata
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
-          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
-          python3 << 'PYTHON_SCRIPT'
-          import re
+          set -euo pipefail
+
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
+          git fetch --no-tags --prune origin "${BASE_REF}"
+
+          python3 <<'PY'
           import os
-          import sys
+          import re
           import subprocess
-          from typing import List, Optional, Tuple
+          import sys
 
-          UNBOUND_TXT = "versions/unbound.txt"
-          OPENSSL_TXT = "versions/openssl-buildenv.txt"
-          OPENSSL_QUIC_TXT = "versions/openssl-quic-buildenv.txt"
-          DOCKER_IMAGE_TXT = "versions/unbound-docker-image.txt"
-          DOCKER_QUIC_IMAGE_TXT = "versions/unbound-quic-docker-image.txt"
+          UNBOUND_FILE = "versions/unbound.txt"
+          OPENSSL_FILE = "versions/openssl-buildenv.txt"
+          OPENSSL_QUIC_FILE = "versions/openssl-quic-buildenv.txt"
+          IMAGE_FILE = "versions/unbound-docker-image.txt"
+          IMAGE_QUIC_FILE = "versions/unbound-quic-docker-image.txt"
 
-          UNBOUND_PATTERN = re.compile(r'^(\d+\.\d+\.\d+)$')
-          DOCKER_PATTERN = re.compile(r'unbound=(\d+\.\d+\.\d+)-(\d+)(-quic)?$')
+          def read(path):
+              with open(path, "r", encoding="utf-8") as fh:
+                  return fh.read().strip()
 
-          def validate_version_file(filepath: str, required_prefix: Optional[str] = None) -> str:
-              """Read and validate version file content."""
-              if not os.path.exists(filepath):
-                  raise FileNotFoundError(f"Version file not found: {filepath}")
-              
-              with open(filepath, 'r', encoding='utf-8') as f:
-                  content = f.read().strip()
-              
-              if not content:
-                  raise ValueError(f"Version file is empty: {filepath}")
-              
-              if required_prefix and not content.startswith(required_prefix):
-                  raise ValueError(f"Version file {filepath} does not start with expected prefix: {required_prefix}")
-              
-              return content
+          def write(path, content):
+              with open(path, "w", encoding="utf-8") as fh:
+                  fh.write(content)
 
-          def parse_unbound_version(content: str) -> Tuple[str, Optional[str]]:
-              """Parse unbound version and extract base version and suffix."""
-              match = UNBOUND_PATTERN.match(content)
-              if not match:
-                  raise ValueError(f"Invalid unbound version format: {content}")
-              
-              base_version = match.group(1)
-              return base_version, None
+          def parse_unbound_version(value):
+              m = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", value)
+              if not m:
+                  raise ValueError(f"Invalid unbound version: {value!r}")
+              return tuple(int(x) for x in m.groups())
 
-          def parse_docker_version(content: str) -> Tuple[str, int, Optional[str]]:
-              """Parse docker image version and extract base, subversion, and suffix."""
-              match = DOCKER_PATTERN.match(content)
-              if not match:
-                  raise ValueError(f"Invalid docker version format: {content}")
-              
-              base_version = match.group(1)
-              subversion = int(match.group(2))
-              suffix = match.group(3)
-              return base_version, subversion, suffix
+          def parse_image_version(value, *, quic=False):
+              pattern = r"^unbound=(\d+\.\d+\.\d+)-(\d+)(-quic)?$"
+              m = re.fullmatch(pattern, value)
+              if not m:
+                  raise ValueError(f"Invalid image version: {value!r}")
+              base, sub, suffix = m.groups()
+              if quic and not suffix:
+                  raise ValueError(f"Expected quic suffix in image version: {value!r}")
+              if (not quic) and suffix:
+                  raise ValueError(f"Unexpected quic suffix in non-quic image version: {value!r}")
+              return base, int(sub), suffix or ""
 
-          def update_docker_image(filepath: str, base_version: str, subversion: int, suffix: Optional[str]) -> bool:
-              """Update docker image file with new version."""
-              target_suffix = suffix or ""
-              new_content = f"unbound={base_version}-{subversion}{target_suffix}\n"
-              
+          def reset_image(path, base_version, *, quic=False):
+              suffix = "-quic" if quic else ""
+              new_value = f"unbound={base_version}-0{suffix}"
+              write(path, new_value + "\n")
+
+          def increment_image(path, *, quic=False):
+              value = read(path)
+              base, sub, suffix = parse_image_version(value, quic=quic)
+              new_value = f"unbound={base}-{sub + 1}{'-quic' if quic else ''}"
+              write(path, new_value + "\n")
+
+          def changed_files(base_ref):
               try:
-                  with open(filepath, 'w', encoding='utf-8') as f:
-                      f.write(new_content)
-                  return True
-              except IOError as e:
-                  print(f"ERROR: Failed to write {filepath}: {e}")
-                  return False
-
-          def increment_docker_image(filepath: str) -> bool:
-              """Increment subversion of docker image file."""
-              if not os.path.exists(filepath):
-                  print(f"WARNING: Docker image file not found: {filepath}")
-                  return False
-              
-              with open(filepath, 'r', encoding='utf-8') as f:
-                  content = f.read().strip()
-              
-              try:
-                  base_version, subversion, suffix = parse_docker_version(content)
-                  new_subversion = subversion + 1
-                  return update_docker_image(filepath, base_version, new_subversion, suffix)
-              except ValueError as e:
-                  print(f"ERROR: Failed to parse {filepath}: {e}")
-                  return False
-
-          def reset_docker_image(filepath: str, base_version: str, suffix: Optional[str]) -> bool:
-              """Reset subversion of docker image file to 0."""
-              return update_docker_image(filepath, base_version, 0, suffix)
-
-          def get_changed_files(base_ref: str) -> List[str]:
-              """Get list of changed files compared to base ref."""
-              try:
-                  result = subprocess.run(
+                  subprocess.run(
                       ["git", "fetch", "origin", base_ref],
+                      check=True,
                       capture_output=True,
                       text=True,
-                      check=False,
-                      timeout=30
+                      timeout=30,
                   )
-                  if result.returncode != 0:
-                      print(f"WARNING: git fetch failed: {result.stderr}")
-                      return []
-                  
-                  result = subprocess.run(
+                  proc = subprocess.run(
                       ["git", "diff", "--name-only", f"origin/{base_ref}...HEAD"],
+                      check=True,
                       capture_output=True,
                       text=True,
-                      check=False,
-                      timeout=30
+                      timeout=30,
                   )
-                  if result.returncode != 0:
-                      print(f"WARNING: git diff failed: {result.stderr}")
-                      return []
-                  
-                  files = [f.strip() for f in result.stdout.strip().split('\n') if f.strip()]
-                  return files
-              except subprocess.TimeoutExpired:
-                  print("ERROR: git command timed out")
-                  return []
-              except Exception as e:
-                  print(f"ERROR: Could not get changed files: {e}")
+                  return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+              except Exception as exc:
+                  print(f"WARNING: unable to compute diff: {exc}")
                   return []
 
-          def main():
-              print("=" * 60)
-              print("Processing Unbound Subversion Logic")
-              print("=" * 60)
-              
-              base_ref = os.environ.get('BASE_REF', 'main')
-              if not base_ref:
-                  print("ERROR: BASE_REF environment variable not set")
-                  sys.exit(1)
-              
-              changed_files = get_changed_files(base_ref)
-              print(f"Changed files: {changed_files}\n")
-              
-              if not changed_files:
-                  print("No files changed. Exiting.")
-                  with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as f:
-                      f.write("HAS_CHANGES=false\n")
-                  sys.exit(0)
-              
-              unbound_changed = UNBOUND_TXT in changed_files
-              openssl_changed = OPENSSL_TXT in changed_files
-              openssl_quic_changed = OPENSSL_QUIC_TXT in changed_files
-              
-              print(f"Unbound changed: {unbound_changed}")
-              print(f"OpenSSL changed: {openssl_changed}")
-              print(f"OpenSSL QUIC changed: {openssl_quic_changed}\n")
-              
-              changed = False
+          base_ref = os.environ.get("BASE_REF", "main")
+          files = changed_files(base_ref)
+          print(f"Changed files: {files}")
 
-              if unbound_changed:
-                  print(">>> UNBOUND VERSION CHANGED")
-                  print("Resetting subversion to 0 for both variants\n")
-                  
-                  try:
-                      unbound_content = validate_version_file(UNBOUND_TXT)
-                      base_version, _ = parse_unbound_version(unbound_content)
-                      print(f"Target Unbound base version: {base_version}")
-                      
-                      if reset_docker_image(DOCKER_IMAGE_TXT, base_version, None):
-                          print(f"Updated {DOCKER_IMAGE_TXT}: {base_version}-0")
-                          changed = True
-                      else:
-                          print(f"WARNING: Failed to update {DOCKER_IMAGE_TXT}")
-                      
-                      if reset_docker_image(DOCKER_QUIC_IMAGE_TXT, base_version, "-quic"):
-                          print(f"Updated {DOCKER_QUIC_IMAGE_TXT}: {base_version}-0-quic")
-                          changed = True
-                      else:
-                          print(f"WARNING: Failed to update {DOCKER_QUIC_IMAGE_TXT}")
-                      
-                  except (FileNotFoundError, ValueError) as e:
-                      print(f"ERROR: {e}")
-                      sys.exit(1)
+          unbound_changed = UNBOUND_FILE in files
+          openssl_changed = OPENSSL_FILE in files
+          openssl_quic_changed = OPENSSL_QUIC_FILE in files
 
-              else:
-                  if openssl_changed:
-                      print(">>> OPENSSL BUILDENV CHANGED")
-                      print("Incrementing non-QUIC subversion\n")
-                      
-                      if increment_docker_image(DOCKER_IMAGE_TXT):
-                          print(f"Incremented {DOCKER_IMAGE_TXT}")
-                          changed = True
-                      else:
-                          print(f"WARNING: Failed to increment {DOCKER_IMAGE_TXT}")
-
-                  if openssl_quic_changed:
-                      print(">>> OPENSSL QUIC BUILDENV CHANGED")
-                      print("Incrementing QUIC subversion\n")
-                      
-                      if increment_docker_image(DOCKER_QUIC_IMAGE_TXT):
-                          print(f"Incremented {DOCKER_QUIC_IMAGE_TXT}")
-                          changed = True
-                      else:
-                          print(f"WARNING: Failed to increment {DOCKER_QUIC_IMAGE_TXT}")
-              
-              print("=" * 60)
-              
-              with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as f:
-                  if changed:
-                      f.write("HAS_CHANGES=true\n")
-                      print("Changes detected. Will commit and push.")
-                  else:
-                      f.write("HAS_CHANGES=false\n")
-                      print("No changes were made.")
-              
+          if not (unbound_changed or openssl_changed or openssl_quic_changed):
+              print("No relevant version file change. Nothing to do.")
               sys.exit(0)
 
-          if __name__ == "__main__":
-              main()
-          PYTHON_SCRIPT
+          if unbound_changed:
+              new_unbound = read(UNBOUND_FILE).strip()
+              parse_unbound_version(new_unbound)
+              reset_image(IMAGE_FILE, new_unbound, quic=False)
+              reset_image(IMAGE_QUIC_FILE, new_unbound, quic=True)
+              print(f"Unbound bumped to {new_unbound}; reset subversions to 0.")
 
-      - name: Export PR Branch
-        env:
-          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          echo "PR_BRANCH=${PR_BRANCH}" >> "${GITHUB_ENV}"
+          if openssl_changed:
+              increment_image(IMAGE_FILE, quic=False)
+              print("OpenSSL non-QUIC file changed; incremented non-QUIC image subversion.")
 
-      - name: Commit and Push Changes
-        if: env.HAS_CHANGES == 'true'
+          if openssl_quic_changed:
+              increment_image(IMAGE_QUIC_FILE, quic=True)
+              print("OpenSSL QUIC file changed; incremented QUIC image subversion.")
+          PY
+
+      - name: Commit and push generated metadata
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: ${{ steps.import_gpg.outputs.name }}
@@ -288,33 +179,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "${GITHUB_TOKEN}" ]; then
-            echo "ERROR: GITHUB_TOKEN is not set"
-            exit 1
-          fi
-          
-          if [ -z "${PR_BRANCH}" ]; then
-            echo "ERROR: PR_BRANCH is not set"
-            exit 1
-          fi
-
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
           git config --local user.name "${GIT_AUTHOR_NAME}"
           git config --local user.email "${GIT_AUTHOR_EMAIL}"
           git config --local commit.gpgsign true
-          
-          echo "Fetching latest state of ${PR_BRANCH}..."
-          git fetch --force origin "${PR_BRANCH}"
-          
+
           git add versions/unbound-docker-image.txt versions/unbound-quic-docker-image.txt
-          
+
           if git diff --staged --quiet; then
-            echo "No real differences to commit."
-            echo "HAS_CHANGES=false" >> "${GITHUB_ENV}"
+            echo "No real changes to commit."
             exit 0
           fi
-          
-          git commit -m "fix: auto-manage unbound subversion"
-          git push origin "HEAD:${PR_BRANCH}"
-          
-          echo "Successfully committed and pushed changes."
+
+          git commit -m "fix: sync docker image subversion metadata"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
+          echo "Updated generated Docker metadata on the Renovate PR branch."
