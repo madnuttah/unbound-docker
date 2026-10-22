@@ -64,11 +64,13 @@ jobs:
       - name: Update generated image metadata
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          REPO_SLUG: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_SLUG}"
           git fetch --no-tags --prune origin "${BASE_REF}"
 
           python3 <<'PY'
@@ -76,6 +78,9 @@ jobs:
           import re
           import subprocess
           import sys
+
+          BASE_REF = os.environ["BASE_REF"]
+          PR_HEAD_REF = os.environ["PR_HEAD_REF"]
 
           UNBOUND_FILE = "versions/unbound.txt"
           OPENSSL_FILE = "versions/openssl-buildenv.txt"
@@ -141,8 +146,7 @@ jobs:
                   print(f"WARNING: unable to compute diff: {exc}")
                   return []
 
-          base_ref = os.environ.get("BASE_REF", "main")
-          files = changed_files(base_ref)
+          files = changed_files(BASE_REF)
           print(f"Changed files: {files}")
 
           unbound_changed = UNBOUND_FILE in files
@@ -171,6 +175,7 @@ jobs:
 
       - name: Commit and push generated metadata
         env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: ${{ steps.import_gpg.outputs.name }}
           GIT_AUTHOR_EMAIL: ${{ steps.import_gpg.outputs.email }}
@@ -191,5 +196,5 @@ jobs:
           fi
 
           git commit -m "fix: sync docker image subversion metadata"
-          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
+          git push origin "HEAD:${PR_HEAD_REF}"
           echo "Updated generated Docker metadata on the Renovate PR branch."
