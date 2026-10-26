@@ -94,7 +94,6 @@ RUN set -xe; \
     || gpg --no-tty --keyserver hkps://pgp.surf.nl --recv-keys "$INTERNIC_PGP" ) && \
   gpg --verify /usr/local/unbound/iana.d/root.hints.sig /usr/local/unbound/iana.d/root.hints && \
   gpg --verify /usr/local/unbound/iana.d/root.zone.sig /usr/local/unbound/iana.d/root.zone && \
-  /usr/local/unbound/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true && \
   pkill -9 gpg-agent && \
   pkill -9 dirmngr
 
@@ -119,6 +118,8 @@ RUN set -xe; \
     protobuf-c \
     hiredis \
     expat && \
+  { /usr/local/unbound/unbound.d/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true; } && \
+  test -s /usr/local/unbound/iana.d/root.key && \
   mkdir -p \
     "/usr/local/unbound/conf.d/" \
     "/usr/local/unbound/certs.d/" \
