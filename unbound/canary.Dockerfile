@@ -118,7 +118,7 @@ RUN set -xe; \
     protobuf-c \
     hiredis \
     expat && \
-  { /usr/local/unbound/unbound.d/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true; } && \
+  /usr/local/unbound/unbound.d/sbin/unbound-anchor -v -a /usr/local/unbound/iana.d/root.key || true && \
   test -s /usr/local/unbound/iana.d/root.key && \
   mkdir -p \
     "/usr/local/unbound/conf.d/" \
