@@ -168,7 +168,13 @@ jobs:
 
       - name: DNS test
         run: |
-          timeout 10s docker exec unbound-dns drill cloudflare.com A || true
+          answer="$(timeout 10s docker exec unbound-dns drill -Q -p 5335 localhost A @127.0.0.1)" || answer=""
+          if [ "$answer" != "127.0.0.1" ]; then
+            echo "Unbound did not answer on 127.0.0.1:5335"
+            docker logs unbound-dns
+            exit 1
+          fi
+          echo "Unbound answered: localhost. A $answer"
 
       - name: Cleanup
         if: always()
