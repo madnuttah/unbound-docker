@@ -27,7 +27,14 @@ echo -e "OpenSSL Build Environment: ${bi_blue}${OPENSSL_BUILDENV_VERSION}${color
 echo ""
 
 disable_set_perms=${1:-false}
-if $disable_set_perms; then
+case "$disable_set_perms" in
+  true|false) ;;
+  *)
+    echo -e "${bi_red}DISABLE_SET_PERMS must be true or false, '$disable_set_perms' is read as false${color_default}
+"
+    ;;
+esac
+if [ "$disable_set_perms" = "true" ]; then
   user_color=$bi_green
   group_color=$bi_green
   if [ $(id -u) -eq 0 ]; then
