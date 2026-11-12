@@ -187,8 +187,8 @@ jobs:
             --build-arg UNBOUND_DOCKER_IMAGE_VERSION="${{ needs.buildvars.outputs.UNBOUND_QUIC_IMAGE_VERSION }}" \
             --build-arg OPENSSL_QUIC_BUILDENV_VERSION="${{ needs.buildvars.outputs.OPENSSL_QUIC_BUILDENV_VERSION }}" \
             --tag "${IMAGE_TAG}" \
-            --provenance=false \
-            --sbom=false \
+            --provenance=true \
+            --sbom=true \
             . 2>&1 | tee "${LOG_FILE}"; then
 
             EXIT_CODE=${PIPESTATUS[0]}
